@@ -1,0 +1,174 @@
+/*
+ * Meeting design tokens, applied to <html> while a meeting is open. Colors alias the
+ * player's theme tokens (app/themes, selected by data-theme); shape and motion match the
+ * player's panels, dialogs, rows and pill controls.
+ */
+.theme {
+  --meeting-bg: var(--theme-bg);
+  --meeting-card: var(--theme-card);
+  --meeting-raised: var(--theme-card-2);
+  --meeting-border: var(--theme-border);
+  --meeting-accent: var(--theme-accent);
+  --meeting-accent-bright: var(--theme-accent-bright);
+  --meeting-text: var(--theme-text);
+  --meeting-muted: var(--theme-muted);
+  --meeting-on-accent: var(--theme-text-dark);
+  --meeting-input: var(--theme-input-bg);
+  --meeting-hover: var(--theme-panel-hover);
+  --meeting-ghost: var(--theme-ghost);
+  --meeting-ghost-hover: var(--theme-ghost-hover);
+  --meeting-danger: var(--theme-red);
+  --meeting-danger-bg: var(--theme-danger);
+  --meeting-danger-hover: var(--theme-danger-hover);
+  --meeting-focus: var(--theme-focus);
+
+  /* Player shapes: main panels, dialogs, video tiles, rows/menus, pill controls. */
+  --meeting-radius-panel: 28px;
+  --meeting-radius-dialog: 24px;
+  --meeting-radius-tile: 24px;
+  --meeting-radius-item: 16px;
+  --meeting-radius-pill: 999px;
+  --meeting-motion: 140ms ease;
+  --meeting-shadow-panel: var(--theme-shadow-panel);
+  --meeting-shadow-card: var(--theme-shadow-card);
+  --meeting-shadow-modal: var(--theme-shadow-modal);
+
+  /* Shared UI primitives (components/ui) and older panel names. */
+  --ui-border: var(--theme-border);
+  --ui-accent: var(--theme-accent);
+  --ui-contrast: var(--theme-text-dark);
+  --ui-surface: var(--theme-card-2);
+  --ui-text: var(--theme-text);
+  --ui-track: var(--theme-input-bg);
+  --chat-meta: var(--theme-muted);
+  --chat-incoming: var(--theme-card-2);
+  --chat-outgoing: color-mix(in srgb, var(--theme-accent) 30%, var(--theme-card-2));
+  --room-border: var(--theme-border);
+  --room-switch-accent: var(--theme-accent);
+}
+
+/* Thin themed scrollbars (Chrome otherwise draws wide light bars with arrows). */
+.theme,
+.theme * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-border) transparent;
+}
+
+/*
+ * Focus changes (View Transitions on <html>): each card glides and resizes as one
+ * image, cropped rather than stretched, with no double-exposure crossfade.
+ */
+.theme:global(::view-transition-group(*)) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.theme:global(::view-transition-image-pair(*)) {
+  overflow: clip;
+  border-radius: var(--meeting-radius-tile);
+}
+
+.theme:global(::view-transition-old(*)) {
+  animation: none;
+  opacity: 0;
+}
+
+.theme:global(::view-transition-new(*)) {
+  animation: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Someone joins: their card fades in; someone leaves: their card fades out. */
+.theme:global(::view-transition-new(*)):only-child {
+  animation: meetingFadeIn 240ms ease-out both;
+}
+
+.theme:global(::view-transition-old(*)):only-child {
+  opacity: 1;
+  animation: meetingFadeOut 200ms ease-in both;
+}
+
+@keyframes meetingFadeIn {
+  from { opacity: 0; }
+}
+
+@keyframes meetingFadeOut {
+  to { opacity: 0; }
+}
+
+/* Named pseudo-elements stay global and in separate rules: CSS Modules wraps selector
+ * lists in :is(), whose pseudo-elements are discarded by the browser. */
+/* Chat and participants panels slide in from the right edge and back out. */
+.theme:global(::view-transition-new(meeting-chat)):only-child {
+  animation: meetingSlideIn 280ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.theme:global(::view-transition-new(meeting-participants)):only-child {
+  animation: meetingSlideIn 280ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.theme:global(::view-transition-old(meeting-chat)):only-child {
+  opacity: 1;
+  animation: meetingSlideOut 260ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.theme:global(::view-transition-old(meeting-participants)):only-child {
+  opacity: 1;
+  animation: meetingSlideOut 260ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+/* Participants sits left of an open chat, so it travels the chat's width further. */
+.theme:global(::view-transition-new(meeting-participants)):only-child {
+  --meeting-slide-extra: var(--meeting-chat-offset, 0px);
+}
+
+.theme:global(::view-transition-old(meeting-participants)):only-child {
+  --meeting-slide-extra: var(--meeting-chat-offset, 0px);
+}
+
+/* Full slide from/to beyond the right edge of the tab, no fade. */
+@keyframes meetingSlideIn {
+  from { transform: translateX(calc(100% + 16px + var(--meeting-slide-extra, 0px))); }
+}
+
+@keyframes meetingSlideOut {
+  to { transform: translateX(calc(100% + 16px + var(--meeting-slide-extra, 0px))); }
+}
+
+.theme:global(::view-transition-image-pair(meeting-chat)) {
+  border-radius: var(--meeting-radius-panel);
+}
+
+.theme:global(::view-transition-image-pair(meeting-participants)) {
+  border-radius: var(--meeting-radius-panel);
+}
+
+/* The page itself does not change during a card transition. */
+.theme:global(::view-transition-image-pair(root)) {
+  border-radius: 0;
+}
+
+.theme:global(::view-transition-old(root)) {
+  opacity: 1;
+}
+
+/* Keep the live dock and its popup snapshots above moving cards, below side panels. */
+.theme:global(::view-transition-group(meeting-controls)) { z-index: 3; }
+.theme:global(::view-transition-group(meeting-control-menu)) { z-index: 10; }
+.theme:global(::view-transition-group(meeting-chat)) { z-index: 11; }
+
+.theme:global(::view-transition-group(meeting-participants)) { z-index: 11; }
+.theme:global(::view-transition-image-pair(meeting-controls)) { border-radius: var(--meeting-radius-pill); }
+.theme:global(::view-transition-image-pair(meeting-control-menu)) { border-radius: var(--meeting-radius-item); }
+
+/* Picker modules own border motion, so include their surface/text in the shared theme fade. */
+.theme:global(.theme-transition) button[role="combobox"] {
+  transition: background-color 250ms ease, color 250ms ease, border-color 140ms ease;
+}
+
+/* The shared Studio theme fade respects the meeting's reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  .theme:global(.theme-transition) * { transition-duration: 0s !important; }
+}

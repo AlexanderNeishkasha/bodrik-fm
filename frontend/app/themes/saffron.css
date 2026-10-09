@@ -1,0 +1,47 @@
+[data-theme="saffron"] {
+  --theme-bg: #f6ead0;
+  --theme-bg-2: #f0ddbd;
+  --theme-card: #fff3dc;
+  --theme-card-2: #f2dfc1;
+  --theme-border: #d6b98f;
+  --theme-accent: #c5661d;
+  --theme-accent-bright: #e3842a;
+  --theme-accent-60: rgba(217, 139, 43, 0.6);
+  --theme-accent-25: rgba(217, 139, 43, 0.25);
+  --theme-red: #b34e2a;
+  --theme-text: #2b1f13;
+  --theme-muted: #6b4e2e;
+  --theme-text-dark: #fff3dc;
+  --theme-hero-a: #f4e1bf;
+  --theme-hero-b: #f6ead0;
+  --theme-hero-c: #e8d1ad;
+  --theme-hero-gradient: radial-gradient(
+    circle at top,
+    var(--theme-hero-a),
+    var(--theme-hero-b) 55%,
+    var(--theme-hero-c)
+  );
+  --theme-ghost: #f3e0c2;
+  --theme-ghost-hover: #e7d1ae;
+  --theme-panel-hover: #edd8b8;
+  --theme-input-bg: #fff3dc;
+  --theme-queue-temp: #ead6b5;
+  --theme-danger: #e4c6a1;
+  --theme-danger-hover: #d6b089;
+  --theme-font-display: var(--font-merriweather);
+  --theme-font-body: var(--font-nunito);
+  --theme-shadow-hero: 0 30px 80px -55px rgba(92, 62, 24, 0.35);
+  --theme-shadow-card: 0 25px 70px -45px rgba(92, 62, 24, 0.25);
+  --theme-shadow-card-soft: 0 25px 70px -45px rgba(92, 62, 24, 0.3);
+  --theme-shadow-panel: 0 15px 45px -35px rgba(92, 62, 24, 0.2);
+  --theme-shadow-drag: 0 15px 45px -35px rgba(92, 62, 24, 0.25);
+  --theme-shadow-modal: 0 30px 80px -55px rgba(92, 62, 24, 0.35);
+  --theme-shadow-toast: 0 25px 70px -45px rgba(92, 62, 24, 0.28);
+  --theme-icon-filter: invert(20%) sepia(13%) saturate(624%)
+    hue-rotate(12deg) brightness(94%) contrast(90%);
+  --theme-icon-filter-contrast: invert(96%) sepia(7%) saturate(127%)
+    hue-rotate(13deg) brightness(105%) contrast(92%);
+  --theme-icon-filter-accent: invert(48%) sepia(74%) saturate(683%)
+    hue-rotate(354deg) brightness(98%) contrast(95%);
+  --theme-focus: #f2a440;
+}

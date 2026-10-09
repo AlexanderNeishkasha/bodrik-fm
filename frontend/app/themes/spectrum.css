@@ -1,0 +1,46 @@
+[data-theme="spectrum"] {
+  --theme-bg: #0b0f1e;
+  --theme-bg-2: #12172a;
+  --theme-card: #131a31;
+  --theme-card-2: #182140;
+  --theme-border: #2a3560;
+  --theme-accent: #ff9f1c;
+  --theme-accent-bright: #ffd166;
+  --theme-accent-60: rgba(255, 159, 28, 0.6);
+  --theme-accent-25: rgba(255, 159, 28, 0.25);
+  --theme-red: #ff4d9a;
+  --theme-text: #f4f6ff;
+  --theme-muted: #9fb0ff;
+  --theme-text-dark: #0b0f1e;
+  --theme-hero-gradient: linear-gradient(
+    135deg,
+    #3a1c71 0%,
+    #ff4d9a 30%,
+    #ff9f1c 55%,
+    #4cf0ff 80%,
+    #2b59ff 100%
+  );
+  --theme-ghost: #171f37;
+  --theme-ghost-hover: #1f2947;
+  --theme-panel-hover: #1c2542;
+  --theme-input-bg: #10162a;
+  --theme-queue-temp: #17203a;
+  --theme-danger: #3b1f34;
+  --theme-danger-hover: #4a243f;
+  --theme-font-display: var(--font-rubik);
+  --theme-font-body: var(--font-nunito-sans);
+  --theme-shadow-hero: 0 30px 80px -55px rgba(4, 7, 18, 0.85);
+  --theme-shadow-card: 0 25px 70px -45px rgba(4, 7, 18, 0.7);
+  --theme-shadow-card-soft: 0 25px 70px -45px rgba(4, 7, 18, 0.75);
+  --theme-shadow-panel: 0 15px 45px -35px rgba(4, 7, 18, 0.6);
+  --theme-shadow-drag: 0 15px 45px -35px rgba(4, 7, 18, 0.65);
+  --theme-shadow-modal: 0 30px 80px -55px rgba(4, 7, 18, 0.9);
+  --theme-shadow-toast: 0 25px 70px -45px rgba(4, 7, 18, 0.75);
+  --theme-icon-filter: invert(85%) sepia(14%) saturate(1118%)
+    hue-rotate(199deg) brightness(103%) contrast(97%);
+  --theme-icon-filter-contrast: invert(14%) sepia(18%) saturate(1300%)
+    hue-rotate(328deg) brightness(90%) contrast(98%);
+  --theme-icon-filter-accent: invert(78%) sepia(30%) saturate(737%)
+    hue-rotate(347deg) brightness(101%) contrast(95%);
+  --theme-focus: #4cf0ff;
+}

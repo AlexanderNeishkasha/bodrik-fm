@@ -1,0 +1,37 @@
+.rich { white-space: pre-wrap; overflow-wrap: anywhere; }
+.rich p { margin: 0 0 0.5rem; }
+.rich p:last-child { margin-bottom: 0; }
+.rich pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.rich table { display: block; max-width: 100%; overflow-x: auto; }
+.preview { display: flex; align-items: center; gap: 0.75rem; margin: 0; padding: 0.5rem; border: 1px solid var(--ui-border, #555); border-radius: 1rem; background: var(--ui-surface, #242633); }
+.previewImage { display: block; max-width: min(160px, 70%); max-height: 80px; object-fit: contain; border-radius: 0.6rem; }
+.previewRemove { display: grid; place-items: center; flex: 0 0 2.5rem; width: 2.5rem; height: 2.5rem; padding: 0; border: 0; border-radius: 0.5rem; background: color-mix(in srgb, var(--ui-text, #e8e8ec) 18%, transparent); color: inherit; cursor: pointer; }
+.previewRemove:hover, .previewRemove:focus-visible { background: color-mix(in srgb, var(--ui-text, #e8e8ec) 28%, transparent); outline: 1px solid var(--ui-accent, #4678f9); }
+.previewRemove:disabled { opacity: 0.5; cursor: default; }
+.composer { flex: 0 0 auto; min-height: 0; display: grid; gap: 0.4rem; padding: 0.5rem 0.35rem 0.2rem; }
+.inputRow { display: flex; align-items: center; border: 1px solid var(--ui-border, #555); border-radius: 1.5rem; background: var(--ui-surface, #242633); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-border, #555) 30%, transparent); overflow: hidden; }
+.inputRow:focus-within { border-color: var(--ui-accent, #4678f9); }
+.textarea { flex: 1; min-width: 0; width: 100%; min-height: 2.75rem; box-sizing: border-box; resize: none; color: inherit; background: transparent; border: 0; outline: 0; padding: 0.75rem 1rem; font: inherit; }
+.textarea::placeholder { color: var(--chat-meta, #9ab4cf); }
+.inputRow .send { flex: 0 0 3rem; display: grid; place-items: center; height: 2.6rem; min-height: 0; padding: 0; border: 0; border-left: 1px solid var(--ui-border, #555); border-radius: 0; background: transparent; color: inherit; cursor: pointer; }
+.inputRow .send:disabled { opacity: 0.4; cursor: default; }
+.inputRow .send:not(:disabled):hover { background: transparent; color: var(--ui-accent, #4678f9); }
+.inputRow .send:not(:disabled):active { transform: none; }
+.hints { display: flex; justify-content: space-between; gap: 0.5rem; color: var(--chat-meta, #9ab4cf); font-size: 0.75rem; padding-inline: 0.35rem; }
+.hints span:last-child { white-space: nowrap; }
+.fileInput { display: none; }
+.attachmentButton { flex: 0 0 2.75rem; display: grid; place-items: center; height: 2.6rem; padding: 0; border: 0; border-right: 1px solid var(--ui-border, #555); background: transparent; color: inherit; cursor: pointer; }
+.attachmentButton:disabled { opacity: 0.4; cursor: default; }
+.attachmentButton:not(:disabled):hover { color: var(--ui-accent, #4678f9); }
+.status { margin: 0; font-size: 0.85rem; }
+.status:empty { display: none; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.figure { margin: 0; display: grid; gap: 0.5rem; }
+/* A fixed cap: a percentage cap cannot bound a shrink-to-fit bubble. */
+.image { display: block; max-width: min(100%, 16rem); max-height: 24rem; object-fit: contain; border-radius: 0.5rem; }
+
+.documentIcon { display: grid; place-items: center; flex: 0 0 2.75rem; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: color-mix(in srgb, var(--ui-accent, #4678f9) 24%, transparent); color: var(--ui-accent, #4678f9); }
+.documentDetails { display: grid; gap: 0.25rem; min-width: 0; flex: 1; }
+.documentDetails strong { overflow-wrap: anywhere; font-weight: 600; }
+.documentDetails span { font-size: 0.8rem; color: var(--chat-meta, #9ab4cf); }

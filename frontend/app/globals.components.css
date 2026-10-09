@@ -1,0 +1,151 @@
+@layer components {
+    .page-transition {
+        opacity: 0;
+        transition: opacity 140ms ease-out;
+    }
+
+    .page-transition-entered {
+        opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .page-transition {
+            opacity: 1;
+            transition: none;
+        }
+    }
+
+    .hero-bg {
+        background: var(--theme-hero-gradient);
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-bg > * {
+        position: relative;
+        z-index: 1;
+    }
+    input[type="checkbox"] {
+        accent-color: var(--theme-accent);
+    }
+    input[type="checkbox"]:focus-visible {
+        outline: 2px solid var(--theme-accent);
+        outline-offset: 3px;
+    }
+    input[type="checkbox"]:disabled {
+        cursor: not-allowed;
+    }
+
+    .btn-ghost {
+        border: 1px solid var(--theme-accent);
+        background: var(--theme-ghost);
+        color: var(--theme-accent);
+    }
+    .btn-ghost:hover {
+        background: var(--theme-ghost-hover);
+    }
+    .btn-ghost:active,
+    .btn-accent:active {
+        transform: scale(0.96);
+    }
+    .btn-press {
+        transform: scale(0.96);
+    }
+    [data-hotkey-pressed-playback="true"] [data-hotkey-press="playback"],
+    [data-hotkey-pressed-mute="true"] [data-hotkey-press="mute"],
+    [data-hotkey-pressed-hotkeys="true"] [data-hotkey-press="hotkeys"] {
+        transform: scale(0.96);
+    }
+    .panel-shadow-hero {
+        box-shadow: var(--theme-shadow-hero);
+    }
+    /* Fixed shadow surfaces are cached; only their opacity reacts to audio. */
+    .audio-glow-hero, .audio-glow-card { --audio-pulse: 0; }
+    .panel-shadow-card { box-shadow: var(--theme-shadow-card); }
+    .audio-glow-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        will-change: opacity;
+        transition: opacity 140ms ease-out;
+    }
+    .audio-glow-near {
+        box-shadow: 0 0 18px var(--theme-accent-60),
+            0 0 42px var(--theme-accent-60), 0 0 72px var(--theme-accent-25);
+        opacity: clamp(0, calc(var(--audio-pulse) * 2), 1);
+    }
+    .audio-glow-wide {
+        box-shadow: 0 0 36px var(--theme-accent-60),
+            0 0 84px var(--theme-accent-60), 0 0 144px var(--theme-accent-25);
+        opacity: clamp(0, calc((var(--audio-pulse) - 0.3) * 1.5), 1);
+    }
+    .bodrick-glow {
+        filter: drop-shadow(0 0 8px var(--theme-accent-60))
+            drop-shadow(0 0 18px var(--theme-accent-25));
+    }
+    .bodrick-flip {
+        animation: bodrick-flip 640ms ease-in-out;
+        transform-style: preserve-3d;
+    }
+
+    @keyframes bodrick-flip {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    .panel-shadow-card-soft {
+        box-shadow: var(--theme-shadow-card-soft);
+    }
+    .panel-shadow-panel {
+        box-shadow: var(--theme-shadow-panel);
+    }
+    .panel-shadow-drag {
+        box-shadow: var(--theme-shadow-drag);
+    }
+    .panel-shadow-modal {
+        box-shadow: var(--theme-shadow-modal);
+    }
+    .panel-shadow-toast {
+        box-shadow: var(--theme-shadow-toast);
+    }
+
+    @media (max-width: 600px),
+        ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+        .mobile-surface-screen {
+            min-height: 100svh !important;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .mobile-surface-shell {
+            margin: 0 !important;
+            max-width: none !important;
+            min-height: 100svh !important;
+            width: 100vw !important;
+            padding: 0 !important;
+        }
+
+        .mobile-surface-panel {
+            min-height: 100svh !important;
+            width: 100vw !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: var(--theme-card);
+            padding: max(2rem, env(safe-area-inset-top))
+                max(1.5rem, env(safe-area-inset-right))
+                max(2rem, env(safe-area-inset-bottom))
+                max(1.5rem, env(safe-area-inset-left)) !important;
+            box-shadow: none !important;
+        }
+
+        .mobile-surface-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    }
+}

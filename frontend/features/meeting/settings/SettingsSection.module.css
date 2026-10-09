@@ -1,0 +1,5 @@
+.section { --ui-accent: var(--room-switch-accent, var(--theme-accent, #94d8c1)); --ui-border: var(--room-border, var(--theme-border, #424252)); --ui-surface: var(--settings-bg, var(--theme-card, #171721)); box-sizing: border-box; color: var(--dd-color, var(--theme-text, #f5f5f7)); font: 400 15px/1.5 var(--theme-font-body, "Montserrat", system-ui, sans-serif); }
+.section * { box-sizing: border-box; }
+.section > div + div { border-top: 1px solid var(--room-border, var(--theme-border, #424252)); }
+.output > div + div { border-top: 0; }
+.status { margin: 8px 0; font-size: 13px; }

@@ -1,0 +1,5 @@
+.overlay {
+  z-index: 200;
+  top: max(1.5rem, env(safe-area-inset-top));
+  pointer-events: none;
+}

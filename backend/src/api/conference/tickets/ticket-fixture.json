@@ -1,0 +1,17 @@
+{
+  "key": "synthetic-replacement-ticket-key-32",
+  "claims": {
+    "iss": "player",
+    "aud": "meeting",
+    "jti": "cross-issuer-fixture",
+    "iat": 100,
+    "nbf": 100,
+    "exp": 145,
+    "meetingInstanceId": "instance-one",
+    "conferenceId": "conference-one",
+    "generation": 3,
+    "actorId": "actor-one",
+    "role": "guest"
+  },
+  "token": "eyJ0eXAiOiJtZWV0aW5nLXRpY2tldCtqd3QiLCJhbGciOiJIUzI1NiJ9.eyJhY3RvcklkIjoiYWN0b3Itb25lIiwiYXVkIjoibWVldGluZyIsImNvbmZlcmVuY2VJZCI6ImNvbmZlcmVuY2Utb25lIiwiZXhwIjoxNDUsImdlbmVyYXRpb24iOjMsImlhdCI6MTAwLCJpc3MiOiJwbGF5ZXIiLCJqdGkiOiJjcm9zcy1pc3N1ZXItZml4dHVyZSIsIm1lZXRpbmdJbnN0YW5jZUlkIjoiaW5zdGFuY2Utb25lIiwibmJmIjoxMDAsInJvbGUiOiJndWVzdCJ9.1OVxOjxQaWDKoAKosJEGpaCEktRHSmI0bOUUNVQ1AQc"
+}

@@ -1,0 +1,6 @@
+.match {
+  background: color-mix(in srgb, var(--theme-accent) 25%, var(--theme-card-2));
+  color: var(--theme-text);
+  border-radius: 0.125rem;
+  font-weight: 600;
+}

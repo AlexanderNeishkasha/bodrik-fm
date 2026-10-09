@@ -1,0 +1,54 @@
+@layer base {
+  ::selection {
+    background-color: var(--theme-accent);
+    color: var(--theme-selection-text, var(--theme-text-dark));
+  }
+  /* Saffron needs darker text for readable selection on its orange accent. */
+  [data-theme="saffron"] {
+    --theme-selection-text: #070707;
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+  :focus-visible {
+    outline: 2px solid var(--theme-focus, var(--theme-accent));
+    outline-offset: 2px;
+  }
+
+  [data-hotkeys-main="false"] .hotkeys-main,
+  [data-hotkeys-studio="false"] .hotkeys-studio {
+    display: none;
+  }
+
+  @media (pointer: coarse) {
+    .hotkeys-shell {
+      display: none !important;
+    }
+  }
+  .font-display {
+    font-family: var(--theme-font-display, var(--font-display));
+  }
+  .font-body {
+    font-family: var(--theme-font-body, var(--font-body));
+  }
+  button {
+    @apply cursor-pointer;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background: var(--theme-bg);
+    color: var(--theme-text);
+    overflow-x: hidden;
+  }
+}
+
+@layer base {
+  .theme-transition * {
+    transition:
+      background-color 250ms ease,
+      color 250ms ease,
+      border-color 250ms ease,
+      box-shadow 250ms ease;
+  }
+}

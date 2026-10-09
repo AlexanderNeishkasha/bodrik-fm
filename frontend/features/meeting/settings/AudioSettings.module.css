@@ -1,0 +1,18 @@
+.section { --ui-accent: var(--room-switch-accent, var(--theme-accent, #94d8c1)); --ui-border: var(--room-border, var(--theme-border, #424252)); --ui-surface: var(--settings-bg, var(--theme-card, #171721)); box-sizing: border-box; padding: 16px; color: var(--dd-color, var(--theme-text, #f5f5f7)); font: 400 15px/1.5 var(--theme-font-body, "Montserrat", system-ui, sans-serif); }
+.section * { box-sizing: border-box; }
+.header { padding-bottom: 14px; border-bottom: 1px solid var(--ui-border); }
+.header h3 { margin: 0 0 4px; font-size: 18px; }
+.header p { margin: 0; font-size: 13px; opacity: .75; }
+.meter { display: flex; gap: 4px; margin: 20px 0 10px; }
+.bar, .activeBar { flex: 1; transition: background-color 140ms ease; height: 6px; border-radius: 4px; background: color-mix(in srgb, currentColor 20%, transparent); }
+.activeBar { background: var(--ui-accent); }
+.noiseRow { flex-wrap: wrap; }
+.noiseSelect { width: min(190px, 100%); }
+.speakerRow { display: flex; align-items: center; gap: 12px; }
+.divider { margin: 14px 0; border-top: 1px solid var(--ui-border); }
+.infoCard { margin-top: 20px; padding: 20px; }
+.infoCard h4 { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
+.infoCard p { margin: 8px 0 0; color: var(--meeting-muted); }
+@media (max-width: 420px) { .section { padding: 12px; } .speakerRow { flex-wrap: wrap; } }
+
+@media (prefers-reduced-motion: reduce) { .bar, .activeBar { transition: none; } }

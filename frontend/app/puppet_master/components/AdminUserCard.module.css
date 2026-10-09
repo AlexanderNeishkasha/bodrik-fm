@@ -1,0 +1,139 @@
+.card {
+    display: grid;
+    grid-template-areas:
+        "heading fields"
+        "heading actions";
+    grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr);
+    gap: 0.65rem 1.25rem;
+    align-items: start;
+    padding: 1rem;
+}
+
+.heading {
+    display: grid;
+    grid-area: heading;
+    min-width: 0;
+    gap: 0.35rem;
+}
+
+.roomLink {
+    display: block;
+    max-width: 16rem;
+}
+
+.button {
+    display: inline-flex;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    line-height: 1;
+}
+
+.fields {
+    display: grid;
+    grid-area: fields;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.controlRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    align-items: center;
+    min-width: 0;
+}
+
+.input {
+    width: 100%;
+    min-width: 0;
+    min-height: 2rem;
+    padding-inline: 0.85rem;
+    outline: none;
+    transition:
+        border-color 140ms ease,
+        box-shadow 140ms ease;
+}
+
+.input:focus {
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 0 2px var(--theme-accent-soft);
+}
+
+.toggles {
+    display: grid;
+    gap: 0.3rem;
+}
+
+.listedToggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 5.25rem;
+    white-space: nowrap;
+}
+
+.listedCheckbox {
+    height: 1rem;
+    width: 1rem;
+    accent-color: var(--theme-accent);
+}
+
+.actions {
+    display: flex;
+    grid-area: actions;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+    .card {
+        grid-template-areas:
+            "heading"
+            "fields"
+            "actions";
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .actions {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 600px),
+    ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+    .card.card {
+        gap: 1rem;
+        border-radius: 1.25rem;
+        padding: 1.1rem;
+    }
+
+    .heading.heading {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 0.75rem;
+    }
+
+    .roomLink.roomLink {
+        max-width: 9rem;
+        text-align: right;
+    }
+
+    .controlRow.controlRow {
+        grid-template-columns: minmax(0, 1fr) max-content;
+        gap: 0.65rem;
+    }
+
+    .input.input {
+        min-height: 2.65rem;
+        padding-inline: 1rem;
+        font-size: 1rem;
+    }
+
+    .listedToggle.listedToggle {
+        min-width: 5.5rem;
+    }
+}

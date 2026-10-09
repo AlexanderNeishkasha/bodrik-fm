@@ -1,0 +1,32 @@
+.room {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--theme-hero-gradient, var(--meeting-bg));
+  color: var(--meeting-text);
+  font-family: var(--theme-font-body, inherit);
+}
+
+.status,
+.error {
+  position: fixed;
+  z-index: 4;
+  top: 16px;
+  left: 50%;
+  margin: 0;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(384px, calc(100vw - 32px));
+  padding: 8px 16px;
+  border: 1px solid var(--meeting-border);
+  border-radius: var(--meeting-radius-item);
+  overflow-wrap: anywhere;
+  background: var(--meeting-card);
+  box-shadow: var(--meeting-shadow-panel);
+  transform: translateX(-50%);
+}
+
+.error {
+  top: 60px;
+  color: var(--meeting-danger);
+}

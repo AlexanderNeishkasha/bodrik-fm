@@ -1,0 +1,15 @@
+/* Shared themed picker: ellipsis in the trigger, wrapped device names in its list. */
+.select { box-sizing: border-box; display: flex; align-items: center; gap: 14px; min-width: 0; width: 100%; padding: 10px 18px; border: 1px solid var(--ui-border, var(--meeting-border, var(--theme-border, #505060))); border-radius: 999px; background: var(--theme-input-bg, var(--meeting-input, var(--ui-surface, #171721))); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: border-color 140ms ease; }
+.value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.select > svg { flex: 0 0 16px; transition: transform 140ms ease; }
+.select[aria-expanded="true"] > svg { transform: rotate(180deg); }
+.select:hover:not(:disabled), .select:focus-visible, .select[aria-expanded="true"] { border-color: var(--ui-accent, var(--meeting-accent, var(--theme-accent, #94d8c1))); }
+.select:focus-visible { outline: 2px solid var(--theme-focus, var(--ui-accent, var(--meeting-accent, #94d8c1))); outline-offset: 3px; }
+.select:disabled { opacity: .5; cursor: not-allowed; }
+.popup { box-sizing: border-box; position: fixed; inset: auto; margin: 0; padding: 6px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--ui-border, var(--meeting-border, var(--theme-border, #505060))); border-radius: 16px; background: var(--theme-card, var(--meeting-card, var(--ui-surface, #171721))); color: var(--meeting-text, inherit); font: inherit; box-shadow: 0 12px 32px #0005; z-index: 100; }
+.option { display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; border-radius: 10px; overflow-wrap: anywhere; cursor: pointer; }
+.option > span:first-child { flex: 1; min-width: 0; }
+.check { flex: 0 0 16px; color: var(--ui-accent, var(--meeting-accent, var(--theme-accent, #94d8c1))); }
+.option[data-active="true"], .option[aria-selected="true"] { background: color-mix(in srgb, var(--ui-accent, var(--meeting-accent, var(--theme-accent, #94d8c1))) 14%, transparent); }
+.option[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .select, .select > svg { transition: none; } }

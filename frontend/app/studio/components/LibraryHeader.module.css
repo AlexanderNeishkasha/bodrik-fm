@@ -1,0 +1,13 @@
+@media (max-width: 600px),
+    ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+    .root.root {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .actions.actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        width: 100%;
+    }
+}

@@ -1,0 +1,38 @@
+export default function buildHotkeysArgs({
+  isAuthed,
+  setShowHotkeys,
+  toggleEdit,
+  state,
+  sendAction,
+  toggleLocalMute,
+  changeLocalVolume,
+  unlockAudio,
+  localMuted,
+  localVolume,
+  seekValue,
+  setSeekValue,
+  isSeekingRef,
+  scheduleSeek,
+  onEaster,
+}) {
+  return {
+    isAuthed,
+    setShowHotkeys,
+    toggleEdit,
+    stateIsPlaying: Boolean(state?.is_playing),
+    sendAction,
+    toggleLocalMute,
+    changeLocalVolume,
+    unlockAudio,
+    localMuted,
+    localVolume,
+    currentPosition: state?.position ?? 0,
+    duration:
+      state?.current?.duration != null ? Number(state.current.duration) : null,
+    seekValue,
+    setSeekValue,
+    isSeekingRef,
+    scheduleSeek,
+    onEaster,
+  };
+}

@@ -1,0 +1,13 @@
+/* Sits outside the bubble: left of outgoing bubbles, right of incoming ones. */
+.anchor { position: absolute; top: 50%; transform: translateY(-50%); right: calc(100% + 0.3rem); opacity: 0; transition: opacity 120ms ease; }
+.anchor[data-side="right"] { right: auto; left: calc(100% + 0.3rem); }
+li:hover .anchor, .anchor:focus-within, .open { opacity: 1; }
+.trigger { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--chat-meta, #9ab4cf); cursor: pointer; }
+.trigger:hover, .trigger:focus-visible, .open .trigger { background: color-mix(in srgb, currentColor 16%, transparent); color: var(--ui-text, #e8e8ec); outline: none; }
+/* The menu opens toward the bubble so the panel edge never clips it. */
+.menu { position: absolute; z-index: 3; top: calc(100% + 4px); left: 0; min-width: 9rem; padding: 4px; border: 1px solid var(--ui-border, #555); border-radius: var(--meeting-radius-item); background: var(--meeting-raised); box-shadow: 0 10px 28px #0008; }
+.anchor[data-side="right"] .menu { left: auto; right: 0; }
+.menu button { display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.5rem 0.65rem; border: 0; border-radius: 7px; background: transparent; color: inherit; font: inherit; font-size: 0.9rem; text-align: left; cursor: pointer; }
+.menu button:hover, .menu button:focus-visible { background: var(--meeting-hover); outline: none; }
+.danger { color: var(--meeting-danger) !important; }
+@media (hover: none) { .anchor { opacity: 0.6; } }

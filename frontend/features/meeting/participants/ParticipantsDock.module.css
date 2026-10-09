@@ -1,0 +1,29 @@
+/* Docked to the right edge at full height, beside the chat panel when both are open. */
+.dock {
+  --ui-border: var(--room-border, var(--theme-border, #424252));
+  position: fixed;
+  z-index: 11;
+  top: 8px;
+  bottom: 8px;
+  right: calc(8px + var(--meeting-chat-offset, 0px));
+  width: var(--meeting-dock-width, min(380px, calc(100vw - 16px)));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--theme-text, #f5f5f7);
+  background: var(--theme-card, #171721);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--meeting-radius-panel);
+  box-shadow: var(--meeting-shadow-panel);
+  font: 400 14px/1.5 var(--theme-font-body, "Montserrat", system-ui, sans-serif);
+}
+.dock[hidden] { display: none; }
+.dock *, .dock *::before, .dock *::after { box-sizing: border-box; }
+.close { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--ui-border); border-radius: var(--meeting-radius-pill); background: var(--meeting-card); color: inherit; cursor: pointer; transition: background-color var(--meeting-motion); }
+.close:hover { background: var(--meeting-hover); }
+.status { margin: 0; padding: 4px 12px; }
+.body { flex: 1; min-height: 0; overflow: hidden; }
+/* Phones and tablets: fullscreen over the control bar; must match FULLSCREEN_OVERLAY_QUERY. */
+@media (max-width: 1024px) {
+  .dock { inset: 0; width: auto; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); border: 0; border-radius: 0; box-shadow: none; }
+}

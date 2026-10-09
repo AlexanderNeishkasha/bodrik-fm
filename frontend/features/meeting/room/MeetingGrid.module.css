@@ -1,0 +1,233 @@
+.layout {
+  position: absolute;
+  inset: 0 var(--meeting-panels-width, 0px) 76px 0;
+  padding: 12px;
+  min-block-size: 0;
+}
+
+/* Equal 16:9 tiles sized by fitTiles; a partial last row is centered. */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.grid > .slot {
+  flex: 0 0 var(--tile-width, calc(50% - 6px));
+  block-size: var(--tile-height, calc(50% - 6px));
+}
+
+.slot, .slot > article {
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+.slot > article, .slot > article > div:first-child {
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+.speaker {
+  display: grid;
+  grid-template-columns: repeat(var(--strip-count), 220px);
+  grid-template-rows: minmax(0, 1fr) 160px;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+}
+
+/* Keep the large card stationary while thumbnails scroll horizontally. */
+.focus {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  position: sticky;
+  left: 12px;
+  inline-size: var(--focus-width, 100%);
+}
+
+.actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+article:hover > .actions,
+article:focus-within > .actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--meeting-radius-pill);
+  /* Over video: light-on-dark in every theme. */
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background-color var(--meeting-motion), transform var(--meeting-motion);
+}
+
+.actions button:hover {
+  background: rgb(0 0 0 / 75%);
+}
+
+.actions button:active {
+  transform: scale(0.96);
+}
+
+.actions button:focus-visible {
+  outline: 2px solid var(--meeting-focus);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    right: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .layout {
+    inset-block-end: 64px;
+    padding: 8px;
+  }
+
+  .speaker {
+    grid-template-rows: minmax(0, 1fr) 120px;
+  }
+
+  .focus { left: 8px; }
+}
+
+.actionsOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cardMenu {
+  position: fixed;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 280px;
+  box-sizing: border-box;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border: 1px solid var(--meeting-border);
+  border-radius: var(--meeting-radius-item);
+  background: var(--meeting-card);
+  box-shadow: var(--meeting-shadow-panel);
+  animation: menuIn var(--meeting-motion);
+}
+
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(-4px); }
+}
+
+.cardMenu button {
+  display: flex;
+  align-items: center;
+  border: 0;
+  cursor: pointer;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  height: auto;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--meeting-text);
+  backdrop-filter: none;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.cardMenu button:hover {
+  background: var(--meeting-hover);
+}
+
+.cardMenu button:focus-visible {
+  outline: 2px solid var(--meeting-focus);
+}
+
+.cardMenu hr {
+  width: 100%;
+  margin: 4px 0;
+  border: 0;
+  border-top: 1px solid var(--meeting-border);
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  color: var(--meeting-text);
+  font-size: 0.85rem;
+}
+
+.volume input {
+  flex: 1;
+  accent-color: var(--meeting-accent);
+}
+
+.danger {
+  color: var(--meeting-danger) !important;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+article:fullscreen {
+  border-radius: 0;
+}
+
+/* Stable wrapper for card motion; takes no layout space itself. */
+.stage {
+  display: contents;
+}
+
+/* Cards are clickable to change focus. */
+.layout article[tabindex] {
+  cursor: pointer;
+}
+
+.layout article[tabindex]:focus-visible {
+  outline: 2px solid var(--meeting-focus);
+  outline-offset: 3px;
+}
+
+/* Until the area is measured (no tile size yet) and the first participants have
+   arrived, keep the grid invisible so nothing flashes at an interim layout on join. */
+.grid:not([style*="--tile-width"]) {
+  visibility: hidden;
+}
+
+.layout {
+  transition: opacity 220ms ease-out;
+}
+
+.layout[data-settling] {
+  opacity: 0;
+}

@@ -1,0 +1,14 @@
+.shell {
+  min-height: 100dvh;
+  background: var(--theme-hero-gradient, var(--theme-bg));
+  color: var(--meeting-text);
+}
+
+.status {
+  display: grid;
+  min-height: 100dvh;
+  place-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+}

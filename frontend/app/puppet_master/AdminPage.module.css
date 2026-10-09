@@ -1,0 +1,31 @@
+.shell {
+    max-width: 56rem;
+}
+
+@media (max-width: 600px),
+    ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+    .screen.screen {
+        min-height: 100svh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .shell.shell {
+        margin: 0;
+        max-width: none;
+        min-height: 100svh;
+        width: 100vw;
+        gap: 1.5rem;
+        padding: max(2rem, env(safe-area-inset-top))
+            max(1.5rem, env(safe-area-inset-right))
+            max(2rem, env(safe-area-inset-bottom))
+            max(1.5rem, env(safe-area-inset-left));
+    }
+
+    .users.users {
+        display: grid;
+        gap: 1rem;
+        margin-inline: calc(0.75rem - max(1.5rem, env(safe-area-inset-left)))
+            calc(0.75rem - max(1.5rem, env(safe-area-inset-right)));
+    }
+}

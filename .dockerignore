@@ -1,0 +1,27 @@
+# Production application and frontend builds use the repository root.
+# Allowlist its inputs so private data, uploads and build outputs never enter the context.
+*
+!frontend/
+frontend/node_modules
+# Exclude caches left by pre-Bun installs.
+frontend/.pnpm-store
+frontend/.next
+frontend/.env*
+frontend/coverage
+frontend/out
+frontend/.releases
+frontend/public/retained-meeting
+frontend/public/meeting-assets
+frontend/public/brand
+frontend/.smoke-results
+frontend/playwright-report
+
+!backend/
+backend/target
+backend/uploads
+backend/data
+backend/.env*
+backend/**/.env*
+backend/crates/meeting/target
+backend/crates/meeting/data
+backend/crates/meeting/logs

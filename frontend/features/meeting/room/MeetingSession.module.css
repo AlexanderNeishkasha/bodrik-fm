@@ -1,0 +1,45 @@
+.password {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  text-align: center;
+}
+
+.password p {
+  margin: 0;
+}
+
+.password input {
+  padding: 10px 18px;
+  border: 1px solid var(--meeting-border);
+  border-radius: var(--meeting-radius-pill);
+  background: var(--meeting-input);
+  color: var(--meeting-text);
+  font: inherit;
+}
+
+.password button {
+  justify-self: center;
+  padding: 10px 22px;
+  border: 1px solid var(--meeting-accent);
+  border-radius: var(--meeting-radius-pill);
+  background: var(--meeting-accent);
+  color: var(--meeting-on-accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--meeting-motion), transform var(--meeting-motion);
+}
+
+.password input:focus-visible {
+  border-color: var(--meeting-accent);
+  outline: 2px solid var(--theme-accent-soft, var(--meeting-accent-25, transparent));
+}
+
+.password button:hover {
+  background: var(--meeting-accent-bright);
+}
+
+.password button:active {
+  transform: scale(0.96);
+}

@@ -1,0 +1,241 @@
+/* Player-style dock: one pill-shaped card holding round icon buttons. */
+.bar {
+  position: fixed;
+  z-index: 3;
+  /* Always centered in the tab; open chat/participants panels may cover it. */
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 16px);
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  border: 1px solid var(--meeting-border);
+  border-radius: var(--meeting-radius-pill);
+  background: var(--meeting-card);
+  box-shadow: var(--meeting-shadow-card);
+  transition: opacity 300ms ease, background-color 250ms ease, border-color 250ms ease, color 250ms ease, box-shadow 250ms ease;
+}
+
+.bar button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  flex-shrink: 0;
+  height: 46px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--meeting-radius-pill);
+  background: transparent;
+  color: var(--meeting-text);
+  cursor: pointer;
+  transition: background-color var(--meeting-motion), border-color var(--meeting-motion), color var(--meeting-motion), transform var(--meeting-motion);
+}
+
+.bar button:hover:not(:disabled) {
+  border-color: var(--meeting-border);
+  background: var(--meeting-hover);
+}
+
+.bar button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.bar button:focus-visible {
+  outline: 2px solid var(--meeting-focus);
+  outline-offset: 2px;
+}
+
+.bar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.split,
+.anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--meeting-radius-pill);
+}
+
+/* Button + chevron read as one pill. */
+.split {
+  background: var(--meeting-ghost);
+}
+
+.split > button:first-child {
+  border-radius: var(--meeting-radius-pill) 0 0 var(--meeting-radius-pill);
+}
+
+.split > .chevron {
+  width: 28px;
+  border-left: 1px solid var(--meeting-border);
+  border-radius: 0 var(--meeting-radius-pill) var(--meeting-radius-pill) 0;
+}
+
+.split > button:hover:not(:disabled) {
+  transform: none;
+}
+
+/* Muted microphone / camera off: the player's danger surface. */
+.bar .off {
+  background: var(--meeting-danger-bg);
+  color: var(--meeting-danger);
+}
+
+.active {
+  color: var(--meeting-accent) !important;
+}
+
+/* Leave: solid danger pill. */
+.bar .exit {
+  width: 58px;
+  background: var(--meeting-danger);
+  color: var(--meeting-on-accent);
+}
+
+.bar .exit:hover:not(:disabled) {
+  background: var(--meeting-danger);
+  filter: brightness(1.1);
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--meeting-radius-pill);
+  background: var(--meeting-accent);
+  color: var(--meeting-on-accent);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+/* Popup menus: player card with border, item radius and panel shadow. */
+.menu {
+  position: absolute;
+  z-index: 10;
+  bottom: calc(100% + 12px);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  max-width: min(320px, calc(100vw - 24px));
+  max-height: calc(100dvh - 96px);
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--meeting-border);
+  border-radius: var(--meeting-radius-item);
+  background: var(--meeting-card);
+  box-shadow: var(--meeting-shadow-panel);
+  animation: menuIn var(--meeting-motion);
+}
+
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+/* The settings trigger is near the right edge; open its menu toward the center. */
+.menuEnd { left: auto; right: 0; }
+
+.anchor:last-child .menu {
+  right: 0;
+  left: auto;
+}
+
+.menu .menuItem {
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  height: auto;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.menu .menuItem:hover:not(:disabled) {
+  transform: none;
+}
+
+.menu .menuItem[aria-checked="true"] {
+  color: var(--meeting-accent);
+}
+
+.menuTitle {
+  margin: 6px 14px 2px;
+  color: var(--meeting-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.danger {
+  color: var(--meeting-danger) !important;
+}
+
+@media (max-width: 900px) {
+  .bar {
+    left: 50%;
+  }
+}
+
+@media (max-width: 600px) {
+  .bar {
+    flex-wrap: nowrap;
+    gap: 3px;
+    padding: 4px;
+  }
+
+  .bar button {
+    width: 46px;
+    height: 46px;
+  }
+
+  .split > .chevron {
+    width: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .bar .exit {
+    width: 46px;
+  }
+
+  .split > .chevron,
+  .menu,
+  .bareMenu {
+    display: none;
+  }
+
+  .split > button:first-child {
+    border-radius: var(--meeting-radius-pill);
+  }
+}
+
+@media (max-width: 380px) {
+  .bar { gap: 1px; padding: 3px; }
+  .bar button { width: 40px; height: 40px; }
+  .split > .chevron { width: 16px; }
+  .bar .exit { width: 40px; }
+}
+
+.bareMenu {
+  position: static;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}

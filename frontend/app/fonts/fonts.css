@@ -1,0 +1,36 @@
+@import './definitions/alegreya-sans.css';
+@import './definitions/cormorant-garamond.css';
+@import './definitions/inter.css';
+@import './definitions/manrope.css';
+@import './definitions/merriweather.css';
+@import './definitions/montserrat-alternates.css';
+@import './definitions/nunito.css';
+@import './definitions/nunito-sans.css';
+@import './definitions/oswald.css';
+@import './definitions/raleway.css';
+@import './definitions/rubik.css';
+@import './definitions/sora.css';
+@import './definitions/space-grotesk.css';
+@import './definitions/unbounded.css';
+@import './definitions/work-sans.css';
+
+:root {
+  --font-display: 'Oswald Variable', sans-serif;
+  --font-body: 'Space Grotesk Variable', sans-serif;
+  --font-space: 'Space Grotesk Variable', sans-serif;
+  --font-inter: 'Inter Variable', sans-serif;
+  --font-mythic-sans: 'Alegreya Sans', sans-serif;
+  --font-sora: 'Sora Variable', sans-serif;
+  --font-work: 'Work Sans Variable', sans-serif;
+  --font-montserrat-alt: 'Montserrat Alternates', sans-serif;
+  --font-manrope: 'Manrope Variable', sans-serif;
+  --font-emberveil-display: 'Unbounded Variable', sans-serif;
+  --font-merriweather: 'Merriweather Variable', serif;
+  --font-nunito: 'Nunito Variable', sans-serif;
+  --font-raleway: 'Raleway Variable', sans-serif;
+  --font-nunito-sans: 'Nunito Sans Variable', sans-serif;
+  --font-rubik: 'Rubik Variable', sans-serif;
+  --font-pirate-display: 'Cormorant Garamond Variable', serif;
+  --font-pirate-body: 'Nunito Sans Variable', sans-serif;
+  --font-cormorant: 'Cormorant Garamond Variable', serif;
+}

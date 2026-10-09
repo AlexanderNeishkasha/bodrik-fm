@@ -1,0 +1,7 @@
+node_modules
+# Exclude caches left by pre-Bun installs.
+.pnpm-store
+.next
+out
+.releases
+public/meeting-ui

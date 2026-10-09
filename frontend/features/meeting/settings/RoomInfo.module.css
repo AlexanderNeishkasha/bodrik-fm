@@ -1,0 +1,7 @@
+.section { display: grid; gap: 10px; margin-bottom: 18px; padding: 0 16px; }
+.section header h3 { margin: 0; font-size: 18px; }
+.section header p { margin: 4px 0 0; color: color-mix(in srgb, currentColor 70%, transparent); font-size: 13px; }
+.row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--room-border, var(--theme-border, #424252)); border-radius: 12px; }
+.slug { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.row button { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--room-border, var(--theme-border, #424252)); border-radius: var(--meeting-radius-pill); background: transparent; color: inherit; cursor: pointer; }
+.row button:disabled { opacity: .5; cursor: not-allowed; }

@@ -1,0 +1,47 @@
+[data-theme="mythic"] {
+  --theme-bg: #0d0f1a;
+  --theme-bg-2: #141827;
+  --theme-card: #141a2a;
+  --theme-card-2: #1b2336;
+  --theme-border: #2a3350;
+  --theme-accent: #c8a45a;
+  --theme-accent-bright: #e0c27a;
+  --theme-accent-60: rgba(200, 164, 90, 0.6);
+  --theme-accent-25: rgba(200, 164, 90, 0.25);
+  --theme-red: #a6695c;
+  --theme-text: #efe9da;
+  --theme-muted: #a79f8b;
+  --theme-text-dark: #0d0f1a;
+  --theme-hero-a: #2a2f47;
+  --theme-hero-b: #151a2a;
+  --theme-hero-c: #0b0d16;
+  --theme-hero-gradient: radial-gradient(
+    circle at top,
+    var(--theme-hero-a),
+    var(--theme-hero-b) 55%,
+    var(--theme-hero-c)
+  );
+  --theme-ghost: #1a2234;
+  --theme-ghost-hover: #212a40;
+  --theme-panel-hover: #1c2539;
+  --theme-input-bg: #121625;
+  --theme-queue-temp: #1a2234;
+  --theme-danger: #2e1f1f;
+  --theme-danger-hover: #3a2626;
+  --theme-font-display: var(--font-cormorant);
+  --theme-font-body: var(--font-mythic-sans);
+  --theme-shadow-hero: 0 30px 80px -55px rgba(5, 6, 12, 0.85);
+  --theme-shadow-card: 0 25px 70px -45px rgba(5, 6, 12, 0.72);
+  --theme-shadow-card-soft: 0 25px 70px -45px rgba(5, 6, 12, 0.78);
+  --theme-shadow-panel: 0 15px 45px -35px rgba(5, 6, 12, 0.6);
+  --theme-shadow-drag: 0 15px 45px -35px rgba(5, 6, 12, 0.65);
+  --theme-shadow-modal: 0 30px 80px -55px rgba(5, 6, 12, 0.9);
+  --theme-shadow-toast: 0 25px 70px -45px rgba(5, 6, 12, 0.75);
+  --theme-icon-filter: invert(83%) sepia(16%) saturate(394%)
+    hue-rotate(14deg) brightness(95%) contrast(90%);
+  --theme-icon-filter-contrast: invert(14%) sepia(12%) saturate(1370%)
+    hue-rotate(18deg) brightness(85%) contrast(98%);
+  --theme-icon-filter-accent: invert(77%) sepia(32%) saturate(303%)
+    hue-rotate(15deg) brightness(95%) contrast(90%);
+  --theme-focus: #e0c27a;
+}

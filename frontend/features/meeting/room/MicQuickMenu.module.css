@@ -1,0 +1,133 @@
+.menu {
+  position: absolute;
+  z-index: 10;
+  bottom: calc(100% + 8px);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100vw - 24px));
+  max-height: calc(100dvh - 96px);
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--meeting-border);
+  border-radius: var(--meeting-radius-item);
+  background: var(--meeting-card);
+  box-shadow: var(--meeting-shadow-panel);
+  color: var(--meeting-text);
+  font-size: 0.92rem;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 10px 4px;
+  color: var(--meeting-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.title:first-child {
+  margin-top: 4px;
+}
+
+.menu .device,
+.menu .action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: auto;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  justify-content: flex-start;
+  cursor: pointer;
+}
+
+.menu .device:hover,
+.menu .action:hover {
+  background: var(--meeting-hover);
+}
+
+.menu .action {
+  margin-top: 2px;
+  background: color-mix(in srgb, var(--meeting-text) 4%, transparent);
+}
+
+.check {
+  display: inline-flex;
+  flex: 0 0 16px;
+  color: var(--meeting-accent);
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.level {
+  flex: 0 0 48px;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.bar,
+.barOn {
+  transition: background-color 140ms ease;
+  width: 3px;
+  height: 14px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--meeting-text) 22%, transparent);
+}
+
+.barOn {
+  background: var(--meeting-accent);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+}
+
+.menu .noiseSelector { width: 150px; height: auto; padding: 7px 14px; justify-content: space-between; border: 1px solid var(--meeting-border); border-radius: var(--meeting-radius-pill); background: var(--meeting-input); }
+
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.volume input {
+  flex: 1;
+  accent-color: var(--meeting-accent);
+}
+
+.note {
+  margin: 4px 10px;
+  color: var(--meeting-muted);
+  font-size: 0.8rem;
+}
+
+.device:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) { .bar, .barOn { transition: none; } }
+
+.unavailable { flex: 0 0 48px; text-align: center; color: var(--meeting-muted); }

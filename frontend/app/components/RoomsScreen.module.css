@@ -1,0 +1,55 @@
+.panelEnter {
+    animation: panelFadeIn 160ms ease-out both;
+}
+
+@keyframes panelFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .panelEnter {
+        animation: none;
+    }
+}
+
+@media (max-width: 600px),
+    ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+    .screen.screen {
+        min-height: 100svh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .shell.shell {
+        margin: 0;
+        max-width: none;
+        min-height: 100svh;
+        width: 100vw;
+        padding: 0;
+    }
+
+    .panel.panel {
+        min-height: 100svh;
+        width: 100vw;
+        border: 0;
+        border-radius: 0;
+        background: var(--theme-card);
+        padding: max(2rem, env(safe-area-inset-top))
+            max(1.5rem, env(safe-area-inset-right))
+            max(2rem, env(safe-area-inset-bottom))
+            max(1.5rem, env(safe-area-inset-left));
+        box-shadow: none;
+    }
+
+    .studioLink.studioLink {
+        white-space: nowrap;
+    }
+}

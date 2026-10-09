@@ -1,0 +1,107 @@
+.copyLabel {
+    display: none;
+}
+
+.dndActive,
+.dndActive * {
+    user-select: none;
+}
+
+.copyLink {
+    max-width: min(15rem, 100%);
+}
+
+@media (max-width: 900px) {
+    .shell.shell {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .roomControls.roomControls {
+        order: 3;
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    .copyUrl.copyUrl {
+        display: none;
+    }
+
+    .copyLabel.copyLabel {
+        display: inline;
+    }
+
+    .roomInput.roomInput {
+        min-width: 0;
+        width: min(13rem, 100%);
+    }
+
+    .headerButton.headerButton,
+    .homeButton.homeButton {
+        height: 2rem;
+    }
+
+    .headerButton.headerButton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding-inline: 1rem;
+        line-height: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .roomControls.roomControls {
+        align-items: stretch;
+    }
+
+    .roomInput.roomInput {
+        flex: 1 1 10rem;
+        width: auto;
+    }
+
+    .listedToggle.listedToggle {
+        border: 0;
+        background: transparent;
+        padding-inline: 0;
+    }
+
+    .sessionActions.sessionActions {
+        min-width: 0;
+    }
+
+    .headerButton.headerButton {
+        padding-inline: 0.8rem;
+        letter-spacing: 0.12em;
+    }
+}
+
+@media (max-width: 600px),
+    ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+    .authScreen.authScreen {
+        min-height: 100svh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .authShell.authShell {
+        margin: 0;
+        max-width: none;
+        min-height: 100svh;
+        width: 100vw;
+        gap: 0;
+        padding: 0;
+    }
+
+    .authEmptyHeader.authEmptyHeader {
+        display: none;
+    }
+}
+
+.queueColumn { display: contents; }
+.meetingPlacement { min-width: 0; order: 1; }
+@media (min-width: 1024px) {
+    .queueColumn { display: flex; min-width: 0; flex-direction: column; gap: 2rem; }
+    .queueColumn > section { flex: 1; }
+    .meetingPlacement { order: 0; flex: none; }
+}

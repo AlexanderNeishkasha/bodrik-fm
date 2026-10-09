@@ -1,0 +1,7 @@
+.help { position: relative; display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.button { appearance: none; display: inline-flex; flex: none; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: 1px solid color-mix(in srgb, var(--ui-accent, var(--theme-accent, #94d8c1)) 70%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--ui-accent, var(--theme-accent, #94d8c1)) 10%, transparent); color: var(--ui-accent, var(--theme-accent, #94d8c1)); font: 700 12px/1 sans-serif; cursor: help; transition: background-color 120ms ease, color 120ms ease; }
+.button:hover, .button:focus-visible { color: var(--ui-contrast, var(--theme-text-dark, #171721)); background: var(--ui-accent, var(--theme-accent, #94d8c1)); }
+.button:focus-visible { outline: 2px solid var(--ui-accent, var(--theme-accent, #94d8c1)); outline-offset: 3px; }
+.tooltip { box-sizing: border-box; position: fixed; width: 280px; overflow: auto; overscroll-behavior: contain; pointer-events: auto; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--ui-accent, var(--theme-accent, #94d8c1)) 35%, transparent); border-radius: 16px; line-height: 1.45; background: var(--ui-surface, var(--theme-card, #171721)); color: inherit; box-shadow: var(--theme-shadow-panel, 0 8px 24px #0005); font-size: 13px; font-weight: 400; z-index: 10; }
+.tooltip[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .button { transition: none; } }

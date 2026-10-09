@@ -1,0 +1,41 @@
+@media (max-width: 600px),
+    ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+    .panel.panel {
+        display: flex;
+        min-height: 100svh;
+        width: 100vw;
+        max-width: none;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 0;
+        background: var(--theme-card);
+        padding: max(2rem, env(safe-area-inset-top))
+            max(1.5rem, env(safe-area-inset-right))
+            max(2rem, env(safe-area-inset-bottom))
+            max(1.5rem, env(safe-area-inset-left));
+        box-shadow: none;
+    }
+
+    .content.content {
+        display: flex;
+        min-height: calc(
+            100svh - max(2rem, env(safe-area-inset-top)) -
+                max(2rem, env(safe-area-inset-bottom))
+        );
+        width: min(100%, 28rem);
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .heading.heading {
+        position: absolute;
+        left: max(1.5rem, env(safe-area-inset-left));
+        right: max(1.5rem, env(safe-area-inset-right));
+        top: max(2rem, env(safe-area-inset-top));
+    }
+
+    .formBlock.formBlock {
+        width: 100%;
+    }
+}

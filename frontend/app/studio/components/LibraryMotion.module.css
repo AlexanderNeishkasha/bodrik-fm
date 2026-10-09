@@ -1,0 +1,30 @@
+.collapse {
+  display: grid;
+  overflow: hidden;
+  transition:
+    grid-template-rows 220ms ease-out,
+    opacity 180ms ease-out,
+    visibility 0ms linear 220ms;
+}
+
+.collapseOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows 220ms ease-out,
+    opacity 180ms ease-out,
+    visibility 0ms linear 0ms;
+}
+
+.collapseClosed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.collapseInner {
+  min-height: 0;
+  overflow: hidden;
+}

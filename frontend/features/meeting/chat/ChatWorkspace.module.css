@@ -1,0 +1,8 @@
+.workspace { position: relative; --ui-text: var(--theme-text, var(--dd-color, #e8e8ec)); --ui-border: var(--theme-border, var(--room-border, #555)); --ui-surface: var(--theme-card, var(--select-bg, #161622)); color: var(--ui-text); height: 100%; min-height: 0; display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem; box-sizing: border-box; }
+.history { flex: 1; min-height: 0; overflow: auto; }
+.workspace select { max-width: 100%; }
+
+.dropOverlay { position: absolute; inset: 0.5rem; z-index: 2; display: grid; place-items: center; padding: 1.5rem; border: 2px dashed var(--ui-accent, var(--theme-accent, #80d6bf)); border-radius: 1.25rem; background: color-mix(in srgb, var(--ui-surface) 92%, transparent); pointer-events: none; text-align: center; animation: dropAppear 140ms ease-out; }
+.dropOverlay span { font-size: 1.05rem; font-weight: 600; }
+@keyframes dropAppear { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .dropOverlay { animation: none; } }

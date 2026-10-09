@@ -1,0 +1,7 @@
+.switch { appearance: none; flex: none; width: 40px; height: 24px; margin: 0; border: 1px solid var(--ui-border, var(--theme-border, #505060)); border-radius: 999px; background: var(--theme-ghost, #8883); cursor: pointer; position: relative; transition: background-color 140ms ease, color 140ms ease, opacity 140ms ease; }
+.switch::before { content: ""; position: absolute; width: 16px; height: 16px; top: 3px; left: 3px; border-radius: 50%; background: currentColor; transition: transform 140ms ease; }
+.switch:checked { background: var(--ui-accent, var(--theme-accent, #94d8c1)); color: var(--ui-contrast, var(--theme-text-dark, #171721)); }
+.switch:checked::before { transform: translateX(16px); }
+.switch:disabled { cursor: wait; opacity: .5; }
+.switch:focus-visible { outline: 2px solid var(--ui-accent, var(--theme-accent, #94d8c1)); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .switch, .switch::before { transition: none; } }

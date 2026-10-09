@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./globals.theme.css";
+@import "./globals.base.css";
+@import "./globals.components.css";

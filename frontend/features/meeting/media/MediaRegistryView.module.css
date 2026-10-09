@@ -1,0 +1,112 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  min-block-size: 0;
+}
+
+.card {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  position: relative;
+  overflow: hidden;
+  min-block-size: 180px;
+  border: 1px solid var(--meeting-border);
+  border-radius: var(--meeting-radius-tile);
+  background: var(--meeting-card);
+  box-shadow: var(--meeting-shadow-card);
+  transition: box-shadow var(--meeting-motion), border-color var(--meeting-motion);
+}
+
+.card[tabindex] { cursor: pointer; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .card[tabindex] {
+    transition: scale 240ms cubic-bezier(0.2, 1.6, 0.4, 1), box-shadow var(--meeting-motion), border-color var(--meeting-motion);
+  }
+
+  .card[tabindex]:active:not(:has(button:active, input:active, select:active, textarea:active, a:active, label:active)) {
+    scale: 0.99;
+    transition-duration: 80ms;
+  }
+}
+
+/* Speaking: accent ring plus the player's audio glow. */
+.speaking {
+  border-color: var(--meeting-accent);
+  box-shadow: 0 0 0 2px var(--meeting-accent), 0 0 28px var(--theme-accent-25, transparent);
+}
+
+.media {
+  display: grid;
+  min-block-size: 180px;
+  place-items: center;
+  background: var(--meeting-raised);
+}
+
+.media video {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.media audio {
+  display: none;
+}
+
+.avatar {
+  inline-size: min(50%, 250px);
+  aspect-ratio: 1;
+}
+
+.avatar svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: 50%;
+}
+
+.footer {
+  position: absolute;
+  inset: auto auto 8px 8px;
+  max-inline-size: calc(100% - 16px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: var(--meeting-radius-pill);
+  /* Sits over video, so it stays light-on-dark in every theme. */
+  color: #fff;
+  background: rgb(0 0 0 / 60%);
+  backdrop-filter: blur(6px);
+}
+
+.presenter {
+  display: inline-flex;
+  color: #f5c542;
+}
+
+.footer span {
+  font-size: 0.75rem;
+}
+
+.microphone,
+.microphoneMuted {
+  position: relative;
+  display: inline-flex;
+}
+
+.microphoneMuted {
+  color: var(--meeting-danger);
+}
+
+.microphoneMuted::after {
+  position: absolute;
+  inset: 45% -2px auto;
+  block-size: 2px;
+  background: currentColor;
+  transform: rotate(45deg);
+  content: "";
+}

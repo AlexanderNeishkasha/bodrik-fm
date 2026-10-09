@@ -1,0 +1,6 @@
+.row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 0; }
+.copy { min-width: 0; display: flex; align-items: center; gap: 8px; }
+.label { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.label svg { flex: none; }
+.sliderControl { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; }
+.sliderValue { min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }

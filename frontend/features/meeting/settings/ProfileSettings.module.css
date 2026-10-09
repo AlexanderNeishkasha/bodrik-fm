@@ -1,0 +1,48 @@
+.profile { min-height: 100%; }
+.identity { display: flex; align-items: center; gap: 18px; padding: 20px 0; }
+.avatar { flex: none; width: 80px; height: 80px; overflow: hidden; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--ui-accent) 32%, transparent); background: color-mix(in srgb, currentColor 8%, transparent); }
+.avatar svg { display: block; width: 100%; height: 100%; }
+.identityBody { min-width: 0; flex: 1; }
+.displayName { margin: 0 0 5px; font-size: 18px; font-weight: 600; overflow-wrap: anywhere; }
+.role { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; font-size: 12px; background: color-mix(in srgb, var(--ui-accent) 12%, transparent); }
+.role svg { color: var(--ui-accent); }
+.avatarActions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 14px; }
+.upload { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 6px 10px; border: 1px solid var(--ui-border); border-radius: var(--meeting-radius-pill); background: color-mix(in srgb, currentColor 3%, transparent); color: inherit; font-weight: 600; cursor: pointer; }
+.clearAvatar { min-height: 36px; padding: 6px 2px; border: 0; background: transparent; color: var(--ui-muted); font: inherit; cursor: pointer; }
+.clearAvatar:hover:not(:disabled) { color: var(--ui-text); text-decoration: underline; }
+.clearAvatar:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+.clearAvatar:disabled, .upload:has(input:disabled) { opacity: .5; cursor: not-allowed; }
+.upload:hover { border-color: var(--ui-accent); background: color-mix(in srgb, var(--ui-accent) 8%, transparent); }
+.upload input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.upload:focus-within { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+.card { overflow: hidden; border: 1px solid var(--ui-border); border-radius: 12px; background: color-mix(in srgb, var(--ui-surface) 88%, black); }
+.nameForm { padding: 16px; }
+.nameLabel { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-weight: 600; }
+.nameLabel svg { color: var(--ui-accent); }
+.nameControls { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+.nameControls input { min-width: 0; padding: 10px 12px; border: 1px solid var(--ui-border); border-radius: var(--meeting-radius-pill); background: var(--ui-surface); color: inherit; font: inherit; }
+.nameControls button { display: inline-flex; align-items: center; gap: 8px; }
+.nameControls input:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+.technical { margin-top: 20px; }
+.technical summary { cursor: pointer; font-weight: 600; }
+.details { display: grid; gap: 8px; margin: 12px 0 0; font-size: 13px; overflow-wrap: anywhere; }
+.details > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border: 1px solid var(--ui-border); border-radius: var(--meeting-radius-item); }
+.details dt { opacity: .72; }
+.details dd { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; margin: 0; }
+.details dd span { padding: 2px 8px; border: 1px solid var(--ui-border); border-radius: 999px; background: color-mix(in srgb, currentColor 4%, transparent); }
+.error { color: var(--meeting-danger); }
+
+@media (max-width: 600px) {
+  .identity { align-items: flex-start; padding: 18px 0; }
+  .avatar { width: 64px; height: 64px; }
+  .nameControls { grid-template-columns: minmax(0, 1fr); }
+  .nameControls button { justify-content: center; }
+  .details > div { align-items: flex-start; flex-direction: column; }
+  .details dd { justify-content: flex-start; }
+}
+
+/* Presenter ban list (moderator tab). */
+.bans { display: grid; gap: 8px; margin: 0; padding: 0 14px; list-style: none; }
+.bans li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--ui-border); }
+.bans li:last-child { border-bottom: 0; }
+.bans small { margin-left: 6px; opacity: 0.7; }

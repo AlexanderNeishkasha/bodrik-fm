@@ -1,0 +1,6 @@
+@media (max-width: 600px),
+    ((orientation: landscape) and (hover: none) and (pointer: coarse) and (max-height: 600px)) {
+    .panel.panel {
+        padding: 1.5rem;
+    }
+}

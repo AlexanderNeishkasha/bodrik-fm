@@ -1,0 +1,10 @@
+node_modules/
+target/
+.next/
+out/
+.env
+data/
+uploads/
+infra/dev/certs/
+public/meeting-assets/
+public/brand

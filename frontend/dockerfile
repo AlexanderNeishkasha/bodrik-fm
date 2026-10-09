@@ -1,0 +1,25 @@
+FROM oven/bun:1.4.2-alpine AS builder
+
+WORKDIR /app
+ENV CI=true NEXT_TELEMETRY_DISABLED=1
+RUN apk add --no-cache libc6-compat
+COPY frontend/package.json frontend/bun.lock ./
+RUN bun install --frozen-lockfile
+
+COPY frontend/ .
+
+ARG NEXT_PUBLIC_API_BASE
+ARG NEXT_PUBLIC_MEDIA_BASE
+ARG NEXT_PUBLIC_SUPPORT_EMAIL
+ENV NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}
+ENV NEXT_PUBLIC_MEDIA_BASE=${NEXT_PUBLIC_MEDIA_BASE}
+ENV NEXT_PUBLIC_SUPPORT_EMAIL=${NEXT_PUBLIC_SUPPORT_EMAIL}
+RUN bun -e 'const u = new URL(process.env.NEXT_PUBLIC_API_BASE); if (u.protocol !== "https:" || u.username || u.password || u.pathname !== "/") throw new Error("NEXT_PUBLIC_API_BASE must be an HTTPS URL origin")' \
+  && bun run build
+
+FROM alpine:3.23
+
+COPY --from=builder /app/out /artifact
+COPY --chmod=755 frontend/export-artifact.sh /usr/local/bin/export-artifact
+
+ENTRYPOINT ["/usr/local/bin/export-artifact"]
