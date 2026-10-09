@@ -28,6 +28,8 @@ struct State {
     port: u16,
     /// Current track/revision identity.
     source_key: Option<String>,
+    /// Whether FFmpeg has used this producer; a restarted RTP stream needs a fresh producer.
+    rtp_started: bool,
     /// Position used when the process started.
     source_position: f64,
     /// Monotonic process start instant.
@@ -174,6 +176,9 @@ async fn reconcile(
 }
 
 /// Apply one authoritative snapshot, creating native resources and correcting drift as needed.
+///
+/// # Errors
+/// Returns native allocation, media validation, spawn or bounded process-cleanup failures.
 async fn apply(
     service: &Service,
     room: &Room,
@@ -231,8 +236,8 @@ async fn apply(
     {
         return Ok(());
     }
-    let replacing_active_source = state.source_key.is_some();
-    if replacing_active_source {
+    // FFmpeg restarts RTP sequence/timestamp state, including after a pause cleared source_key.
+    if state.rtp_started {
         let mut stale = states.remove(&id).ok_or("music unavailable")?;
         silence(&mut stale).await?;
         close_native(service, room).await;
@@ -263,6 +268,7 @@ async fn apply(
         .stderr(Stdio::null())
         .kill_on_drop(true);
     state.process = Some(command.spawn().map_err(|_| "music process unavailable")?);
+    state.rtp_started = true;
     state.source_key = Some(key);
     state.source_position = snapshot.position;
     state.source_started = Instant::now();
@@ -297,6 +303,7 @@ async fn create_native(service: &Service, room: &Room, volume: f64) -> Result<St
         producer_id,
         port,
         source_key: None,
+        rtp_started: false,
         source_position: 0.0,
         source_started: Instant::now(),
         process: None,
@@ -403,6 +410,7 @@ fn ffmpeg_args(media: &str, position: f64, host: &str, port: u16, ssrc: u32) -> 
     ]
 }
 
+/// Source lifecycle and fixed-command contract regression tests.
 #[cfg(test)]
 mod tests {
     mod flow;
@@ -447,6 +455,7 @@ mod tests {
             producer_id: "producer".into(),
             port: 40_000,
             source_key: None,
+            rtp_started: false,
             source_position: 0.0,
             source_started: Instant::now(),
             process: None,

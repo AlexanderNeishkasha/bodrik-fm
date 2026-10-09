@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/AlexanderNeishkasha/bodrik-fm",
   "version": "1.1.7",
-  "sourceCommit": "9ce00d9ef17f4b7f867f43ab5456382a7ab29069",
+  "sourceCommit": "b6b6d45a7204857bd8525080f14c5c29126417c7",
   "files": [
     {
       "path": ".dockerignore",
@@ -193,11 +193,11 @@
     },
     {
       "path": "backend/crates/meeting/src/replacement/music.rs",
-      "sha256": "406b6b662ffac9035fba833fd0578119d46503254bde230078f5e57da404944e"
+      "sha256": "97d3537cbbc2447562d75f9968cb6690e4cdd800a813ebac35039a97339b4ab6"
     },
     {
       "path": "backend/crates/meeting/src/replacement/music/tests/flow.rs",
-      "sha256": "fe84c37da6d163c2476554cdc4010341816cad9a0a6410f02317e3c87a7b77ec"
+      "sha256": "7f4a2ca5a3ca0ddc3abc06988043ee0dc75b68c0b477a1bd87dd04e9db514d42"
     },
     {
       "path": "backend/crates/meeting/src/replacement/native.rs",
@@ -1257,7 +1257,7 @@
     },
     {
       "path": "frontend/app/lib/hls.mjs",
-      "sha256": "e35fed559b626104f86aa81ce6a8f1c359ae118f3997d71887b9f882986dc672"
+      "sha256": "e9eed3227641fac00043c6d8fd47f4a0445ba11827d60bb5fc80de6f0b9671f2"
     },
     {
       "path": "frontend/app/lib/mainRouting.mjs",
@@ -2653,7 +2653,7 @@
     },
     {
       "path": "frontend/test/hls.test.mjs",
-      "sha256": "479353a1447210a3b8c878e52d989c1753114ea2145028e757770dc09ee5ef80"
+      "sha256": "876d73353805c2f9b274ad53f488ff0e9499fc84dec41b0e1a84e2f868c469cd"
     },
     {
       "path": "frontend/test/main-routing.test.mjs",

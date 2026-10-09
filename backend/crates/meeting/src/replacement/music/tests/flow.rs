@@ -159,12 +159,37 @@ async fn native_music_authority_and_controls() {
         states["conference"].process.is_some(),
         "resume starts FFmpeg"
     );
+    let resumed_id = states["conference"].producer_id.clone();
+    assert_ne!(
+        resumed_id, first_id,
+        "resume must retire the RTP source used by the stopped FFmpeg process"
+    );
+    for (name, revision, playing) in [
+        ("repeated paused snapshot", 3, false),
+        ("second resume", 3, true),
+    ] {
+        *snapshot.lock().expect("authority") =
+            (StatusCode::OK, playback(revision, playing, 0.2, "first"));
+        reconcile(&service, &mut states, &mut seen, true)
+            .await
+            .expect("repeated pause/resume reconciliation");
+        assert_eq!(states["conference"].process.is_some(), playing, "{name}");
+        if playing {
+            assert_ne!(
+                states["conference"].producer_id, resumed_id,
+                "{name}: restart replaces RTP even without a revision change"
+            );
+        } else {
+            assert_eq!(states["conference"].producer_id, resumed_id, "{name}");
+        }
+    }
+    let resumed_id = states["conference"].producer_id.clone();
     *snapshot.lock().expect("authority") = (StatusCode::OK, playback(4, true, 0.8, "first"));
     reconcile(&service, &mut states, &mut seen, true)
         .await
         .expect("music reconciliation");
     assert_ne!(
-        states["conference"].producer_id, first_id,
+        states["conference"].producer_id, resumed_id,
         "active seek retires prior RTP source"
     );
     let sought_id = states["conference"].producer_id.clone();

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   attachMediaSource,
+  canPlayHlsNatively,
   destroyHls,
   getDirectUrl,
   getHlsUrl,
@@ -13,7 +14,12 @@ function fakeAudio({ nativeHls = false } = {}) {
   return {
     src: "",
     loadCount: 0,
-    canPlayType: () => (nativeHls ? "probably" : ""),
+    probeCount: 0,
+    /** Record native capability probes independently of source attachment. */
+    canPlayType() {
+      this.probeCount += 1;
+      return nativeHls ? "probably" : "";
+    },
     /** Record a requested native media reload. */
     load() {
       this.loadCount += 1;
@@ -62,6 +68,30 @@ function fakeHlsClass({ supported = true } = {}) {
   }
   return { FakeHls, instances };
 }
+
+test("native HLS capability is probed once per element, including unsupported results", () => {
+  for (const [name, response, expected] of [
+    ["unsupported", "", false],
+    ["possible native support", "maybe", true],
+    ["native support", "probably", true],
+  ]) {
+    let probes = 0;
+    const audio = {
+      /** Count capability queries, which can emit browser decoder warnings. */
+      canPlayType(type) {
+        assert.equal(type, "application/vnd.apple.mpegurl");
+        probes += 1;
+        return response;
+      },
+    };
+    for (let snapshot = 0; snapshot < 25; snapshot += 1) {
+      assert.equal(canPlayHlsNatively(audio), expected, name);
+    }
+    assert.equal(probes, 1, name);
+  }
+  assert.equal(canPlayHlsNatively(null), false);
+  assert.equal(canPlayHlsNatively({}), false);
+});
 
 test("HLS URL and eligibility policy covers supported and direct files", () => {
   const cases = [
@@ -118,8 +148,11 @@ test("lazy hls.js attachment reuses the current track and falls back on network 
   assert.equal(instances[0].source, result);
   assert.equal(instances[0].media, audio);
 
-  await attachMediaSource(options);
+  for (let snapshot = 0; snapshot < 25; snapshot += 1) {
+    await attachMediaSource(options);
+  }
   assert.equal(instances.length, 1);
+  assert.equal(audio.probeCount, 1);
 
   instances[0].handlers.get(FakeHls.Events.ERROR)(null, { type: FakeHls.ErrorTypes.NETWORK_ERROR });
   assert.equal(instances[0].destroyed, true);

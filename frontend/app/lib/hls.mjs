@@ -12,6 +12,9 @@ const HLS_EXTS = new Set([
 
 const HLS_CACHE_VERSION = "ts-v1";
 
+/** Stable native-HLS capability per element; weak keys do not retain retired players. */
+const nativeHlsSupport = new WeakMap();
+
 /** Return whether a media filename can use the generated HLS fallback. */
 export function isHlsEligible(filename) {
   if (!filename) return false;
@@ -30,9 +33,13 @@ export function getHlsUrl(base, filename) {
   return `${base}/media/hls/${encodeURIComponent(filename)}/index.m3u8?v=${HLS_CACHE_VERSION}`;
 }
 
-/** Return whether the current browser can play HLS without hls.js. */
+/** Probe native HLS once per element, avoiding repeated unsupported-format warnings. */
 export function canPlayHlsNatively(audio) {
-  return Boolean(audio?.canPlayType?.("application/vnd.apple.mpegurl"));
+  if (!audio?.canPlayType) return false;
+  if (!nativeHlsSupport.has(audio)) {
+    nativeHlsSupport.set(audio, Boolean(audio.canPlayType("application/vnd.apple.mpegurl")));
+  }
+  return nativeHlsSupport.get(audio);
 }
 
 /** Load hls.js only when a non-native browser requests an eligible track. */
