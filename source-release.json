@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/AlexanderNeishkasha/bodrik-fm",
   "version": "1.1.7",
-  "sourceCommit": "c67dbdec3cc490c52e98b368ff1bd040cc40148a",
+  "sourceCommit": "9ce00d9ef17f4b7f867f43ab5456382a7ab29069",
   "files": [
     {
       "path": ".dockerignore",
@@ -29,11 +29,11 @@
     },
     {
       "path": "backend/crates/meeting/PROVENANCE.md",
-      "sha256": "c5da86dd67b1c1185d5928291a38b62f57f02aa5174c0258b7b6e305f0b7bc95"
+      "sha256": "3efd08c719ed3dacb3858eb457826e7d6696f4be8c1c7fd12ab48d3a46b87de1"
     },
     {
       "path": "backend/crates/meeting/README.md",
-      "sha256": "071677cc2b03ecfe60100ac8a4cf5c257d1484493a4c9262bfe466f1c7cf3c1d"
+      "sha256": "3df87e06c09924a91a2c077b34b51a59635308da6fc1ef55a0fdeb1dbebd0b15"
     },
     {
       "path": "backend/crates/meeting/examples/replacement_lifecycle.rs",

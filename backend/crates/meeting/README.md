@@ -23,19 +23,12 @@ never extend grants; denial, expiry and replaced incarnations fail closed.
 
 ## Contracts
 
-Current protocol/operational contracts live in [meeting backend docs](../../../docs/meeting-backend):
-
-- [WebSocket v1](../../../docs/meeting-backend/websocket-v1.md)
-- [Signaling and HTTP routes](../../../docs/meeting-backend/public-signaling.md)
-- [Native worker](../../../docs/meeting-backend/native-worker.md)
-- [Media ownership](../../../docs/meeting-backend/runtime-media.md)
-- [Roles](../../../docs/meeting-backend/runtime-roles.md)
-- [Moderation](../../../docs/meeting-backend/runtime-moderation.md)
-- [File transfer](../../../docs/meeting-backend/file-transfer-v1.md)
-
+The implementation contracts are defined by `src/replacement/wire.rs`,
+`src/signaling.rs`, the `src/runtime/` modules and `src/integration/` host ports.
 The React meeting and licensed notification sounds belong to `frontend/`.
-Infrastructure belongs to `infra/`; [meeting operations](../../../docs/meeting-operations.md)
-describes local setup, TURN/nginx and rollback. There is no submodule dependency.
+See the [root README](../../../README.md) for build/run instructions. Private
+operational documentation and production configuration are not part of public
+source snapshots. There is no submodule dependency.
 
 ## Checks
 
