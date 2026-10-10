@@ -1,7 +1,7 @@
 //! Replacement admission issuance; independent keys and server-resolved actor/role authority.
 
 use super::{db, handlers, hosts, policy};
-use crate::api::{AppState, internal_error_response, json_message, normalize_origin, studio_v2};
+use crate::api::{AppState, internal_error_response, json_message, normalize_origin, studio};
 use axum::{
     Json, Router,
     extract::{ConnectInfo, DefaultBodyLimit, Path, State},
@@ -379,7 +379,7 @@ async fn issue(
     };
     // Authenticate presenters before discovery; resolve again after the await before signing.
     if slug.is_none() {
-        if let Err(response) = studio_v2::studio_user_from_http_async(&state.app, &headers).await {
+        if let Err(response) = studio::studio_user_from_http_async(&state.app, &headers).await {
             return *response;
         }
     } else if !slug.as_deref().is_some_and(identifier) {
@@ -404,7 +404,7 @@ async fn issue(
                 false,
             ),
             None => {
-                let user = studio_v2::studio_user_from_http(&state.app, &headers)?;
+                let user = studio::studio_user_from_http(&state.app, &headers)?;
                 (
                     db::by_room_id(&state.app, user.room_id).map_err(|error| {
                         Box::new(internal_error_response("conference.ticket.owner", error))

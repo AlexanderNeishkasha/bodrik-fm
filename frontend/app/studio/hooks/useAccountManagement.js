@@ -1,18 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ui } from "../../lang/ru";
-import { localizeApiMessage } from "../lib/localizeApiMessage";
+import { readApiMessage } from "../../lib/apiMessage";
 import { clearCachedAuthUser } from "../../lib/authSession";
-
-/** Read and localize one public account error response. */
-async function readApiMessage(res, fallback) {
-  try {
-    const data = await res.json();
-    return data?.message ? localizeApiMessage(data.message, fallback) : fallback;
-  } catch {
-    return fallback;
-  }
-}
+import { isAbortError } from "../../lib/abortError.mjs";
 
 /** Own account modal drafts and cancellable account mutations. */
 export default function useAccountManagement({ apiBase, showNotice, setStatus }) {
@@ -73,7 +64,7 @@ export default function useAccountManagement({ apiBase, showNotice, setStatus })
         setStatus("password change failed");
       }
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         showNotice(ui.messages.passwordChangeFailed);
         setStatus("password change failed");
       }
@@ -110,7 +101,7 @@ export default function useAccountManagement({ apiBase, showNotice, setStatus })
       showNotice(message);
       setStatus("account delete failed");
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         showNotice(ui.messages.accountDeleteFailed);
         setStatus("account delete failed");
       }

@@ -1,20 +1,6 @@
 import { useCallback } from "react";
-import { localizeApiMessage } from "../lib/localizeApiMessage";
-
-/** Return whether a failed command was intentionally superseded. */
-function isAbortError(error) {
-  return error?.name === "AbortError";
-}
-
-/** Read one localized Studio command error without exposing response details. */
-async function readActionMessage(response, fallback) {
-  try {
-    const data = await response.json();
-    return data?.message ? localizeApiMessage(data.message, fallback) : fallback;
-  } catch {
-    return fallback;
-  }
-}
+import { readApiMessage } from "../../lib/apiMessage";
+import { isAbortError } from "../../lib/abortError.mjs";
 
 /** Own authenticated Studio commands and consistent public failure reporting. */
 export default function useStudioActions({
@@ -51,7 +37,7 @@ export default function useStudioActions({
           return null;
         }
       }
-      const message = await readActionMessage(response, actionFailedMessage);
+      const message = await readApiMessage(response, actionFailedMessage);
       showNotice(message);
       setStatus(message);
     } catch {
@@ -75,7 +61,7 @@ export default function useStudioActions({
         setStatus("ready");
         return true;
       }
-      const message = await readActionMessage(response, actionFailedMessage);
+      const message = await readApiMessage(response, actionFailedMessage);
       showNotice(message);
       setStatus(message);
     } catch {
@@ -100,7 +86,7 @@ export default function useStudioActions({
         body: JSON.stringify({ slug }),
       });
       if (!response.ok) {
-        const message = await readActionMessage(response, actionFailedMessage);
+        const message = await readApiMessage(response, actionFailedMessage);
         if (!signal?.aborted) {
           showNotice(message);
           setStatus(message);
@@ -135,7 +121,7 @@ export default function useStudioActions({
         body: JSON.stringify({ listed: Boolean(listed) }),
       });
       if (!response.ok) {
-        const message = await readActionMessage(response, actionFailedMessage);
+        const message = await readApiMessage(response, actionFailedMessage);
         if (!signal?.aborted) {
           showNotice(message);
           setStatus(message);

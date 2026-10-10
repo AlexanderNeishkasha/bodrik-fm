@@ -2,7 +2,8 @@
 
 use super::{db, service};
 use crate::api::{
-    AppState, auth_v2, internal_error_response, json_message, room_settings, runtime_v2, studio_v2,
+    AppState, auth, blocking, internal_error_response, json_message, op_error::OpError,
+    room_settings, runtime, studio,
 };
 use axum::{
     Json,
@@ -53,7 +54,7 @@ pub struct SetMusicVolumeRequest {
 
 /// Load current Studio state after off-thread live identity/ownership resolution.
 pub async fn studio_status(State(state): State<AppState>, headers: HeaderMap) -> Response {
-    let user = match studio_v2::studio_user_from_http_async(&state, &headers).await {
+    let user = match studio::studio_user_from_http_async(&state, &headers).await {
         Ok(user) => user,
         Err(response) => return *response,
     };
@@ -70,7 +71,7 @@ pub async fn set_enabled(
     headers: HeaderMap,
     Json(payload): Json<SetEnabledRequest>,
 ) -> Response {
-    let user = match studio_v2::studio_user_from_http_async(&state, &headers).await {
+    let user = match studio::studio_user_from_http_async(&state, &headers).await {
         Ok(user) => user,
         Err(response) => return *response,
     };
@@ -94,36 +95,34 @@ pub async fn set_music_output(
     headers: HeaderMap,
     Json(payload): Json<SetMusicOutputRequest>,
 ) -> Response {
-    let user = match studio_v2::studio_user_from_http_async(&state, &headers).await {
+    let user = match studio::studio_user_from_http_async(&state, &headers).await {
         Ok(user) => user,
         Err(response) => return *response,
     };
     if !matches!(payload.output.as_str(), "studio" | "conference") {
         return json_message(StatusCode::BAD_REQUEST, "invalid music output").into_response();
     }
-    let runtime = match runtime_v2::ensure_room_runtime(&state, user.room_id).await {
+    let runtime = match runtime::ensure_room_runtime(&state, user.room_id).await {
         Ok(runtime) => runtime,
         Err(error) => return internal_error_response("conference.output.runtime", error),
     };
     let output = payload.output.clone();
-    match studio_v2::db_task(move || {
+    match blocking::op_task(move || {
         let mut current = runtime.music_output.blocking_lock();
-        let conference = db::by_room_id(&state, user.room_id)?.ok_or("conference disabled")?;
+        let disabled = OpError::Conflict("conference disabled");
+        let conference = db::by_room_id(&state, user.room_id)?.ok_or(disabled)?;
         if !conference.allowed || !conference.enabled {
-            return Err("conference disabled".into());
+            return Err(OpError::Conflict("conference disabled"));
         }
         room_settings::set_music_output(&state, user.room_id, &output)?;
         *current = output;
-        runtime_v2::notify_music(&runtime);
+        runtime::notify_music(&runtime);
         Ok(())
     })
     .await
     {
         Ok(()) => Json(serde_json::json!({"music_output": payload.output})).into_response(),
-        Err(error) if error == "conference disabled" => {
-            json_message(StatusCode::CONFLICT, error).into_response()
-        }
-        Err(error) => internal_error_response("conference.output", error),
+        Err(error) => error.respond("conference.output"),
     }
 }
 
@@ -133,22 +132,22 @@ pub async fn set_music_volume(
     headers: HeaderMap,
     Json(payload): Json<SetMusicVolumeRequest>,
 ) -> Response {
-    let user = match studio_v2::studio_user_from_http_async(&state, &headers).await {
+    let user = match studio::studio_user_from_http_async(&state, &headers).await {
         Ok(user) => user,
         Err(response) => return *response,
     };
     if !payload.volume.is_finite() || !(0.0..=1.0).contains(&payload.volume) {
         return json_message(StatusCode::BAD_REQUEST, "invalid music volume").into_response();
     }
-    let runtime = match runtime_v2::ensure_room_runtime(&state, user.room_id).await {
+    let runtime = match runtime::ensure_room_runtime(&state, user.room_id).await {
         Ok(runtime) => runtime,
         Err(error) => return internal_error_response("conference.volume.runtime", error),
     };
-    match studio_v2::db_task(move || {
+    match blocking::db_task(move || {
         let mut current = runtime.conference_music_volume.blocking_lock();
         room_settings::set_conference_music_volume(&state, user.room_id, payload.volume)?;
         *current = payload.volume;
-        runtime_v2::notify_music(&runtime);
+        runtime::notify_music(&runtime);
         Ok(())
     })
     .await
@@ -166,7 +165,7 @@ pub async fn studio_join(
     headers: HeaderMap,
     ConnectInfo(remote): ConnectInfo<SocketAddr>,
 ) -> Response {
-    let user = match studio_v2::studio_user_from_http_async(&state, &headers).await {
+    let user = match studio::studio_user_from_http_async(&state, &headers).await {
         Ok(user) => user,
         Err(response) => return *response,
     };
@@ -237,12 +236,12 @@ fn status_payload(state: &AppState, conference: db::Conference) -> StudioStatus 
 /// Returns worker/SQL errors; missing rooms remain absent.
 async fn room_state(state: &AppState, room: i64) -> Result<Option<db::Conference>, String> {
     let state = state.clone();
-    studio_v2::db_task(move || db::by_room_id(&state, room)).await
+    blocking::db_task(move || db::by_room_id(&state, room)).await
 }
 
 /// Atomically count admission before any expensive provider work, shared across join surfaces.
 pub(super) async fn admit(state: &AppState, headers: &HeaderMap, remote: SocketAddr) -> bool {
-    let key = auth_v2::client_key(headers, Some(remote.ip()), state.trust_proxy_headers);
+    let key = auth::client_key(headers, Some(remote.ip()), state.trust_proxy_headers);
     state
         .conference_join_rate_limiter
         .try_record_attempt(&key)

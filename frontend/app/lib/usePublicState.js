@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { applyTheme } from "./theme";
 import { deferEffect } from "./deferEffect";
 import { normalizePublicStatePayload } from "./publicState.mjs";
+import { isAbortError } from "./abortError.mjs";
 
 const WS_RETRY_MS = 1500;
 const WS_STALE_MS = 15000;
@@ -94,7 +95,7 @@ export default function usePublicState({ apiBase, roomSlug, enabled = true, onRo
         applyPayload(payload);
         return true;
       } catch (error) {
-        if (!cancelled && error?.name !== "AbortError" && !quiet) setStatus("error");
+        if (!cancelled && !isAbortError(error) && !quiet) setStatus("error");
         return false;
       } finally {
         if (fetchController === controller) fetchController = null;

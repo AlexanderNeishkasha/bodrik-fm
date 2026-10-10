@@ -1,22 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ui } from "../../lang/ru";
-import { localizeApiMessage } from "../lib/localizeApiMessage";
+import { readApiMessage } from "../../lib/apiMessage";
 import { deferEffect } from "../../lib/deferEffect";
 import { clearCachedAuthUser, hasCachedAuthUser, setCachedAuthUser } from "../../lib/authSession";
+import { isAbortError } from "../../lib/abortError.mjs";
 
 /** Return whether a response contains the minimum authoritative user contract. */
 const isAuthPayload = (payload) => typeof payload?.role === "string" && typeof payload?.room_slug === "string";
-
-/** Read and localize one public authentication failure response. */
-async function readAuthError(response, fallback) {
-  try {
-    const data = await response.json();
-    return data?.message ? localizeApiMessage(data.message, fallback) : fallback;
-  } catch {
-    return fallback;
-  }
-}
 
 /** Own Studio authentication while treating browser cache only as a UI hint. */
 export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus, setIsBusy }) {
@@ -104,7 +95,7 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
         setIsAuthChecked(true);
       }
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         setIsAuthed(false);
         setUser(null);
         setIsAuthChecked(true);
@@ -163,13 +154,13 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
       });
       if (response.ok) await applySuccessfulAuth(response, controller.signal);
       else if (!controller.signal.aborted) {
-        const message = await readAuthError(response, ui.messages.loginFailed);
+        const message = await readApiMessage(response, ui.messages.loginFailed);
         if (controller.signal.aborted) return;
         showNotice(message);
         setStatus("login failed");
       }
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         showNotice(ui.messages.loginFailed);
         setStatus("login failed");
       }
@@ -198,13 +189,13 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
       });
       if (response.ok) await applySuccessfulAuth(response, controller.signal);
       else if (!controller.signal.aborted) {
-        const message = await readAuthError(response, ui.messages.registrationFailed);
+        const message = await readApiMessage(response, ui.messages.registrationFailed);
         if (controller.signal.aborted) return;
         showNotice(message);
         setStatus("registration failed");
       }
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         showNotice(ui.messages.registrationFailed);
         setStatus("registration failed");
       }
@@ -229,7 +220,7 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
         signal: controller.signal,
       });
       if (!response.ok) {
-        const message = await readAuthError(response, ui.messages.actionFailed);
+        const message = await readApiMessage(response, ui.messages.actionFailed);
         if (controller.signal.aborted) return false;
         showNotice(message);
         setStatus("logout failed");
@@ -244,7 +235,7 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
       setStatus("logged out");
       return true;
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         showNotice(ui.messages.actionFailed);
         setStatus("logout failed");
       }

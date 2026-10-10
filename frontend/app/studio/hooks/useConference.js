@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ui } from "../../lang/ru";
 import { normalizeConferenceVolume } from "../lib/requestPolicy.mjs";
 import { reconcileConferenceRoomSnapshot } from "../lib/conferenceSnapshot.mjs";
+import { isAbortError } from "../../lib/abortError.mjs";
 
 /** Manage the optional conference capability without exposing its provider. */
 export default function useConference({ apiBase, asUserId, isAuthed, roomState, showNotice }) {
@@ -51,7 +52,7 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
         });
       })
       .catch((error) => {
-        if (error?.name !== "AbortError") {
+        if (!isAbortError(error)) {
           setSnapshot({ scope, allowed: false, enabled: false, inviteUrl: null });
         }
       });
@@ -94,7 +95,7 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
       const payload = options?.json === false ? null : await response.json();
       return controller.signal.aborted ? null : payload;
     } catch (error) {
-      if (error?.name !== "AbortError") showNotice(failureMessage);
+      if (!isAbortError(error)) showNotice(failureMessage);
       return null;
     } finally {
       if (actionControllerRef.current === controller) {
@@ -152,7 +153,7 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
         });
         if (!response.ok) throw new Error("music volume update failed");
       } catch (error) {
-        if (error?.name !== "AbortError" && musicVolumeRequestRef.current === controller) {
+        if (!isAbortError(error) && musicVolumeRequestRef.current === controller) {
           setVolumeState({ scope, value: null });
           showNotice(ui.studio.meetingVolumeFailed);
         }

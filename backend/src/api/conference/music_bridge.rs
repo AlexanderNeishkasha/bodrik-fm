@@ -1,8 +1,6 @@
 //! Queue-free music bridge authorization and no-store authoritative playback snapshots.
 
-use crate::api::{
-    AppState, internal_error_response, json_message, media_v2, runtime_v2, studio_v2,
-};
+use crate::api::{AppState, blocking, internal_error_response, json_message, media, runtime};
 use axum::{
     Json,
     extract::{Path, State},
@@ -80,15 +78,15 @@ pub(crate) async fn current(state: &AppState, id: String) -> Result<Option<Music
     let Some(room) = lookup(state, &id).await? else {
         return Ok(None);
     };
-    let runtime = runtime_v2::ensure_room_runtime(state, room).await?;
-    let playback = runtime_v2::playback_snapshot(&runtime).await;
+    let runtime = runtime::ensure_room_runtime(state, room).await?;
+    let playback = runtime::playback_snapshot(&runtime).await;
     let output = runtime.music_output.lock().await.clone();
     let volume = *runtime.conference_music_volume.lock().await;
     if !valid_gain(volume) {
         return Err("invalid runtime gain".into());
     }
     let track = match playback.player.current {
-        Some(track) if media_v2::valid_storage_key(&track.media_path) => Some(MusicTrack {
+        Some(track) if media::valid_storage_key(&track.media_path) => Some(MusicTrack {
             id: track.id,
             title: track.filename,
             duration: track.duration,
@@ -101,7 +99,7 @@ pub(crate) async fn current(state: &AppState, id: String) -> Result<Option<Music
         None => None,
     };
     match lookup(state, &id).await {
-        Ok(Some(current)) if current == room && !runtime_v2::is_closed(&runtime) => {}
+        Ok(Some(current)) if current == room && !runtime::is_closed(&runtime) => {}
         Ok(_) => {
             return Ok(None);
         }
@@ -124,7 +122,7 @@ pub(crate) async fn current(state: &AppState, id: String) -> Result<Option<Music
 async fn lookup(state: &AppState, id: &str) -> Result<Option<i64>, String> {
     let state = state.clone();
     let id = id.to_owned();
-    studio_v2::db_task(move || super::db::room_id_by_provider_id(&state, &id)).await
+    blocking::db_task(move || super::db::room_id_by_provider_id(&state, &id)).await
 }
 
 /// Check the independent private-player bearer without exposing or timing-comparing its value.

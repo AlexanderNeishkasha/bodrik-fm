@@ -1,7 +1,7 @@
 //! Read-only admission authority shared by embedded meetings and standalone compatibility HTTP.
 
 use super::{db, policy};
-use crate::api::{AppState, internal_error_response, json_message, studio_v2};
+use crate::api::{AppState, blocking, internal_error_response, json_message};
 use axum::{
     Json, Router,
     extract::{Path, State},
@@ -102,7 +102,7 @@ pub(crate) async fn grant(app: &AppState, id: String) -> Result<Option<Grant>, S
     let lookup = app.clone();
     let lookup_id = id.clone();
     let Some(conference) =
-        studio_v2::db_task(move || db::by_provider_id(&lookup, &lookup_id)).await?
+        blocking::db_task(move || db::by_provider_id(&lookup, &lookup_id)).await?
     else {
         return Ok(None);
     };

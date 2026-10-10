@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  isAbortError,
   nextRequestRevision,
   ownsRequestRevision,
   passwordResetPayload,
@@ -42,10 +41,4 @@ test("admin row updates affect only the selected user", () => {
     { id: 2, login: "two", room_slug: "changed" },
   ]);
   assert.deepEqual(updateAdminUser(rows, 3, { room_slug: "missing" }), rows);
-});
-
-test("abort errors stay distinct from operational failures", () => {
-  assert.equal(isAbortError({ name: "AbortError" }), true);
-  assert.equal(isAbortError(new Error("offline")), false);
-  assert.equal(isAbortError(null), false);
 });

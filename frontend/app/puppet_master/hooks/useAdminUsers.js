@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ui } from "../../lang/ru";
 import { clearCachedAuthUser, setCachedAuthUser } from "../../lib/authSession";
+import { isAbortError } from "../../lib/abortError.mjs";
 import { deferEffect } from "../../lib/deferEffect";
-import { readAdminApiMessage } from "../lib/adminApiMessage";
+import { readApiMessage } from "../../lib/apiMessage";
 import {
-  isAbortError,
   nextRequestRevision,
   ownsRequestRevision,
   passwordResetPayload,
@@ -14,6 +14,18 @@ import {
 import useAdminNotice from "./useAdminNotice";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:3001";
+
+/** Send one credentialed admin API request, JSON-encoding an optional body. */
+function adminFetch(path, { method = "GET", body, signal } = {}) {
+  return fetch(`${API_BASE}${path}`, {
+    method,
+    credentials: "include",
+    signal,
+    ...(body === undefined
+      ? {}
+      : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
+  });
+}
 
 /** Own admin authorization, users, drafts and cancellable mutations. */
 export default function useAdminUsers() {
@@ -30,6 +42,7 @@ export default function useAdminUsers() {
   const loadControllerRef = useRef(null);
   const roomRequestsRef = useRef({});
   const conferenceControllersRef = useRef({});
+  const mutationControllersRef = useRef(new Set());
   const roomDraftsRef = useRef(roomDrafts);
   const listedDraftsRef = useRef(listedDrafts);
 
@@ -52,6 +65,8 @@ export default function useAdminUsers() {
     roomRequestsRef.current = {};
     for (const controller of Object.values(conferenceControllersRef.current)) controller.abort();
     conferenceControllersRef.current = {};
+    for (const controller of mutationControllersRef.current) controller.abort();
+    mutationControllersRef.current.clear();
   }, []);
 
   useEffect(() => cancelOwnedWork, [cancelOwnedWork]);
@@ -63,17 +78,14 @@ export default function useAdminUsers() {
     loadControllerRef.current = controller;
     setStatus("loading");
     try {
-      const me = await fetch(`${API_BASE}/api/auth/me`, {
-        credentials: "include",
-        signal: controller.signal,
-      });
+      const me = await adminFetch("/api/auth/me", { signal: controller.signal });
       if (me.status === 401) {
         clearCachedAuthUser();
         setStatus("unauthorized");
         return;
       }
       if (!me.ok) {
-        const message = await readAdminApiMessage(me);
+        const message = await readApiMessage(me);
         if (controller.signal.aborted) return;
         showNotice(message);
         setStatus("error");
@@ -86,12 +98,9 @@ export default function useAdminUsers() {
         setStatus("forbidden");
         return;
       }
-      const response = await fetch(`${API_BASE}/api/admin/users`, {
-        credentials: "include",
-        signal: controller.signal,
-      });
+      const response = await adminFetch("/api/admin/users", { signal: controller.signal });
       if (!response.ok) {
-        const message = await readAdminApiMessage(response);
+        const message = await readApiMessage(response);
         if (controller.signal.aborted) return;
         showNotice(message);
         setStatus("error");
@@ -124,12 +133,10 @@ export default function useAdminUsers() {
   /** End the server session before clearing the local navigation hint. */
   const logout = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      // Deliberately not owned/aborted: cancelling logout could leave the session alive.
+      const response = await adminFetch("/api/auth/logout", { method: "POST" });
       if (!response.ok) {
-        showNotice(await readAdminApiMessage(response));
+        showNotice(await readApiMessage(response));
         return;
       }
       clearCachedAuthUser();
@@ -144,22 +151,28 @@ export default function useAdminUsers() {
     const payload = passwordResetPayload(passwordDrafts[userId] || "");
     if (!payload || passwordBusyByUser[userId]) return;
     setPasswordBusyByUser((current) => ({ ...current, [userId]: true }));
+    const controller = new AbortController();
+    mutationControllersRef.current.add(controller);
     try {
-      const response = await fetch(`${API_BASE}/api/admin/users/${userId}/reset-password`, {
+      const response = await adminFetch(`/api/admin/users/${userId}/reset-password`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
+        body: payload,
+        signal: controller.signal,
       });
       if (!response.ok) {
-        showNotice(await readAdminApiMessage(response, ui.messages.passwordResetFailed));
+        const message = await readApiMessage(response, ui.messages.passwordResetFailed);
+        if (!controller.signal.aborted) showNotice(message);
         return;
       }
+      if (controller.signal.aborted) return;
       setPasswordDrafts((current) => ({ ...current, [userId]: "" }));
-    } catch {
-      showNotice(ui.messages.actionFailed);
+    } catch (error) {
+      if (!isAbortError(error)) showNotice(ui.messages.actionFailed);
     } finally {
-      setPasswordBusyByUser((current) => ({ ...current, [userId]: false }));
+      mutationControllersRef.current.delete(controller);
+      if (!controller.signal.aborted) {
+        setPasswordBusyByUser((current) => ({ ...current, [userId]: false }));
+      }
     }
   }, [passwordBusyByUser, passwordDrafts, showNotice]);
 
@@ -167,20 +180,27 @@ export default function useAdminUsers() {
   const deleteUser = useCallback(async (userId) => {
     if (deleteBusyByUser[userId] || !window.confirm("Удалить пользователя?")) return;
     setDeleteBusyByUser((current) => ({ ...current, [userId]: true }));
+    const controller = new AbortController();
+    mutationControllersRef.current.add(controller);
     try {
-      const response = await fetch(`${API_BASE}/api/admin/users/${userId}/delete`, {
+      const response = await adminFetch(`/api/admin/users/${userId}/delete`, {
         method: "POST",
-        credentials: "include",
+        signal: controller.signal,
       });
       if (!response.ok) {
-        showNotice(await readAdminApiMessage(response));
+        const message = await readApiMessage(response);
+        if (!controller.signal.aborted) showNotice(message);
         return;
       }
+      if (controller.signal.aborted) return;
       await loadUsers();
-    } catch {
-      showNotice(ui.messages.actionFailed);
+    } catch (error) {
+      if (!isAbortError(error)) showNotice(ui.messages.actionFailed);
     } finally {
-      setDeleteBusyByUser((current) => ({ ...current, [userId]: false }));
+      mutationControllersRef.current.delete(controller);
+      if (!controller.signal.aborted) {
+        setDeleteBusyByUser((current) => ({ ...current, [userId]: false }));
+      }
     }
   }, [deleteBusyByUser, loadUsers, showNotice]);
 
@@ -194,15 +214,13 @@ export default function useAdminUsers() {
     const controller = new AbortController();
     owned.controller = controller;
     try {
-      const response = await fetch(`${API_BASE}/api/admin/users/${userId}/room`, {
+      const response = await adminFetch(`/api/admin/users/${userId}/room`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        body: { room, listed },
         signal: controller.signal,
-        body: JSON.stringify({ room, listed }),
       });
       if (!response.ok) {
-        const message = await readAdminApiMessage(response);
+        const message = await readApiMessage(response);
         if (!controller.signal.aborted && ownsRequestRevision(roomRequestsRef.current[userId], revision)) {
           showNotice(message);
         }
@@ -248,15 +266,13 @@ export default function useAdminUsers() {
     conferenceControllersRef.current[userId] = controller;
     setConferenceBusyByUser((current) => ({ ...current, [userId]: true }));
     try {
-      const response = await fetch(`${API_BASE}/api/admin/users/${userId}/conference-access`, {
+      const response = await adminFetch(`/api/admin/users/${userId}/conference-access`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        body: { allowed: enabled },
         signal: controller.signal,
-        body: JSON.stringify({ allowed: enabled }),
       });
       if (!response.ok) {
-        const message = await readAdminApiMessage(response);
+        const message = await readApiMessage(response);
         if (!controller.signal.aborted && conferenceControllersRef.current[userId] === controller) {
           showNotice(message);
         }

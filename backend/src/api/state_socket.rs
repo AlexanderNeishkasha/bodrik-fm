@@ -1,6 +1,6 @@
 //! Shared state-socket resource ownership and bounded transport policy.
 
-use super::runtime_v2::{self, RoomRuntime};
+use super::runtime::{self, RoomRuntime};
 use axum::extract::ws::{Message, WebSocket};
 use std::sync::{Arc, atomic::Ordering};
 use tokio::time::{self, Duration};
@@ -20,14 +20,14 @@ impl Drop for ListenerLease {
         self.runtime
             .active_listeners
             .fetch_sub(1, Ordering::Relaxed);
-        runtime_v2::notify(&self.runtime);
+        runtime::notify(&self.runtime);
     }
 }
 
 /// Acquire one listener lease for the complete lifetime of a socket task.
 pub(crate) fn listen(runtime: Arc<RoomRuntime>) -> ListenerLease {
     runtime.active_listeners.fetch_add(1, Ordering::Relaxed);
-    runtime_v2::notify(&runtime);
+    runtime::notify(&runtime);
     ListenerLease { runtime }
 }
 

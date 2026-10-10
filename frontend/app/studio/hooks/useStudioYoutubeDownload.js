@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ui } from "../../lang/ru";
 import { localizeApiMessage } from "../lib/localizeApiMessage";
 import { validateYoutubeUrl } from "../lib/youtube";
+import { isAbortError } from "../../lib/abortError.mjs";
 
 /** Own YouTube submission/dismiss requests and cancel obsolete Studio identity work. */
 export default function useStudioYoutubeDownload({
@@ -60,7 +61,7 @@ export default function useStudioYoutubeDownload({
       });
       if (!response.ok) throw new Error("dismiss failed");
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         showNotice(ui.messages.actionFailed);
         setStatus(ui.messages.actionFailed);
       }
@@ -108,7 +109,7 @@ export default function useStudioYoutubeDownload({
       showNotice(publicMessage);
       setStatus(publicMessage);
     } catch (error) {
-      if (error?.name !== "AbortError") {
+      if (!isAbortError(error)) {
         setYoutubeError(ui.messages.youtubeDownloadFailed);
         showNotice(ui.messages.youtubeDownloadFailed);
         setStatus(ui.messages.youtubeDownloadFailed);

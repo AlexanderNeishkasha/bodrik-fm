@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-
-/** Return whether a request was intentionally superseded. */
-function isAbortError(error) {
-  return error?.name === "AbortError";
-}
+import { isAbortError } from "../../lib/abortError.mjs";
 
 /** Own cancellable Studio library reads and mutations. */
 export default function useStudioLibraryRequests({

@@ -1,7 +1,7 @@
 //! Actual replacement issuance routes against isolated SQLite and private discovery fixtures.
 #![cfg(test)]
 use super::*;
-use crate::api::{auth_v2, mirotalk, playback_observer::PlaybackObserver};
+use crate::api::{auth, playback_observer::PlaybackObserver};
 use axum::{Json, routing::get};
 use std::{
     collections::HashMap,
@@ -58,14 +58,11 @@ fn state() -> AppState {
         jwt_secret: "synthetic-cookie-key-unrelated-to-tickets".into(),
         trust_proxy_headers: false,
         csrf_allowed_origins: Arc::new(vec!["http://localhost:3000".into()]),
-        login_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(5, 60)),
-        conference_join_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(30, 60)),
-        conference_provider: Some(Arc::new(super::super::Provider::mirotalk(
-            mirotalk::Config {
-                public_url: "https://legacy-unused.test".into(),
-                replacement_url: "http://replacement-unused".into(),
-                replacement_secret: "synthetic-replacement-secret-32".into(),
-            },
+        login_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
+        conference_join_rate_limiter: Arc::new(auth::LoginRateLimiter::new(30, 60)),
+        conference_provider: Some(Arc::new(super::super::Provider::embedded(
+            "https://meeting-unused.test".into(),
+            crate::meeting::Shared::new(),
         ))),
         music_bridge_secret: None,
         playback_observer: Arc::new(PlaybackObserver::new(16)),

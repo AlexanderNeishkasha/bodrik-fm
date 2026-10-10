@@ -4,7 +4,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use rusqlite::Connection;
 
-use crate::api::{AppState, auth_v2};
+use crate::api::{AppState, auth};
 
 use super::db;
 
@@ -43,8 +43,8 @@ fn state() -> AppState {
         jwt_secret: String::new(),
         trust_proxy_headers: false,
         csrf_allowed_origins: Arc::new(Vec::new()),
-        login_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(5, 60)),
-        conference_join_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(5, 60)),
+        login_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
+        conference_join_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
         conference_provider: None,
         music_bridge_secret: None,
         playback_observer: Arc::new(crate::api::playback_observer::PlaybackObserver::new(16)),

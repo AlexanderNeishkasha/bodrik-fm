@@ -5,7 +5,7 @@ use super::{
     handlers::{JoinResponse, admit},
     response::{no_store_json, no_store_redirect, unavailable_invitation},
 };
-use crate::api::{AppState, internal_error_response, json_message, studio_v2};
+use crate::api::{AppState, blocking, internal_error_response, json_message};
 use axum::{
     Json,
     extract::{ConnectInfo, Path, State},
@@ -104,5 +104,5 @@ pub async fn public_status(State(state): State<AppState>, Path(slug): Path<Strin
 /// Returns worker/SQL errors; missing slugs remain `None`.
 async fn lookup(state: &AppState, slug: String) -> Result<Option<db::Conference>, String> {
     let state = state.clone();
-    studio_v2::db_task(move || db::by_slug(&state, &slug)).await
+    blocking::db_task(move || db::by_slug(&state, &slug)).await
 }

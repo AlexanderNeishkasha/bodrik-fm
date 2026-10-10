@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/AlexanderNeishkasha/bodrik-fm",
   "version": "1.1.7",
-  "sourceCommit": "b6b6d45a7204857bd8525080f14c5c29126417c7",
+  "sourceCommit": "34620fa9c59d97aeec578fd18d4df2406ca8af96",
   "files": [
     {
       "path": ".dockerignore",
@@ -461,43 +461,47 @@
     },
     {
       "path": "backend/src/api.rs",
-      "sha256": "1533576f4841b469109b34cdbcb3a688f0daa971de26ed1f8f29242b14d1f018"
+      "sha256": "26df45f87b99aa56cdd82bfdbcfe9cb4fcfe1d9ed84ac7912ea33b41503a9ed7"
     },
     {
-      "path": "backend/src/api/account_v2.rs",
-      "sha256": "0cedf12fcfc1908dbb3dab06e4d001bcdcfa80326dfd2574c9c0ccea5fe71670"
+      "path": "backend/src/api/account.rs",
+      "sha256": "fcb3d0a2f66413c1d37ac2ddc439d0182ebc039aa88850db3a6f41d035a7eaaa"
     },
     {
-      "path": "backend/src/api/admin_v2.rs",
-      "sha256": "7135bf7fbae2ff63a61ad069b79b54b9d3281b0d5a6faaf264975b00c25ecad4"
+      "path": "backend/src/api/admin.rs",
+      "sha256": "4e81947f1b5b2559b594f7efee74a54a4a1e50ba33fedc0d35eefa08c038a297"
     },
     {
-      "path": "backend/src/api/auth_v2.rs",
-      "sha256": "47ffbee8e3051af473c3ecd0a6af58689205d432666790861594bcff3f6b409e"
+      "path": "backend/src/api/auth.rs",
+      "sha256": "6f2a942c7e6e67245451912455f72cada2b4277ba27ae20d230d37b96e326256"
     },
     {
-      "path": "backend/src/api/auth_v2/client.rs",
+      "path": "backend/src/api/auth/client.rs",
       "sha256": "a7709cbfcbc6557ce0ba8343bd2f7c972726a8d3d40026329c0dcda26f312d4c"
     },
     {
-      "path": "backend/src/api/auth_v2/cookies.rs",
+      "path": "backend/src/api/auth/cookies.rs",
       "sha256": "32d611789994c6d39519c9bd6ce7d8532dc773b2e6fc71ef0186c639ebdbf9f5"
     },
     {
-      "path": "backend/src/api/auth_v2/password_policy.rs",
+      "path": "backend/src/api/auth/password_policy.rs",
       "sha256": "78f4ce10cc7a50aff5a547ec858a0129d46021712f5fa7f50775fbe651730a63"
     },
     {
-      "path": "backend/src/api/auth_v2/rate_limiter.rs",
+      "path": "backend/src/api/auth/rate_limiter.rs",
       "sha256": "d3f17ce92400ae3089c1c673081f83db1582180ed8e6984fc52ac348ead34149"
     },
     {
-      "path": "backend/src/api/auth_v2/tests.rs",
+      "path": "backend/src/api/auth/tests.rs",
       "sha256": "b6f10702710594e473aebba4eb1f01fe51c3e2a12021ee229cafc1197cc61808"
     },
     {
+      "path": "backend/src/api/blocking.rs",
+      "sha256": "aacabff3fd6cc6f418b4a4bac075b30cabce220068e7fdfe8a1b100cb911a8d0"
+    },
+    {
       "path": "backend/src/api/conference/admission.rs",
-      "sha256": "980eab229ae9182c8b0880fcfd58765d7566dfc0f62dfddae2178897cda4f7d9"
+      "sha256": "5e7dd57c91d4259881e5bbfd2a74b9b1e4aabd3181c09c653c1e6ae386c54765"
     },
     {
       "path": "backend/src/api/conference/chat/cleanup.rs",
@@ -509,7 +513,7 @@
     },
     {
       "path": "backend/src/api/conference/chat/direct/storage_tests.rs",
-      "sha256": "e3956465f7dc6df4788f31b57c946be6645a43b896f5a8e1f91865801d18c449"
+      "sha256": "bd8329414d04c1e1fea71a2597f0dfd925a7d8db331bddb4579ba2e5be224a31"
     },
     {
       "path": "backend/src/api/conference/chat/files.rs",
@@ -517,7 +521,7 @@
     },
     {
       "path": "backend/src/api/conference/chat/mod.rs",
-      "sha256": "1ac6c8872d3a17d71b8b9f9c973386ceb90a83842d4f9c39db0b67bad99ac2b8"
+      "sha256": "6a79d05705ff2d440790a92f3bf2e11abe4a6dc5e0ff15465d2cc9a7dd97cdf3"
     },
     {
       "path": "backend/src/api/conference/chat/store.rs",
@@ -533,7 +537,7 @@
     },
     {
       "path": "backend/src/api/conference/cleanup.rs",
-      "sha256": "3294d7fc5a5d6760a0412ce6cb547d9850665f2b2888c4cf358d319d5776cc87"
+      "sha256": "f54ccd63c46b0f58bbad99903feb7eab1cdbd6395644b5849040bf6570fb175d"
     },
     {
       "path": "backend/src/api/conference/db.rs",
@@ -541,31 +545,31 @@
     },
     {
       "path": "backend/src/api/conference/db_tests.rs",
-      "sha256": "45df55fe980a41375665ca720630784b6c74c9b9f6cafc22e744d9354f861ebb"
+      "sha256": "62c5a3da1879be13ce093ee3802d28777df4be9d8949d1b07011ed6904c0e56b"
     },
     {
       "path": "backend/src/api/conference/embedded.rs",
-      "sha256": "944bbea400ca81b712d310551434d24e724da7f9e00aa29128c54d792129c2a5"
+      "sha256": "4be8c84264d1c162fe96c3b2246f8fe5a0e2ca0191751e20105248a10ac4a3ab"
     },
     {
       "path": "backend/src/api/conference/guest.rs",
-      "sha256": "76f34a27cec7cb30f6da0c54d26564388557b965013680e5d5c2dd608fb0731e"
+      "sha256": "e1704229ea99632054480f88cc5839a4480faf364b7b622efb5370c4ba7f39e5"
     },
     {
       "path": "backend/src/api/conference/handlers.rs",
-      "sha256": "e651d37870bfbe00ca8af11ffee044b6f1229658a953265452a98e3dce93f0d9"
+      "sha256": "0af2f39d6056a8b1e2c900fb7072b00996c012b5ecbd695cd03d43cf0af42c36"
     },
     {
       "path": "backend/src/api/conference/hosts.rs",
-      "sha256": "91311afd228f54d9f00d12105ad87800c3256b64b2baef608eba21067e1f813b"
+      "sha256": "7682d131fcf327fb93c3941e30f16e2b3ee4c5d1cb2432349484991b6462012c"
     },
     {
       "path": "backend/src/api/conference/mod.rs",
-      "sha256": "772fd09e0d3b88bd0aad41497c4c5ba732f58423a2328277ee8d43822e356548"
+      "sha256": "eefe25b30f03fcf4cebd8890a79341e7cf400d278e06eb2bae67ac11bae05439"
     },
     {
       "path": "backend/src/api/conference/music_bridge.rs",
-      "sha256": "473c7e67e05954095a75e6fafb94894ccd00eb785ab44b6bd0d5fa0a71e9c883"
+      "sha256": "fbad8ca99554e6329bfc2c2af5d61423ddd9f633763b3e1eca36be65f5f6b23f"
     },
     {
       "path": "backend/src/api/conference/policy.rs",
@@ -573,7 +577,7 @@
     },
     {
       "path": "backend/src/api/conference/provider.rs",
-      "sha256": "dcbc3fa6a87ca275bfd6173696bc6b1ccf3dcde4d0c66da419f2b74e9ca43f06"
+      "sha256": "a0697b46ff566797223e1f6a7226d77b2bc53a88cb4a2029adf7566d092e3834"
     },
     {
       "path": "backend/src/api/conference/response.rs",
@@ -581,11 +585,15 @@
     },
     {
       "path": "backend/src/api/conference/service.rs",
-      "sha256": "5c7a19f4f89c804404615d488710bc1319dfec3d9aa703c74cfca1c50dbb8731"
+      "sha256": "ff8e1c849b4aa16fa2367567d7bda3caef003156b823f6411ff03d26495d58e0"
+    },
+    {
+      "path": "backend/src/api/conference/service_tests.rs",
+      "sha256": "6713cdc2c7fe4cc19f53e4549ec276ff23a393c33ccb69c26c1a44a5115d9361"
     },
     {
       "path": "backend/src/api/conference/tickets.rs",
-      "sha256": "9b75b2e54105e430709eee6639516babebc961116a29e5d945fe788bd6b0b30d"
+      "sha256": "70f65e6565b7d909b67224e85b7dbab1c7fef70747fedefeef6d1eab30e1b72a"
     },
     {
       "path": "backend/src/api/conference/tickets/device.rs",
@@ -593,7 +601,7 @@
     },
     {
       "path": "backend/src/api/conference/tickets/route_tests.rs",
-      "sha256": "d8e296c4072592e616db8754aa0ef07bebb510487a21885f7fc1f7d6dd21727f"
+      "sha256": "ae78e87ef09a53aa88df342296a15bcc7a106319f22e60b073e5e9e3386bfecf"
     },
     {
       "path": "backend/src/api/conference/tickets/tests.rs",
@@ -604,92 +612,80 @@
       "sha256": "71b7bbd41d3a96f41d073638136cfbaf436994fefd07d16f5588c6fee1b15e4d"
     },
     {
-      "path": "backend/src/api/db_v2.rs",
+      "path": "backend/src/api/db.rs",
       "sha256": "89217909f46c7742df6be816aab191894ae283d0a1969185686da9ecbec6336b"
     },
     {
-      "path": "backend/src/api/db_v2/accounts.rs",
-      "sha256": "15c909b0c0934e2f12ffd7771c5be217c7ecc6f62e0ab45dbe5f6b50d83388aa"
+      "path": "backend/src/api/db/accounts.rs",
+      "sha256": "c41a75268f7db31619e2b8b3e9ae8ad23454ec51ca6707f6fe45779d57ab0e23"
     },
     {
-      "path": "backend/src/api/db_v2/prepared.rs",
-      "sha256": "ee66f47f4353dc24b5cec09ab5afd573b718e9d0917dee0480c5100d41c44832"
+      "path": "backend/src/api/db/prepared.rs",
+      "sha256": "ca60ba46ba9ef4e166bbf0750e5b6fa91938ab12b108eac4382efb0191570a26"
     },
     {
-      "path": "backend/src/api/db_v2/rooms.rs",
-      "sha256": "6a2c2cc46a13a8bcab63cad6f96cba7733aa0bf6333a37afb1a7d742fb3572eb"
+      "path": "backend/src/api/db/rooms.rs",
+      "sha256": "22735307f3b509d95b272711feaed5a26ac1ddc141001bc12cf531a6a363ca7d"
     },
     {
-      "path": "backend/src/api/db_v2/schema.rs",
-      "sha256": "30f98fbf97c41cf0dba7a4670ea2129994d134e7a729850e4364db5950d7144f"
+      "path": "backend/src/api/db/schema.rs",
+      "sha256": "b052a866aa564c279f9cc3dd779201838d2a171a73c0a8df049869f681dd47e9"
     },
     {
-      "path": "backend/src/api/db_v2/tracks.rs",
-      "sha256": "3ca03e2fd9903912212b0bbf2b7b71c7c63687fb8644926cc38988346aa268cd"
+      "path": "backend/src/api/db/tracks.rs",
+      "sha256": "ae560d81f5008e848d9ad3329046a766a396a037bdb05e6c061ab41da5fb7e82"
     },
     {
-      "path": "backend/src/api/db_v2/types.rs",
+      "path": "backend/src/api/db/types.rs",
       "sha256": "8ff1e150805d7c5b710d5d4c8164242ab7428bc8a72a2df5263f20aad9f006b7"
     },
     {
-      "path": "backend/src/api/library_db_util_v2.rs",
-      "sha256": "98290327441f522b43f1b66039ca20544b0a133166780ab8ef2295664c4b24d0"
+      "path": "backend/src/api/library.rs",
+      "sha256": "e566f22f8e36f019335924464c25e1c8b19b6d08f8d2e6dc139c3563ea5202b9"
     },
     {
-      "path": "backend/src/api/library_db_v2.rs",
-      "sha256": "956b3d014f7b19079c617346cd909a74b85450432ae4aa4ab50876cb6c4b6078"
+      "path": "backend/src/api/library_db.rs",
+      "sha256": "fdcb6b9b908eb42582801a0626a9e8a5f89036c8a8d83c78de518ad52b4967ad"
     },
     {
-      "path": "backend/src/api/library_playback_v2.rs",
-      "sha256": "8e65ee561d2ff93d580163a79b205af2b47959f4eb1135ab91cb4694e4d6a6cf"
+      "path": "backend/src/api/library_db_util.rs",
+      "sha256": "5356160230707d45cafc97cacfdc912dd3d2fdd69fb5747dd6c125f7316075ff"
     },
     {
-      "path": "backend/src/api/library_v2.rs",
-      "sha256": "4f2e30713026b7acd319c238788f825b1c9766d8faaf042ffb8834432b569a34"
+      "path": "backend/src/api/library_playback.rs",
+      "sha256": "12053df260f93c6eb22d7f5989ce8591992474bc4c59c478e67b9f78e1bd8abd"
     },
     {
-      "path": "backend/src/api/media_v2.rs",
-      "sha256": "366be1c49bf923f99c210e03ed873e0a483ab0f323ddeec5a3406d33a0ece1fd"
+      "path": "backend/src/api/media.rs",
+      "sha256": "acde325fe50aeb1779d5d50f5cf4c8a6de70a2fc2dbfc18bc99ed9e4a095899a"
     },
     {
-      "path": "backend/src/api/media_v2/artifacts.rs",
+      "path": "backend/src/api/media/artifacts.rs",
       "sha256": "4f451d34b8b8adaafe7b5eefde7fe38040540bba726f34418580608eb983e89d"
     },
     {
-      "path": "backend/src/api/media_v2/hls.rs",
-      "sha256": "d99bfd6361c730c0216ecca0ccaa7e740a5a9e8a96e63ec003e1a770c26b3ba1"
+      "path": "backend/src/api/media/hls.rs",
+      "sha256": "9d290a7a901d7fee5d07fedf35f2c143923d0d56aded6adb1bb9c83949f879c5"
     },
     {
-      "path": "backend/src/api/media_v2/process.rs",
-      "sha256": "9dbf012394453bf747724b6af79b8e838d26b85c89c8378eb5c3c5cb480356ad"
+      "path": "backend/src/api/media/process.rs",
+      "sha256": "57546879e8f6cea585ab98327c9c5de66cd57e083c6592c143c5d143dabaa07e"
     },
     {
-      "path": "backend/src/api/media_v2/storage.rs",
+      "path": "backend/src/api/media/storage.rs",
       "sha256": "b1e92ce18568b7a16b920dffcf318f7b341be7909a552596b1989fa2b64384bc"
     },
     {
-      "path": "backend/src/api/mirotalk/client.rs",
-      "sha256": "2ff361343e4c8bc296c8e3f78ffedadc8b37ad108ab3afab3f57344e0d488a3f"
-    },
-    {
-      "path": "backend/src/api/mirotalk/client/integration_tests.rs",
-      "sha256": "e038fa46edfccc0318489c5181df647e74d7772e27d002598e0d1c7155a6ade3"
-    },
-    {
-      "path": "backend/src/api/mirotalk/mod.rs",
-      "sha256": "936fa5069ef62636e4caf7cb1fce84179fff4f308adf912b7020c607cc312112"
-    },
-    {
-      "path": "backend/src/api/mirotalk/service_tests.rs",
-      "sha256": "bee3df2a5f63179ff0064d2950cb4dc19b863445a18a385523ec913e0fff89a0"
+      "path": "backend/src/api/op_error.rs",
+      "sha256": "bcdd6b4e43bfb56422c8da6bdb9b78e7d892c6e2fba05828d2214698b99d5217"
     },
     {
       "path": "backend/src/api/playback_observer.rs",
       "sha256": "d5b706d567fe1d2d736f03eed92eb00a93c4e96465fbf09be71ed5650d3b3d9e"
     },
     {
-      "path": "backend/src/api/public_v2.rs",
-      "sha256": "f202bb43caaa364c1163c2ad30b68ccb8b54a2a823f4d4657ec477f7a953d0cb"
+      "path": "backend/src/api/public.rs",
+      "sha256": "02f80b7539937d2a862e427523c1882d026c8f783557e74a51f680f09bf6b741"
     },
     {
       "path": "backend/src/api/request_security.rs",
@@ -700,88 +696,88 @@
       "sha256": "5195aa25a29d47b98315f0376018adc5c342a8de0820c7fd6e0d58419dedfad1"
     },
     {
-      "path": "backend/src/api/runtime_v2.rs",
-      "sha256": "f6d16f867c72a0c94b04ca208398bcb23fd4ef6606a692c0072bdf23415163b3"
+      "path": "backend/src/api/runtime.rs",
+      "sha256": "69dc96b7e2433f29470f508d3e4f2c506e4bde6e703752adfc7a03ef0fd80bfe"
     },
     {
-      "path": "backend/src/api/runtime_v2/tests.rs",
+      "path": "backend/src/api/runtime/tests.rs",
       "sha256": "10a8f9515fa6f6b3961fe798f49112b056ca5e3fdef4e3d46a26d78544d35c2f"
     },
     {
       "path": "backend/src/api/state_socket.rs",
-      "sha256": "24962663a80acbc1dddb30128b60f5544a5098f3be3bdc1d233f8bf6c610a65e"
+      "sha256": "63541aea4ca04fc28c1254e0f704c5bc903eeb9d9f357d24d5b1db70a01ca2da"
     },
     {
-      "path": "backend/src/api/studio_state.rs",
-      "sha256": "672b64ce1ba17c2f0c52910d74c747d26bdf0b45c47a98adbe843bfa3cb6ce6e"
+      "path": "backend/src/api/studio.rs",
+      "sha256": "79bc45e4f9ba4efa4d2ae046b45848f180df570dc6c92f03924dd9fe4b297ba6"
     },
     {
-      "path": "backend/src/api/studio_v2.rs",
-      "sha256": "035db94a839c68c9dd2f866b2f581c14245fc6246fdc0bf6737ce7c65f60febc"
+      "path": "backend/src/api/studio/auth.rs",
+      "sha256": "1a50e875553cc3d0d9b8c0d5a33ffe2c591bf19de5d990d7d745f78a673d3970"
     },
     {
-      "path": "backend/src/api/studio_v2/auth.rs",
-      "sha256": "168e569b82ec489d10b234c8ac010c7e2727c26b4c6b99049e7a7d0d07ff72e1"
+      "path": "backend/src/api/studio/context.rs",
+      "sha256": "f61ff4927bb655024dfce32b752b411de3fdaea5c4237d5cd9ac954f64ecd22b"
     },
     {
-      "path": "backend/src/api/studio_v2/context.rs",
-      "sha256": "1dbc2df2f5f932f8fb7af6a1c7c3d4a5ca822c89d37584f20e9fda5c011ffc4f"
+      "path": "backend/src/api/studio/playback.rs",
+      "sha256": "17f776c5c7a05015b5c41a793c9a1e86e36852c8833c8d958bd2db64c62cd7da"
     },
     {
-      "path": "backend/src/api/studio_v2/playback.rs",
-      "sha256": "b590dfda5638529171432bb7a582c54cd748d5b9dc53c3c1e1f43aca0b6c0baa"
+      "path": "backend/src/api/studio/preferences.rs",
+      "sha256": "0e7d682a4c60b9281354581fc8ecd001892e8ce11e924c53319844f8e29b9164"
     },
     {
-      "path": "backend/src/api/studio_v2/preferences.rs",
-      "sha256": "04c2c459b71ecf95bbcaa48e068336234cf108fc55f0a928be212ba69769d1a1"
-    },
-    {
-      "path": "backend/src/api/studio_v2/queue.rs",
+      "path": "backend/src/api/studio/queue.rs",
       "sha256": "4d73f8e4af286b27982808197e29be465775594aa241ae40e7d4907aa425e286"
     },
     {
-      "path": "backend/src/api/studio_v2/tracks.rs",
-      "sha256": "05cbb2809caf0c55e1f3ac49b35435ad894c7050847d1289e6d1c53b2643c38c"
+      "path": "backend/src/api/studio/tracks.rs",
+      "sha256": "16953232ef4519865a38e76eb96ce8a57a579ee728c5a9695a6991cceab9a064"
     },
     {
-      "path": "backend/src/api/studio_v2/types.rs",
+      "path": "backend/src/api/studio/types.rs",
       "sha256": "8d9f6f8497e9e5d864d7e1de6349fe5e3b2f6190496b17fb38642e0031f4cc47"
     },
     {
-      "path": "backend/src/api/studio_v2/upload.rs",
-      "sha256": "9bde11fcf42731b477e44c65dd7791140d3757a1198b95a66daf2f5aac9c2438"
+      "path": "backend/src/api/studio/upload.rs",
+      "sha256": "7791291ef2b745dd04e9d25523b20f6a3bdcfa1c02add56e9d687eae5c02c091"
     },
     {
-      "path": "backend/src/api/util_v2.rs",
+      "path": "backend/src/api/studio_state.rs",
+      "sha256": "e83e948bb2c562431f1c97e174f108bb2545b389f289ac6fa7f44b2fb4f640c4"
+    },
+    {
+      "path": "backend/src/api/util.rs",
       "sha256": "251ec9976a17f0c23a8232cdf53c392201df2804016408eddaec0b0c8fb6c14b"
     },
     {
-      "path": "backend/src/api/util_v2/tests.rs",
+      "path": "backend/src/api/util/tests.rs",
       "sha256": "668f28de41155a6f9b0a8ee476e793085fd16d737c59208d7b3b5fec17f30cfb"
     },
     {
-      "path": "backend/src/api/youtube_download_runner_v2.rs",
-      "sha256": "d65b3c640a409ff8db2bb2dea544f22405efa982f4b49aaf9a5be3c66643316b"
+      "path": "backend/src/api/youtube.rs",
+      "sha256": "9d40f4de338a4190d99121329eefa847397c29e73e9a9bf9a235908464b67651"
     },
     {
-      "path": "backend/src/api/youtube_download_runner_v2/native.rs",
-      "sha256": "a7c51c8b2f868a3b95e1c5a20baf11ece2fd22367c88db89d1dbfdd3f6d301d1"
+      "path": "backend/src/api/youtube/policy.rs",
+      "sha256": "a26aabd52a2a28905d7d218b5ac3f511591d2d80c68dcf5c217668064e0f2a3d"
     },
     {
-      "path": "backend/src/api/youtube_jobs_v2.rs",
-      "sha256": "0aee00453308af1220dd8c80a4fc994c53712d972699d23709a11709c6afc970"
+      "path": "backend/src/api/youtube/policy/tests.rs",
+      "sha256": "1b33c2667fdb1c5db25dd4b2a1ad422d4fb0767f2523d66645b14a314eef5aa0"
     },
     {
-      "path": "backend/src/api/youtube_v2.rs",
-      "sha256": "970ae09830250a06c4cc513adcadf2a241e66e56c4f6946dc4791d70c741654c"
+      "path": "backend/src/api/youtube_download_runner.rs",
+      "sha256": "686c684c68d807a4b7cfb1f1f9b71dd5814aa0d06b52d19095924ee401432651"
     },
     {
-      "path": "backend/src/api/youtube_v2/policy.rs",
-      "sha256": "49c64a752d046f330d666638dce60018f4b399b2a4ca7560b24750729f1c1ed2"
+      "path": "backend/src/api/youtube_download_runner/native.rs",
+      "sha256": "c4656b4ae4180d903fb0807fd39c40f9267f2a0a6dd466019f94f4678fea9d47"
     },
     {
-      "path": "backend/src/api/youtube_v2/policy/tests.rs",
-      "sha256": "0c79d065ea786be42a0a0aef68007559844d7bf3a4dd6b3bed20c3ab4628cf92"
+      "path": "backend/src/api/youtube_jobs.rs",
+      "sha256": "45e33b9265ec9f8d084fac26858cd4048c09241a173dc52be80a0cc2cb31fe04"
     },
     {
       "path": "backend/src/config.rs",
@@ -789,7 +785,7 @@
     },
     {
       "path": "backend/src/main.rs",
-      "sha256": "983cd7eb1ed8269575e74bbfa773320940b6b6e1b67887630d5127a879117ab8"
+      "sha256": "524d459b3cd88a57b08ce09f6d29c86dbdcc679757c9007262db4f1a944d1008"
     },
     {
       "path": "backend/src/meeting.rs",
@@ -869,7 +865,7 @@
     },
     {
       "path": "frontend/app/components/BrandedStatusPage.js",
-      "sha256": "03fdf3363e4cb499aaf0b1b13c66b18fae488da2469aa1d206d38440054507cf"
+      "sha256": "67c213321368ab4c3e9e6f8e7e92775f7c5f2c04d6e6b5b99c204ada1fb46158"
     },
     {
       "path": "frontend/app/components/HotkeysPanel.js",
@@ -1216,6 +1212,14 @@
       "sha256": "39afbaca0711f8d4591c2a67c5efcf7012be42c03e73290d9e7033cd4fcc8686"
     },
     {
+      "path": "frontend/app/lib/abortError.mjs",
+      "sha256": "4653684258fe205873aff025a99b19faec28cb96933c23e568842d7b53852201"
+    },
+    {
+      "path": "frontend/app/lib/apiMessage.js",
+      "sha256": "3bb846769bbea8384eb1698b53161ef71315957eeb8e5b5061c8de0e4ecfa5d8"
+    },
+    {
       "path": "frontend/app/lib/asset.js",
       "sha256": "d80370d901f9394a68003634dfbeb08297d0a2208754f1f80e4ed8bd5ae04745"
     },
@@ -1266,6 +1270,10 @@
     {
       "path": "frontend/app/lib/publicState.mjs",
       "sha256": "601bd508d38d30c5481cee3c134e4994bab97d2f8958d6348cd19af604721682"
+    },
+    {
+      "path": "frontend/app/lib/statusNavigation.mjs",
+      "sha256": "11a4b9bf51a7f0f670e16b9506e5f4f5321121eb5809e8d25cdfad360a5f6802"
     },
     {
       "path": "frontend/app/lib/storageKeys.js",
@@ -1325,7 +1333,7 @@
     },
     {
       "path": "frontend/app/lib/usePublicState.js",
-      "sha256": "face086a31138161f1072b05e2a90a04d3bb27166a8a9e3f74c6c4bc8684f3a9"
+      "sha256": "7e01cde6bd40b23770a1fa90221f189039ab6a683e0f2f07c5c464cf85837d29"
     },
     {
       "path": "frontend/app/meeting-unavailable/page.js",
@@ -1365,15 +1373,11 @@
     },
     {
       "path": "frontend/app/puppet_master/hooks/useAdminUsers.js",
-      "sha256": "101628ee62a2ed309b26f9943a42998b34003cb30ca2a4a80a3bd8aa3631441e"
-    },
-    {
-      "path": "frontend/app/puppet_master/lib/adminApiMessage.js",
-      "sha256": "cc780d5534f0150e05af554d5f0f82305e3edafe3422c8508574d79db0b0043a"
+      "sha256": "91fd4cc0085dd1ab376bdd0ee3439733f757286997e6b5b24d1315481fd05ae1"
     },
     {
       "path": "frontend/app/puppet_master/lib/adminPolicy.mjs",
-      "sha256": "b67d37d283d07db9f982d3a72fba8900ca395cf51e14b9e7111118b2c6cb782e"
+      "sha256": "9a3cc4912a38faa5dc7b0224954ae70f8f25c8a5b7b595a7e87a39609758ab15"
     },
     {
       "path": "frontend/app/puppet_master/page.js",
@@ -1521,11 +1525,11 @@
     },
     {
       "path": "frontend/app/studio/hooks/useAccountManagement.js",
-      "sha256": "7cef7ab70ba69cb4965425e5fd097d29192c9adb08eb6e3c4f12899dde0133d0"
+      "sha256": "984a0c617194664d354f33fc05d3196edb90aa493edce29d420b65006daea2f2"
     },
     {
       "path": "frontend/app/studio/hooks/useConference.js",
-      "sha256": "3a1f6630f51cdac5b8671fcda0815b90884d1346e26cac199d9067d7611a4702"
+      "sha256": "1b0fd684d68adb9cbb5f94f9ae89ad198a4b1076387348e5ecb5c1f926b37cf2"
     },
     {
       "path": "frontend/app/studio/hooks/useLibraryPresence.js",
@@ -1541,7 +1545,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioActions.js",
-      "sha256": "53deb1eea60b6827b51299fdfe861a983f33ed84452b607bca7f663485f6d769"
+      "sha256": "bf297f2acacdf534867f5255724a6af0ed660c28e5159ab6cc0fc4bd1439df71"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioAudio.js",
@@ -1561,7 +1565,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioAuth.js",
-      "sha256": "bc92209cf2024df7e8ab41a96f291a4ecda55e71ebb1bead1f9a7c912dd38342"
+      "sha256": "0e11dde40b1408c242ed02ebc93be3f893cdd087e5f9f9de0dd6a617485ca00e"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioAuthState.js",
@@ -1597,7 +1601,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioLibraryRequests.js",
-      "sha256": "7fdf6f2352fa9d01eff480f7183f96787e9ab6cf4328ca7f1b73254704cb7539"
+      "sha256": "5c95c134156ce1cb373f8b1fe2d96c4d6db298c982c030d00069ccf1fb7af572"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioLibraryState.js",
@@ -1645,7 +1649,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioYoutubeDownload.js",
-      "sha256": "7d290d672d2d84ace0f70362ae3a25c1e9690a4f639cfcfe2c770641a0ef3093"
+      "sha256": "1e6f53937f3cb9421df57b11171a36c295e5db04e5c2ab560600bc03167da956"
     },
     {
       "path": "frontend/app/studio/hooks/useUploadDrop.js",
@@ -2628,12 +2632,20 @@
       "sha256": "5c4cecc8965c22b9d93f977ad77bb6336739e2092b74e17faec3b58390910be4"
     },
     {
+      "path": "frontend/test/abort-error.test.mjs",
+      "sha256": "61ddfbfd8562cc3670fa7f2b8d7b4e69ce0553897afe9426112f9f7119e8da92"
+    },
+    {
       "path": "frontend/test/admin-navigation.test.mjs",
       "sha256": "f1bcddb407a5cb5e9cb8b4021b57e69eac3f0f60e7bb0deb19acd7927ff821dd"
     },
     {
       "path": "frontend/test/admin-policy.test.mjs",
-      "sha256": "afc5b4c63af424a59c9ab4db13962a1c832481ebcd05654078f8b0bfcbcfff10"
+      "sha256": "ba281cd3c8a225534a86b3cf0f17b4c687deb6f1b8dd269fc1e5abc6eecb3b5c"
+    },
+    {
+      "path": "frontend/test/api-message.test.mjs",
+      "sha256": "28ebd0bd14a1bc097c68280c96877fe1665abc9833997eea20a698565ff34e9c"
     },
     {
       "path": "frontend/test/audio-pulse.test.mjs",
@@ -2914,6 +2926,10 @@
     {
       "path": "frontend/test/shared-ui.test.mjs",
       "sha256": "1238797f4fa1c37c9c5df521ca73deb84a87cdabbf718794a1674345ad763b9b"
+    },
+    {
+      "path": "frontend/test/status-navigation.test.mjs",
+      "sha256": "842db2541be1eca72a5d7b8810090e74d850b9f76fd247e9aa6931eb83bce173"
     },
     {
       "path": "frontend/test/studio-as-user.test.mjs",

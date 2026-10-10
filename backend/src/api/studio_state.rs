@@ -1,6 +1,6 @@
 //! Private Studio state delivery, live authorization and cancellation-safe listener leases.
 
-use super::{AppState, request_security, runtime_v2, state_socket, studio_v2, youtube_jobs_v2};
+use super::{AppState, blocking, request_security, runtime, state_socket, studio, youtube_jobs};
 use axum::{
     extract::{
         Query, State,
@@ -16,7 +16,7 @@ use tokio::time::{self, Duration};
 pub(crate) async fn state_ws(
     State(state): State<AppState>,
     headers: HeaderMap,
-    Query(query): Query<studio_v2::StudioAsQuery>,
+    Query(query): Query<studio::StudioAsQuery>,
     ws: WebSocketUpgrade,
 ) -> axum::response::Response {
     if !request_security::websocket_origin_allowed(&headers, &state.csrf_allowed_origins) {
@@ -26,18 +26,18 @@ pub(crate) async fn state_ws(
     let auth_headers = headers.clone();
     let as_user_id = query.as_user_id;
     let user = match tokio::task::spawn_blocking(move || {
-        studio_v2::resolve_studio_user(&auth_state, &auth_headers, as_user_id)
+        studio::resolve_studio_user(&auth_state, &auth_headers, as_user_id)
     })
     .await
     {
         Ok(Ok(user)) => user,
-        Ok(Err(error)) => return studio_v2::studio_user_error_status(error).into_response(),
+        Ok(Err(error)) => return studio::studio_user_error_status(error).into_response(),
         Err(error) => {
             tracing::error!(%error, "Studio socket authorization task failed");
             return StatusCode::INTERNAL_SERVER_ERROR.into_response();
         }
     };
-    let runtime = match runtime_v2::ensure_room_runtime(&state, user.room_id).await {
+    let runtime = match runtime::ensure_room_runtime(&state, user.room_id).await {
         Ok(runtime) => runtime,
         Err(error) => {
             tracing::error!(%error, "Studio socket runtime failed");
@@ -54,7 +54,7 @@ pub(crate) async fn state_ws(
 async fn run(
     mut socket: WebSocket,
     state: AppState,
-    runtime: Arc<runtime_v2::RoomRuntime>,
+    runtime: Arc<runtime::RoomRuntime>,
     room: i64,
     headers: HeaderMap,
     as_user_id: Option<i64>,
@@ -74,7 +74,7 @@ async fn run(
             _ = authorization.tick() => {
                 let auth_state = state.clone();
                 let auth_headers = headers.clone();
-                match tokio::task::spawn_blocking(move || studio_v2::resolve_studio_user(&auth_state, &auth_headers, as_user_id)).await {
+                match tokio::task::spawn_blocking(move || studio::resolve_studio_user(&auth_state, &auth_headers, as_user_id)).await {
                     Ok(Ok(user)) if user.room_id == room => {},
                     Ok(_) => break,
                     Err(error) => { tracing::error!(%error, "Studio socket revalidation task failed"); break; }
@@ -86,7 +86,7 @@ async fn run(
                 continue;
             }
         }
-        if runtime_v2::is_closed(&runtime) {
+        if runtime::is_closed(&runtime) {
             break;
         }
         let Some(payload) = payload(&state, &runtime, room).await else {
@@ -99,17 +99,17 @@ async fn run(
 }
 
 /// Serialize current playback/preferences and jobs without inventing empty data on DB errors.
-async fn payload(state: &AppState, runtime: &runtime_v2::RoomRuntime, room: i64) -> Option<String> {
-    let snapshot = runtime_v2::snapshot(runtime).await;
+async fn payload(state: &AppState, runtime: &runtime::RoomRuntime, room: i64) -> Option<String> {
+    let snapshot = runtime::snapshot(runtime).await;
     let db_state = state.clone();
-    let jobs =
-        match studio_v2::db_task(move || youtube_jobs_v2::list_room_jobs(&db_state, room)).await {
-            Ok(jobs) => jobs,
-            Err(error) => {
-                tracing::error!(%error, "Studio state job lookup failed");
-                return None;
-            }
-        };
+    let jobs = match blocking::db_task(move || youtube_jobs::list_room_jobs(&db_state, room)).await
+    {
+        Ok(jobs) => jobs,
+        Err(error) => {
+            tracing::error!(%error, "Studio state job lookup failed");
+            return None;
+        }
+    };
     Some(serde_json::json!({
         "is_playing": snapshot.player.is_playing, "position": snapshot.player.position,
         "current": snapshot.player.current, "queue": snapshot.player.queue,

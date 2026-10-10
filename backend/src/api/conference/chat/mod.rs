@@ -8,7 +8,7 @@ mod tests;
 mod types;
 
 use super::admission;
-use crate::api::{AppState, studio_v2};
+use crate::api::{AppState, blocking};
 use axum::{
     Json, Router,
     extract::{Path, Query, State},
@@ -129,7 +129,7 @@ pub(super) async fn database<T: Send + 'static>(
     operation: impl FnOnce(&mut rusqlite::Connection) -> Result<T, String> + Send + 'static,
 ) -> Result<T, String> {
     let app = state.app.clone();
-    studio_v2::db_task(move || {
+    blocking::db_task(move || {
         let mut conn = app.db.lock().map_err(|_| "chat database lock poisoned")?;
         operation(&mut conn)
     })

@@ -1,6 +1,6 @@
 //! Private host implementation of the public meeting application's typed ports.
 use super::{admission, chat, music_bridge};
-use crate::api::{AppState, media_v2};
+use crate::api::{AppState, media};
 use meeting_backend::integration::{Grant, Playback, PlaybackTrack, services::*};
 use serde_json::Value;
 use tokio::sync::watch;
@@ -62,7 +62,7 @@ impl Services for HostServices {
     /// Restrict FFmpeg input to a validated single-component original media key.
     fn media_source(&self, reference: &str) -> Result<String, String> {
         let key = media_key(reference)?;
-        media_v2::media_path(&self.app, &key)
+        media::media_path(&self.app, &key)
             .to_str()
             .map(str::to_owned)
             .ok_or_else(|| "invalid media path".into())
@@ -113,7 +113,7 @@ fn media_key(reference: &str) -> Result<String, String> {
     let key = percent_encoding::percent_decode_str(encoded)
         .decode_utf8()
         .map_err(|_| "invalid media encoding")?;
-    if !media_v2::valid_storage_key(&key) {
+    if !media::valid_storage_key(&key) {
         return Err("invalid media key".into());
     }
     Ok(key.into_owned())

@@ -1,6 +1,6 @@
 //! Direct host storage integration with synthetic SQLite and streamed attachment bytes.
 use super::*;
-use crate::api::{AppState, auth_v2, playback_observer::PlaybackObserver};
+use crate::api::{AppState, auth, playback_observer::PlaybackObserver};
 use axum::body::Body;
 use meeting_backend::integration::services::Submission;
 use std::{
@@ -24,8 +24,8 @@ fn fixture() -> ChatState {
             jwt_secret: String::new(),
             trust_proxy_headers: false,
             csrf_allowed_origins: Arc::new(Vec::new()),
-            login_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(5, 60)),
-            conference_join_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(5, 60)),
+            login_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
+            conference_join_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
             conference_provider: None,
             music_bridge_secret: None,
             playback_observer: Arc::new(PlaybackObserver::new(16)),

@@ -4,7 +4,7 @@ use super::{
     cleanup,
     db::{self, Conference},
 };
-use crate::api::{AppState, runtime_v2, studio_v2};
+use crate::api::{AppState, blocking, runtime};
 
 /// Own enablement/disablement and provider cleanup through request cancellation.
 ///
@@ -27,13 +27,13 @@ async fn enabled_command(state: AppState, room: i64, enabled: bool) -> Result<Co
     }
     let runtime = runtime_for_command(&state, room).await;
     let db_state = state.clone();
-    let conference = studio_v2::db_task(move || {
+    let conference = blocking::db_task(move || {
         let _serialized = runtime
             .as_ref()
             .map(|runtime| runtime.music_output.blocking_lock());
         let conference = db::set_enabled(&db_state, room, enabled)?;
         if let Some(runtime) = &runtime {
-            runtime_v2::set_conference_state(runtime, conference.allowed, conference.enabled);
+            runtime::set_conference_state(runtime, conference.allowed, conference.enabled);
         }
         Ok(conference)
     })
@@ -68,20 +68,19 @@ async fn access_command(state: AppState, user: i64, allowed: bool) -> Result<boo
         return Err("conference provider unavailable".into());
     }
     let lookup = state.clone();
-    let Some(room) = studio_v2::db_task(move || db::room_id_by_user_id(&lookup, user)).await?
-    else {
+    let Some(room) = blocking::db_task(move || db::room_id_by_user_id(&lookup, user)).await? else {
         return Ok(false);
     };
     let runtime = runtime_for_command(&state, room).await;
     let db_state = state.clone();
-    let changed = studio_v2::db_task(move || {
+    let changed = blocking::db_task(move || {
         let _serialized = runtime
             .as_ref()
             .map(|runtime| runtime.music_output.blocking_lock());
         let changed = db::set_allowed_by_user_id(&db_state, user, provider, allowed)?;
         let conference = db::by_room_id(&db_state, room)?;
         if let (Some(runtime), Some(conference)) = (&runtime, conference) {
-            runtime_v2::set_conference_state(runtime, conference.allowed, conference.enabled);
+            runtime::set_conference_state(runtime, conference.allowed, conference.enabled);
         }
         Ok(changed)
     })
@@ -96,8 +95,8 @@ async fn access_command(state: AppState, user: i64, allowed: bool) -> Result<boo
 async fn runtime_for_command(
     state: &AppState,
     room: i64,
-) -> Option<std::sync::Arc<runtime_v2::RoomRuntime>> {
-    match runtime_v2::ensure_room_runtime(state, room).await {
+) -> Option<std::sync::Arc<runtime::RoomRuntime>> {
+    match runtime::ensure_room_runtime(state, room).await {
         Ok(runtime) => Some(runtime),
         Err(error) => {
             tracing::error!(room_id = room, %error, "conference runtime mirror unavailable");

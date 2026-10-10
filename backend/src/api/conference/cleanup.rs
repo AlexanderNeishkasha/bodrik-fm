@@ -1,6 +1,6 @@
 //! Durable, idempotent retirement of provider resources after revocation/deletion.
 
-use crate::api::{AppState, studio_v2};
+use crate::api::{AppState, blocking};
 use rusqlite::{Transaction, params};
 
 /// One retired provider mapping, never a new-join authority.
@@ -42,7 +42,7 @@ pub(crate) async fn for_room(state: &AppState, room: i64) -> Result<(), String> 
 /// Returns lookup/provider/ack failures; failed targets stay durable.
 async fn drain(state: &AppState, room: Option<i64>) -> Result<(), String> {
     let query_state = state.clone();
-    let pending = studio_v2::db_task(move || {
+    let pending = blocking::db_task(move || {
         let conn = query_state.db.lock().map_err(|_| "db lock poisoned")?;
         let mut stmt = conn
             .prepare(
@@ -77,7 +77,7 @@ async fn drain(state: &AppState, room: Option<i64>) -> Result<(), String> {
             continue;
         }
         let ack_state = state.clone();
-        if let Err(error) = studio_v2::db_task(move || {
+        if let Err(error) = blocking::db_task(move || {
             let conn = ack_state.db.lock().map_err(|_| "db lock poisoned")?;
             conn.execute("DELETE FROM conference_termination_outbox WHERE provider = ?1 AND provider_room_id = ?2 AND room_id = ?3",
                 params![entry.provider, entry.target, entry.room]).map_err(|err| err.to_string())?;

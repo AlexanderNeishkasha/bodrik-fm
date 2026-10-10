@@ -15,6 +15,8 @@ mod policy;
 mod provider;
 mod response;
 pub(crate) mod service;
+#[cfg(test)]
+mod service_tests;
 mod tickets;
 
 pub(crate) use admission::routes as admission_routes;

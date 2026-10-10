@@ -112,7 +112,7 @@ mod tests {
     //! Host pass lifecycle tables against the real migration.
 
     use super::*;
-    use crate::api::{auth_v2, playback_observer::PlaybackObserver};
+    use crate::api::{auth, playback_observer::PlaybackObserver};
     use std::{
         collections::HashMap,
         sync::{Arc, Mutex},
@@ -134,8 +134,8 @@ mod tests {
             jwt_secret: String::new(),
             trust_proxy_headers: false,
             csrf_allowed_origins: Arc::new(Vec::new()),
-            login_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(5, 60)),
-            conference_join_rate_limiter: Arc::new(auth_v2::LoginRateLimiter::new(5, 60)),
+            login_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
+            conference_join_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
             conference_provider: None,
             music_bridge_secret: None,
             playback_observer: Arc::new(PlaybackObserver::new(16)),

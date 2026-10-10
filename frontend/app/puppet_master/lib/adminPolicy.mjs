@@ -1,8 +1,3 @@
-/** Return whether a caught request failure is an intentional cancellation. */
-export function isAbortError(error) {
-  return error?.name === "AbortError";
-}
-
 /** Return the next monotonic draft revision for one admin user. */
 export function nextRequestRevision(previous) {
   return (previous?.revision ?? 0) + 1;
