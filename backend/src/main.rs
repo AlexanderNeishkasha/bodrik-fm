@@ -63,7 +63,7 @@ async fn run() -> Result<(), String> {
     let meeting_enabled = config::env_flag("MEETING_ENABLED", false);
     let conference_provider = if meeting_enabled {
         let public_url =
-            env::var("MIROTALK_PUBLIC_URL").map_err(|_| "MIROTALK_PUBLIC_URL is required")?;
+            env::var("MEETING_PUBLIC_URL").map_err(|_| "MEETING_PUBLIC_URL is required")?;
         let url = url::Url::parse(&public_url).map_err(|_| "invalid meeting public URL")?;
         if !matches!(url.scheme(), "http" | "https")
             || !url.has_host()

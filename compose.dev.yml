@@ -14,7 +14,7 @@ services:
       UPLOAD_TMP_DIR: ${UPLOAD_TMP_DIR:-/app/backend/uploads/tmp}
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-http://localhost:3000,http://127.0.0.1:3000,http://pc.local:3000,https://pc.local:3443,https://localhost:3443}
       TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-false}
-      MIROTALK_PUBLIC_URL: ${MIROTALK_PUBLIC_URL:-}
+      MEETING_PUBLIC_URL: ${MEETING_PUBLIC_URL:-}
       CONFERENCE_UNAVAILABLE_URL: ${CONFERENCE_UNAVAILABLE_URL:-}
       MEETING_TICKET_KEY: ${LOCAL_MEETING_TICKET_KEY:-}
       MEETING_ENABLED: "true"

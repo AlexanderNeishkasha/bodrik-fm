@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/AlexanderNeishkasha/bodrik-fm",
   "version": "1.1.7",
-  "sourceCommit": "34620fa9c59d97aeec578fd18d4df2406ca8af96",
+  "sourceCommit": "e5de4dcfcd3586e32234e25420e4e52f5ea4f916",
   "files": [
     {
       "path": ".dockerignore",
@@ -785,7 +785,7 @@
     },
     {
       "path": "backend/src/main.rs",
-      "sha256": "524d459b3cd88a57b08ce09f6d29c86dbdcc679757c9007262db4f1a944d1008"
+      "sha256": "1c17ed35dd05a5f4d1e214906c2e86015f2fe3f3731156cd355768a3a28e5b70"
     },
     {
       "path": "backend/src/meeting.rs",
@@ -817,7 +817,7 @@
     },
     {
       "path": "compose.dev.yml",
-      "sha256": "0ebfaaf9b50910c7345ee01cb42e01f6d131feac21c830bb8db7a6323935583d"
+      "sha256": "031bc67b048ccbe0900eb0c82aba8f1ed1f9f2b069b071d7a412531595964600"
     },
     {
       "path": "frontend/.dockerignore",
@@ -2981,7 +2981,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "03b6a131949c6b7952ab2c78107fb25c03a085324be8e509efb8a2127301f2a7"
+      "sha256": "537104e95bb6dca870e85d931aef173f07e42f2d34745330d3505d05e653de65"
     },
     {
       "path": "LICENSE",
