@@ -6,7 +6,6 @@ const sections = Object.freeze({
   tabRoom: [{ view: "roomInfo", source: "roomInfo" }, { view: "policy", source: "policy", kind: "room" }],
   tabModerator: [{ view: "policy", source: "policy", kind: "moderator" }],
   tabShortcuts: [{ view: "personal", source: "personal", kind: "shortcuts" }],
-  tabLanguages: [{ view: "personal", source: "personal", kind: "language" }],
 });
 
 /** Resolve authorized shell sections to existing feature sources; missing owners fail closed, never create fallbacks. */

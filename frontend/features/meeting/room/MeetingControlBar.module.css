@@ -2,7 +2,7 @@
 .bar {
   position: fixed;
   z-index: 3;
-  /* Always centered in the tab; open chat/participants panels may cover it. */
+  /* Centered in the tab; wide layouts re-center it beside docked panels (below). */
   left: 50%;
   bottom: max(10px, env(safe-area-inset-bottom));
   display: flex;
@@ -87,7 +87,12 @@
 /* Muted microphone / camera off: the player's danger surface. */
 .bar .off {
   background: var(--meeting-danger-bg);
-  color: var(--meeting-danger);
+  color: var(--meeting-danger-foreground);
+}
+
+.bar .off:hover:not(:disabled) {
+  background: var(--meeting-danger-hover);
+  color: var(--meeting-danger-foreground);
 }
 
 .active {
@@ -183,6 +188,23 @@
 
 .danger {
   color: var(--meeting-danger) !important;
+}
+
+/*
+ * Chat/participants dock beside the grid only above 1024px (they are fullscreen below).
+ * Center the bar in the remaining stage so docked panels never cover it; if the stage is
+ * narrower than the bar, it stays pinned to the left edge. It sits above the docks (z 10/11)
+ * so its wide device menus overlay a panel instead of being clipped beneath it.
+ */
+@media (min-width: 1025px) {
+  .bar {
+    z-index: 12;
+    left: 8px;
+    right: calc(8px + var(--meeting-panels-width, 0px));
+    width: max-content;
+    margin-inline: auto;
+    transform: none;
+  }
 }
 
 @media (max-width: 900px) {

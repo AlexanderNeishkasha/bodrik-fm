@@ -6,13 +6,9 @@ import Icon from "../../../components/ui/Icon";
 import ParticipantAvatar from "../media/ParticipantAvatar";
 import styles from "./AudioSettings.module.css";
 import layout from "./ProfileSettings.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** Profile copy belongs to React; uploaded files and admission credentials stay outside the view state. */
-const copy = {
-  ru: { title: "Ваш профиль", intro: "Измените имя и аватар для встречи.", name: "Имя пользователя", save: "Сохранить", upload: "Изменить аватар", reset: "Удалить", resetLabel: "Удалить аватар", presenter: "Ведущий", participant: "Участник", details: "Техническая информация", browser: "Браузер", cpu: "Процессор", device: "Устройство", engine: "Движок", os: "ОС", error: "Не удалось обновить профиль. Проверьте имя или изображение и попробуйте ещё раз." },
-  en: { title: "Your profile", intro: "Change your name and avatar for the meeting.", name: "Username", save: "Save", upload: "Change avatar", reset: "Remove", resetLabel: "Remove avatar", presenter: "Presenter", participant: "Participant", details: "Technical details", browser: "Browser", cpu: "CPU info", device: "Device", engine: "Engine", os: "OS info", error: "Could not update your profile. Check the name or image and try again." },
-};
-
 /** Render a name draft, not a second profile store; the key resets only when the authoritative name changes. */
 function NameForm({ name, disabled, text, submit }) {
   const [draft, setDraft] = useState(name);
@@ -28,7 +24,7 @@ function NameForm({ name, disabled, text, submit }) {
 /** Project the single runtime identity source; mounting does not upload, persist or send peer events. */
 export default function ProfileSettings({ source, onReady }) {
   const snapshot = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot);
-  const text = copy[snapshot.language === "en" ? "en" : "ru"];
+  const text = t("meeting.profileSettings");
   const disabled = !!snapshot.pending || snapshot.available === false;
   useEffect(() => { onReady?.(); }, [onReady]);
   /** The source reports errors and rejects obsolete session results; the view owns only the name draft. */
@@ -36,7 +32,7 @@ export default function ProfileSettings({ source, onReady }) {
     try { await source.execute(key, value); }
     catch { console.warn("Profile command rejected; see profile settings status"); }
   }
-  return <section className={`${styles.section} ${layout.profile}`} lang={snapshot.language}
+  return <section className={`${styles.section} ${layout.profile}`}
     onKeyDown={(event) => { if (event.key !== "Escape") event.stopPropagation(); }}>
     <header className={styles.header}><h3>{text.title}</h3><p>{text.intro}</p></header>
     <div className={layout.identity}>

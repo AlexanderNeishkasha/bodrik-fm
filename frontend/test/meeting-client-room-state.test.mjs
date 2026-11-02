@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { MUSIC_ID, initialRoomState, reduceRoomState, registryView } from "../features/meeting/client/roomState.mjs";
+import { buildCards } from "../features/meeting/room/gridLayout.mjs";
 
 const stamp = (sessionId) => ({ roomInstanceId: "r1", sessionId, admissionEpoch: 1 });
 const welcome = { type: "welcome", welcome: { stamp: stamp("me"), phase: "admitted", presenter: true } };
@@ -70,14 +71,72 @@ test("early producer-state changes are bounded", () => {
   assert.equal(Object.keys(run(welcome, snapshot, ...changes).early).length, 64);
 });
 
-test("music participant follows the music producer", () => {
-  const started = run(welcome, snapshot, event("producerCreated", music));
-  assert.equal(viewOf(started, MUSIC_ID)?.bot, true);
-  assert.equal(started.musicVolume, 0.4);
-  assert.equal(viewOf(reduceRoomState(started, snapshot), MUSIC_ID)?.bot, true, "snapshot keeps music");
-  assert.equal(viewOf(reduceRoomState(started, event("producerClosed", { resourceId: "m1" })), MUSIC_ID), undefined);
-  assert.equal(viewOf(reduceRoomState(started, { type: "inventory", sources: [] }), MUSIC_ID), undefined, "inventory without music removes it");
+test("music participant follows output while replaceable sources only change audio", () => {
+  const disconnected = run(welcome, snapshot);
+  assert.equal(viewOf(disconnected, MUSIC_ID), undefined, "Studio output keeps the bot out");
+  assert.equal(disconnected.participants[MUSIC_ID], undefined, "bot is derived, not copied into membership");
+
+  const connected = reduceRoomState(disconnected, event("producerCreated", music));
+  assert.equal(viewOf(connected, MUSIC_ID)?.bot, true, "conference output connects the bot");
+  assert.equal(viewOf(connected, MUSIC_ID)?.audio, true);
+  assert.equal(connected.musicVolume, 0.4);
+  assert.equal(connected.count, 2, "human count excludes the bot");
+
+  const refreshed = reduceRoomState(connected, snapshot);
+  assert.equal(viewOf(refreshed, MUSIC_ID)?.bot, true, "human snapshots retain the server source");
+  const closed = reduceRoomState(refreshed, event("producerClosed", { resourceId: "m1" }));
+  assert.equal(viewOf(closed, MUSIC_ID)?.bot, true, "replacing the RTP source keeps the bot connected");
+  assert.equal(viewOf(closed, MUSIC_ID)?.audio, false, "closed source stops audio until replacement");
+  const inventoried = reduceRoomState(connected, { type: "inventory", sources: [] });
+  assert.equal(viewOf(inventoried, MUSIC_ID)?.bot, true, "an interim empty inventory keeps logical presence");
+  const outputDisconnected = reduceRoomState(closed, event("musicDisconnected", {}));
+  assert.equal(viewOf(outputDisconnected, MUSIC_ID), undefined, "Studio output disconnects the bot explicitly");
 });
+
+test("music source replacements never duplicate the bot", () => {
+  let state = run(welcome, snapshot);
+  for (let repeat = 0; repeat < 10; repeat += 1) {
+    const id = `repeat-${repeat}`;
+    state = reduceRoomState(state, event("producerCreated", { ...music, producerId: id }));
+    const connected = registryView(state);
+    assert.equal(connected.participants.filter((value) => value.id === MUSIC_ID).length, 1);
+    assert.deepEqual(buildCards(connected.participants, connected.sources).map((card) => card.key), ["me", "bob", MUSIC_ID]);
+    state = reduceRoomState(state, event("producerClosed", { resourceId: id }));
+    assert.equal(viewOf(state, MUSIC_ID)?.bot, true);
+    assert.equal(viewOf(state, MUSIC_ID)?.audio, false);
+  }
+});
+
+test("late closure of the old source cannot remove the bot or the replacement audio", () => {
+  const state = run(welcome, snapshot, event("producerCreated", music),
+    event("producerCreated", { ...music, producerId: "m2" }),
+    event("producerClosed", { resourceId: "m1" }));
+  assert.equal(viewOf(state, MUSIC_ID).audio, true);
+  assert.deepEqual(registryView(state).sources.map((source) => source.id), ["m2"]);
+});
+
+test("connected music bot is limited to active meeting lifecycle states", () => {
+  for (const [status, present] of [
+    ["admitted", true], ["reconnecting", true], ["idle", false], ["lobby", false],
+    ["password", false], ["left", false], ["failed", false], ["kicked", false],
+  ]) {
+    const state = reduceRoomState(run(welcome, snapshot, event("producerCreated", music)), { type: "status", status });
+    assert.equal(Boolean(viewOf(state, MUSIC_ID)), present, status);
+  }
+  assert.equal(viewOf(reduceRoomState(run(welcome, snapshot, event("producerCreated", music)), { type: "reset" }), MUSIC_ID), undefined);
+});
+
+for (const status of ["admitted", "reconnecting", "left", "failed", "kicked", "banned", "replaced", "lobby"]) {
+  test(`music source has a registry owner during ${status}`, () => {
+    const state = reduceRoomState(run(welcome, snapshot, event("producerCreated", music)), { type: "status", status });
+    const view = registryView(state);
+    const ids = new Set(view.participants.map((value) => value.id));
+    assert.ok(view.sources.every((source) => ids.has(source.participantId)), "every projected source has a projected owner");
+    const active = ["admitted", "reconnecting"].includes(status);
+    assert.equal(view.sources.some((source) => source.id === music.producerId), active);
+    assert.ok(state.producers[music.producerId], "projection does not mutate the server inventory");
+  });
+}
 
 test("snapshot replaces participants and drops orphaned producers", () => {
   const state = run(welcome, snapshot, event("producerCreated", mic("p1", "bob")), {

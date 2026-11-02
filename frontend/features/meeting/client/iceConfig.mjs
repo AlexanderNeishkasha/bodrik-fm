@@ -18,9 +18,16 @@ export function iceOptions(value, now = Date.now()) {
   return { iceServers, iceTransportPolicy: value.iceTransportPolicy, expiresAt: value.expiresAt };
 }
 
+/** Restrict an already validated configuration to encrypted TURN, or report it unavailable. */
+export function tlsRelayOptions(options) {
+  const iceServers = options.iceServers.map((server) => ({ ...server, urls: server.urls.filter((url) => url.startsWith("turns:")) }))
+    .filter((server) => server.urls.length);
+  return iceServers.length ? { ...options, iceServers, iceTransportPolicy: "relay" } : null;
+}
+
 /** Own coalesced credential requests and one expiry-aware refresh timer per media session. */
 export function createIceConfiguration({ command, apply, onFailure, setTimer = setTimeout, clearTimer = clearTimeout,
-  now = Date.now, random = Math.random }) {
+  now = Date.now, random = Math.random, forceRelay = false }) {
   let closed = false;
   let pending = null;
   let timer = null;
@@ -39,7 +46,9 @@ export function createIceConfiguration({ command, apply, onFailure, setTimer = s
     if (closed) return Promise.reject(new Error("Media closed"));
     if (pending) return pending;
     pending = (async () => {
-      const options = iceOptions(await command({ type: "iceConfig" }), now());
+      const supplied = iceOptions(await command({ type: "iceConfig" }), now());
+      const options = forceRelay ? tlsRelayOptions(supplied) : supplied;
+      if (!options) throw new Error("Encrypted TURN is unavailable");
       if (closed) throw new Error("Media closed");
       await apply(options);
       if (closed) throw new Error("Media closed");

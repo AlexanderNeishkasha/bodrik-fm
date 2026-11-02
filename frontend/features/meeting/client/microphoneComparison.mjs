@@ -1,4 +1,4 @@
-/** Compare raw microphone levels using menu-owned captures, one context and one sampling timer. */
+/** Compare independent microphones; coupled audio routes must never be opened for background probes. */
 export function createMicrophoneComparison({ capture, mediaDevices = globalThis.navigator?.mediaDevices, AudioContextImpl = globalThis.AudioContext, schedule = setInterval, cancel = clearInterval }) {
   const listeners = new Set();
   const entries = new Map();
@@ -51,7 +51,8 @@ export function createMicrophoneComparison({ capture, mediaDevices = globalThis.
   }
   /** Add/remove only changed device IDs; selecting a call microphone does not restart comparison. */
   function sync() {
-    const devices = capture.getSnapshot().inputDevices;
+    const value = capture.getSnapshot();
+    const devices = value.coupledAudioRouting ? [] : value.inputDevices;
     const ids = new Set(devices.map((device) => device.value));
     for (const [id, entry] of entries) {
       if (!ids.has(id)) { release(entry); entries.delete(id); }
@@ -69,7 +70,7 @@ export function createMicrophoneComparison({ capture, mediaDevices = globalThis.
     const owner = {};
     session = owner;
     try {
-      if (typeof AudioContextImpl === "function" && mediaDevices?.getUserMedia) owner.context = new AudioContextImpl();
+      if (!capture.getSnapshot().coupledAudioRouting && typeof AudioContextImpl === "function" && mediaDevices?.getUserMedia) owner.context = new AudioContextImpl();
     } catch (error) { console.warn("Microphone comparison initialization failed", error.name); }
     owner.off = capture.subscribe(sync);
     sync();

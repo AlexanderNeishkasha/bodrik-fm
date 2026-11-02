@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test.use({ hasTouch: true });
 
 test("themed selects support keyboard, touch and viewport fitting inside settings", async ({ page }) => {
-  await page.goto(`/room/${encodeURIComponent(process.env.SMOKE_ROOM || "chopper")}`);
+  await page.goto(`/room/${encodeURIComponent(smokeRoom())}`);
   const microphone = page.getByRole("combobox", { name: "Микрофон", exact: true });
   await expect(microphone).toBeEnabled();
   await microphone.click();
@@ -19,7 +20,8 @@ test("themed selects support keyboard, touch and viewport fitting inside setting
   await expect(microphone).toContainText(chosen);
   await expect(devices).toHaveCount(0);
   await microphone.click();
-  await page.getByRole("textbox", { name: "Введите имя" }).click();
+  // Click outside the list; the open device list may cover the name field below it.
+  await page.getByRole("heading", { level: 1 }).click();
   await expect(devices).toHaveCount(0);
 
   await nextDriver(page).join(`select-${Date.now()}`);
@@ -36,7 +38,7 @@ test("themed selects support keyboard, touch and viewport fitting inside setting
     expect(box.x + box.width).toBeLessThanOrEqual(width - 7);
     expect(box.y).toBeGreaterThanOrEqual(7);
     expect(box.y + box.height).toBeLessThanOrEqual((await page.viewportSize()).height - 7);
-    await expect(list.getByRole("option", { name: "Усиленное", exact: true })).toBeVisible();
+    await expect(list.getByRole("option", { name: "Умное", exact: true })).toBeVisible();
     await noise.press("Escape");
     await expect(list).toHaveCount(0);
     await expect(dialog).toBeVisible();
@@ -45,8 +47,8 @@ test("themed selects support keyboard, touch and viewport fitting inside setting
   await noise.press("Enter");
   await expect(noise).toContainText("Выключено");
   await noise.click();
-  await page.getByRole("option", { name: "Усиленное", exact: true }).tap();
-  await expect(noise).toContainText("Усиленное");
+  await page.getByRole("option", { name: "Умное", exact: true }).tap();
+  await expect(noise).toContainText("Умное");
   await dialog.getByRole("button", { name: "Закрыть настройки" }).click();
   await nextDriver(page).leave();
 });

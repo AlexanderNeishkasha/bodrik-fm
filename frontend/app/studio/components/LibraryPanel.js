@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { filterLibraryTracks } from "../lib/librarySearch.mjs";
 import { useDndContext, useDroppable } from "@dnd-kit/core";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import LibraryHeader from "./LibraryHeader";
 import LibraryDownloads from "./LibraryDownloads";
 import LibraryUploads from "./LibraryUploads";
@@ -139,13 +139,14 @@ export default function LibraryPanel({
           onToggleEdit={onToggleEdit}
           onStartAddSection={onStartAddSection}
         />
+        <YoutubeDownloadForm {...youtubeModal} isBusy={isBusy} />
         <input
           type="search"
-          aria-label={ui.studio.searchLibrary}
-          placeholder={ui.studio.searchLibrary}
+          aria-label={t("studio.searchLibrary")}
+          placeholder={t("studio.searchLibrary")}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          className="block w-full rounded-full border border-[var(--theme-border)] bg-[var(--theme-input-bg)] px-4 py-2 text-sm text-[var(--theme-text)] placeholder:text-[var(--theme-muted)]"
+          className="block w-full rounded-full border border-[var(--theme-border)] bg-[var(--theme-input-bg)] px-4 py-2 text-sm text-[var(--theme-text)] placeholder:text-[var(--theme-text)] placeholder:opacity-50"
         />
         <CollapsibleLibraryBlock isOpen={isAddingSection}>
           <SectionCreateForm
@@ -157,7 +158,6 @@ export default function LibraryPanel({
             onCreate={onCreateSection}
           />
         </CollapsibleLibraryBlock>
-        <YoutubeDownloadForm {...youtubeModal} isBusy={isBusy} />
         <div className="space-y-2 text-sm">
           <LibraryUploads uploads={uploads} displayName={displayName} />
           <LibraryDownloads
@@ -199,9 +199,9 @@ export default function LibraryPanel({
               tracks={isSearching ? filteredTracks : looseTracks}
               searchQuery={isSearching ? searchQuery : ""}
               emptyMessage={isSearching && filteredTracks.length === 0
-                ? { key: "message:search-empty", text: ui.studio.noSearchResults, role: "status" }
+                ? { key: "message:search-empty", text: t("studio.noSearchResults"), role: "status" }
                 : !isSearching && isEmpty
-                  ? { key: "message:library-empty", text: ui.studio.noUploads }
+                  ? { key: "message:library-empty", text: t("studio.noUploads") }
                   : undefined}
               setLooseDropRef={isSearching ? undefined : setLooseDropRef}
               isEditingLibrary={isEditingLibrary}

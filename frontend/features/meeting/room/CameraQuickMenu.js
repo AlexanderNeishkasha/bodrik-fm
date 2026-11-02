@@ -5,18 +5,14 @@ import { Check, Settings, Sparkles, Video } from "lucide-react";
 
 import { effectLabels } from "../media/cameraEffects.mjs";
 import styles from "./MicQuickMenu.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** RU/EN copy. */
-const COPY = {
-  ru: { cameras: "Камеры", open: "Открыть настройки видео" },
-  en: { cameras: "Cameras", open: "Open video settings" },
-};
-
 /** Quick camera menu above the camera button: devices and background effect, like the mic menu. */
-export default function CameraQuickMenu({ video, onOpenSettings, onError, language = "ru" }) {
+export default function CameraQuickMenu({ video, onOpenSettings, onError }) {
   const snapshot = useSyncExternalStore(video.subscribe, video.getSnapshot, video.getSnapshot);
-  const text = COPY[language === "en" ? "en" : "ru"];
-  const effects = effectLabels(language);
+  const text = t("meeting.cameraQuickMenu");
+  const effects = effectLabels();
   const busy = Boolean(snapshot.pending) || !snapshot.cameraAllowed;
 
   /** Run one video setting change. */

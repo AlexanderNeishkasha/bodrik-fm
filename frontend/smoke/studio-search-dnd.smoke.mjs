@@ -27,7 +27,7 @@ for (const [name, destination, expected] of [
   ["queue accepts categorized search results", '[data-testid="queue-container"]', "queue-container"],
   ["player accepts categorized search results", '[data-testid="now-playing"]', "now-playing"],
 ]) {
-  test(name, async ({ page }) => {
+  test(name, { tag: "@push" }, async ({ page }) => {
     await page.setContent(fixture);
     await page.getByRole("searchbox").fill("forest");
     await expect(page.locator('[data-library-presence="section:10"]')).toHaveCount(0);
@@ -41,7 +41,7 @@ for (const [name, destination, expected] of [
   });
 }
 
-test("clearing a search restores categorized library drop targets", async ({ page }) => {
+test("clearing a search restores categorized library drop targets", { tag: "@push" }, async ({ page }) => {
   await page.setContent(fixture);
   await page.getByRole("searchbox").fill("forest");
   await page.getByRole("searchbox").fill("   ");

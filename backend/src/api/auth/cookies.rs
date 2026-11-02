@@ -1,4 +1,10 @@
-//! Host-scoped HttpOnly session cookies and byte-safe extraction.
+//! HttpOnly session cookies and byte-safe extraction.
+//!
+//! Without a configured domain the cookie is host-scoped. With one (production:
+//! `bodrik.fm`) it is shared with subdomains such as `meet.bodrik.fm`, so the meeting
+//! can recognise the room owner; issuance then also clears any older host-only copy.
+//! The domain applies only to requests addressed to that domain, so direct local access
+//! (`localhost:3001`) keeps working with host-only cookies.
 
 use axum::http::{HeaderMap, HeaderValue, header};
 
@@ -7,11 +13,22 @@ const AUTH_COOKIE_NAME: &str = "bodrik_fm_token";
 /// Existing ten-year cookie lifetime, matching session expiry.
 const AUTH_COOKIE_MAX_AGE: usize = 315_360_000;
 
-/// Issue an HttpOnly host-scoped cookie containing a server-generated JWT.
+/// Shared cookie attributes after the value; the lifetime and domain are appended per use.
+const AUTH_COOKIE_ATTRIBUTES: &str = "Path=/; HttpOnly; SameSite=Lax";
+
+/// Host-only clearing header, for logout and for replacing pre-domain sessions.
+const CLEAR_HOST_ONLY: &str = "bodrik_fm_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax";
+
+/// Issue an HttpOnly cookie containing a server-generated JWT, shared with subdomains of
+/// `domain` when configured.
 ///
 /// # Errors
 /// Rejects empty/non-JWT-alphabet values or invalid HTTP header construction.
-pub(super) fn append_auth_cookies(headers: &mut HeaderMap, token: &str) -> Result<(), String> {
+pub(super) fn append_auth_cookies(
+    headers: &mut HeaderMap,
+    token: &str,
+    domain: Option<&str>,
+) -> Result<(), String> {
     if token.is_empty()
         || !token
             .bytes()
@@ -20,19 +37,59 @@ pub(super) fn append_auth_cookies(headers: &mut HeaderMap, token: &str) -> Resul
         return Err("invalid authentication cookie token".into());
     }
     let value = HeaderValue::from_str(&format!(
-        "{AUTH_COOKIE_NAME}={token}; Path=/; Max-Age={AUTH_COOKIE_MAX_AGE}; HttpOnly; SameSite=Lax"
+        "{AUTH_COOKIE_NAME}={token}; {AUTH_COOKIE_ATTRIBUTES}; Max-Age={AUTH_COOKIE_MAX_AGE}{}",
+        domain_attribute(domain)
     ))
     .map_err(|err| err.to_string())?;
+    if domain.is_some() {
+        headers.append(
+            header::SET_COOKIE,
+            HeaderValue::from_static(CLEAR_HOST_ONLY),
+        );
+    }
     headers.append(header::SET_COOKIE, value);
     Ok(())
 }
 
-/// Clear the same host/path cookie without fallible dynamic header parsing.
-pub(crate) fn append_clear_auth_cookies(headers: &mut HeaderMap) {
+/// Clear the host-only cookie and, when configured, the domain-wide one.
+pub(crate) fn append_clear_auth_cookies(headers: &mut HeaderMap, domain: Option<&str>) {
     headers.append(
         header::SET_COOKIE,
-        HeaderValue::from_static("bodrik_fm_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"),
+        HeaderValue::from_static(CLEAR_HOST_ONLY),
     );
+    if domain.is_some()
+        && let Ok(value) = HeaderValue::from_str(&format!(
+            "{AUTH_COOKIE_NAME}=; {AUTH_COOKIE_ATTRIBUTES}; Max-Age=0{}",
+            domain_attribute(domain)
+        ))
+    {
+        headers.append(header::SET_COOKIE, value);
+    }
+}
+
+/// The configured cookie domain if the request's `Host` is that domain or a subdomain;
+/// browsers reject a `Domain` that does not cover the responding host.
+pub(crate) fn request_cookie_domain<'a>(
+    configured: Option<&'a str>,
+    request: &HeaderMap,
+) -> Option<&'a str> {
+    let domain = configured?;
+    let host = request.get(header::HOST)?.to_str().ok()?;
+    let host = host
+        .rsplit_once(':')
+        .filter(|(_, port)| port.bytes().all(|byte| byte.is_ascii_digit()))
+        .map_or(host, |(name, _)| name)
+        .to_ascii_lowercase();
+    (host == domain
+        || host
+            .strip_suffix(domain)
+            .is_some_and(|prefix| prefix.ends_with('.')))
+    .then_some(domain)
+}
+
+/// `; Domain=...` for a configured (startup-validated) cookie domain, else nothing.
+fn domain_attribute(domain: Option<&str>) -> String {
+    domain.map_or_else(String::new, |domain| format!("; Domain={domain}"))
 }
 
 /// Extract only our ASCII token; unrelated cookie bytes may be non-ASCII.
@@ -121,28 +178,114 @@ mod tests {
         ] {
             let mut headers = HeaderMap::new();
             assert_eq!(
-                append_auth_cookies(&mut headers, token).is_ok(),
+                append_auth_cookies(&mut headers, token, None).is_ok(),
                 valid,
                 "{token:?}"
             );
             if valid {
-                let value = headers[header::SET_COOKIE].to_str().unwrap();
-                assert!(value.contains("HttpOnly; SameSite=Lax"));
-                assert!(value.contains("Path=/; Max-Age=315360000"));
+                assert_eq!(
+                    set_cookies(&headers),
+                    [format!(
+                        "bodrik_fm_token={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=315360000"
+                    )]
+                );
             } else {
                 assert!(!headers.contains_key(header::SET_COOKIE));
             }
         }
     }
 
-    /// Logout targets exactly the issued host/path cookie without other names.
+    /// All Set-Cookie values in order.
+    fn set_cookies(headers: &HeaderMap) -> Vec<String> {
+        headers
+            .get_all(header::SET_COOKIE)
+            .iter()
+            .map(|value| value.to_str().unwrap().to_owned())
+            .collect()
+    }
+
+    /// A configured domain shares the session with subdomains and retires the host-only copy.
+    #[test]
+    fn domain_issuance_replaces_host_only_cookie() {
+        let mut headers = HeaderMap::new();
+        append_auth_cookies(&mut headers, "a.b.c", Some("bodrik.fm")).unwrap();
+        assert_eq!(
+            set_cookies(&headers),
+            [
+                CLEAR_HOST_ONLY.to_owned(),
+                "bodrik_fm_token=a.b.c; Path=/; HttpOnly; SameSite=Lax; Max-Age=315360000; Domain=bodrik.fm".to_owned(),
+            ]
+        );
+    }
+
+    /// The domain applies to itself and its subdomains (any port), never to other hosts.
+    #[test]
+    fn request_domain_cases() {
+        for (name, configured, host, expected) in [
+            (
+                "apex",
+                Some("bodrik.fm"),
+                Some("bodrik.fm"),
+                Some("bodrik.fm"),
+            ),
+            (
+                "subdomain",
+                Some("bodrik.fm"),
+                Some("meet.bodrik.fm"),
+                Some("bodrik.fm"),
+            ),
+            (
+                "port",
+                Some("pc.lan"),
+                Some("meet.pc.lan:3443"),
+                Some("pc.lan"),
+            ),
+            ("case", Some("pc.lan"), Some("PC.LAN:3443"), Some("pc.lan")),
+            (
+                "direct local access",
+                Some("pc.lan"),
+                Some("localhost:3001"),
+                None,
+            ),
+            (
+                "suffix lookalike",
+                Some("bodrik.fm"),
+                Some("evilbodrik.fm"),
+                None,
+            ),
+            ("missing host", Some("bodrik.fm"), None, None),
+            ("not configured", None, Some("bodrik.fm"), None),
+        ] {
+            let mut headers = HeaderMap::new();
+            if let Some(host) = host {
+                headers.insert(header::HOST, HeaderValue::from_static(host));
+            }
+            assert_eq!(
+                request_cookie_domain(configured, &headers),
+                expected,
+                "{name}"
+            );
+        }
+    }
+
+    /// Logout clears exactly our cookie: host-only always, the domain copy when configured.
     #[test]
     fn clearing_targets_our_cookie() {
-        let mut headers = HeaderMap::new();
-        append_clear_auth_cookies(&mut headers);
-        assert_eq!(
-            headers[header::SET_COOKIE],
-            "bodrik_fm_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"
-        );
+        for (name, domain, expected) in [
+            ("host only", None, vec![CLEAR_HOST_ONLY.to_owned()]),
+            (
+                "with domain",
+                Some("bodrik.fm"),
+                vec![
+                    CLEAR_HOST_ONLY.to_owned(),
+                    "bodrik_fm_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Domain=bodrik.fm"
+                        .to_owned(),
+                ],
+            ),
+        ] {
+            let mut headers = HeaderMap::new();
+            append_clear_auth_cookies(&mut headers, domain);
+            assert_eq!(set_cookies(&headers), expected, "{name}");
+        }
     }
 }

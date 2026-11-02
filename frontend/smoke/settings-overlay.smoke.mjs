@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("settings dismisses on backdrop and control menus stay above animated membership changes", async ({ page, browser }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   const driver = nextDriver(page);
-  const room = process.env.SMOKE_ROOM || "chopper";
+  const room = smokeRoom();
   await page.goto(driver.path(room));
   await driver.join(`overlay-${Date.now()}`);
   await page.getByRole("button", { name: "Настройки", exact: true }).click();
@@ -18,7 +19,7 @@ test("settings dismisses on backdrop and control menus stay above animated membe
   await expect(dialog).toBeVisible();
   await page.mouse.click(4, 4);
   await expect(dialog).toBeHidden();
-  await page.getByRole("button", { name: "Выбор микрофона и динамика", exact: true }).click();
+  await page.getByRole("button", { name: "Выбор микрофона и динамиков", exact: true }).click();
   const menu = page.getByRole("menu", { name: "Микрофоны", exact: true });
   await expect(menu).toBeVisible();
   expect(await menu.evaluate((node) => getComputedStyle(node).viewTransitionName)).toBe("meeting-control-menu");
@@ -35,7 +36,7 @@ test("settings dismisses on backdrop and control menus stay above animated membe
       return transition;
     };
   });
-  const other = await browser.newContext({ baseURL: process.env.SMOKE_BASE_URL || "https://pc.local:3443", ignoreHTTPSErrors: true, permissions: ["camera", "microphone"] });
+  const other = await browser.newContext({ baseURL: test.info().project.use.baseURL, ignoreHTTPSErrors: true, permissions: ["camera", "microphone"] });
   try {
     const peer = await other.newPage();
     const peerDriver = nextDriver(peer);
@@ -49,9 +50,10 @@ test("settings dismisses on backdrop and control menus stay above animated membe
     // Inspect the generated stylesheet rules without querying transition pseudo-elements (a Chrome crash path).
     const layers = await page.evaluate(() => {
       const result = {};
-      /** Read compiled transition stacking rules, including CSS grouping rules. */
+      /** Read compiled transition stacking rules that apply at this width, including CSS grouping rules. */
       function collect(rules) {
         for (const rule of rules) {
+          if (rule.media && !matchMedia(rule.media.mediaText).matches) continue;
           for (const name of ["meeting-controls", "meeting-control-menu", "meeting-chat"]) {
             if (rule.selectorText?.includes(`::view-transition-group(${name})`) && rule.style.zIndex) result[name] = Number(rule.style.zIndex);
           }
@@ -62,11 +64,12 @@ test("settings dismisses on backdrop and control menus stay above animated membe
       return result;
     });
     expect(layers["meeting-control-menu"]).toBeGreaterThan(layers["meeting-controls"]);
-    expect(layers["meeting-chat"]).toBeGreaterThan(layers["meeting-control-menu"]);
+    // Above 1024px chat docks beside the stage, so the bar and its menus stay above it while it slides.
+    expect(layers["meeting-controls"]).toBeGreaterThan(layers["meeting-chat"]);
     await peerDriver.leave();
     await expect(peerCard).toHaveCount(0);
     await expect(menu).toBeVisible();
   } finally { await other.close(); }
-  await page.getByRole("button", { name: "Выбор микрофона и динамика", exact: true }).click();
+  await page.getByRole("button", { name: "Выбор микрофона и динамиков", exact: true }).click();
   await driver.leave();
 });

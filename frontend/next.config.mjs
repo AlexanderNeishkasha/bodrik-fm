@@ -1,9 +1,13 @@
 import { fileURLToPath } from "node:url";
 
+import { devOrigins } from "./devOrigins.mjs";
+
+const { allowedDevOrigins } = devOrigins();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
-  allowedDevOrigins: ["pc.local"],
+  allowedDevOrigins,
   reactCompiler: true,
   poweredByHeader: false,
   output: process.env.NODE_ENV === "production" ? "export" : undefined,

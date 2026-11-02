@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 const message = "The request is not allowed by the user agent or the platform in the current context.";
 
@@ -9,7 +10,7 @@ test("long meeting errors stay rectangular and readable on mobile", async ({ pag
     navigator.mediaDevices.getDisplayMedia = async () => { throw new Error(text); };
   }, message);
   const driver = nextDriver(page);
-  await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+  await page.goto(driver.path(smokeRoom()));
   await driver.join(`toast-${Date.now()}`);
   const controls = page.getByRole("navigation", { name: "Управление встречей" });
   for (const width of [320, 390]) {

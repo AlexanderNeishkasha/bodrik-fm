@@ -102,14 +102,14 @@ test("participant view renders presenter actions, lobby and safe fallback identi
     presenter: true,
     followMe: false,
   });
-  assert.match(html, /Participants/);
-  assert.match(html, /Waiting room/);
+  assert.match(html, /Участники/);
+  assert.match(html, /Зал ожидания/);
   // Per-participant and room actions live behind menus that are closed on first render.
-  assert.match(html, /aria-label="Actions: Participant"/);
-  assert.match(html, /aria-label="Room actions"/);
-  assert.match(html, /Invite/);
-  assert.doesNotMatch(html, /Public chat/, "no public-chat row in the participants list");
-  assert.match(html, /aria-label="Microphone on"/);
+  assert.match(html, /aria-label="Действия: Participant"/);
+  assert.match(html, /aria-label="Действия комнаты"/);
+  assert.match(html, /Пригласить/);
+  assert.doesNotMatch(html, /Общий чат/, "no public-chat row in the participants list");
+  assert.match(html, /aria-label="Микрофон включён"/);
   assert.doesNotMatch(html, /peer_token|transport/);
 });
 

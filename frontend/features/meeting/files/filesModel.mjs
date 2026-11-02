@@ -34,7 +34,7 @@ function transfer(value) {
 }
 
 /** Own a bounded immutable projection while the replacement adapter retains transport and byte ownership. */
-export function createFilesSource({ observe, send, cancel, download, getSession, getLanguage }) {
+export function createFilesSource({ observe, send, cancel, download, getSession }) {
   if (typeof observe !== "function" || typeof send !== "function" || typeof cancel !== "function" || typeof download !== "function")
     throw new Error("Unsupported file transfer source");
   const listeners = new Set();
@@ -56,11 +56,10 @@ export function createFilesSource({ observe, send, cancel, download, getSession,
     transfers = Object.freeze(Array.from(values).slice(-MAX_TRANSFERS).map(transfer));
     const next = Object.freeze({
       available: Boolean(session),
-      language: getLanguage() === "en" ? "en" : "ru",
       transfers,
       actionError,
     });
-    if (snapshot && next.available === snapshot.available && next.language === snapshot.language && next.transfers === snapshot.transfers && next.actionError === snapshot.actionError) return;
+    if (snapshot && next.available === snapshot.available && next.transfers === snapshot.transfers && next.actionError === snapshot.actionError) return;
     snapshot = next;
     listeners.forEach((listener) => listener());
   }

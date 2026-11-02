@@ -1,5 +1,5 @@
 import RangeControl from "../../../components/ui/RangeControl";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 
 /** Render shared seek styling while retaining Studio's existing preview/commit events. */
 export default function NowPlayingSeek({
@@ -11,7 +11,7 @@ export default function NowPlayingSeek({
   return (
     <div className="space-y-2">
       <RangeControl
-        label={ui.studio.hotkeys.seek}
+        label={t("studio.hotkeys.seek")}
         min="0"
         max={seekMax}
         step="1"

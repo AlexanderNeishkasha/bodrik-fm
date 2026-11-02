@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import { displayName } from "../lib/format";
 import { localizeApiMessage } from "../lib/localizeApiMessage";
 import { deferEffect } from "../../lib/deferEffect";
@@ -83,8 +83,8 @@ export default function useStudioLibrary({
     if (result.ok) {
       setStatus("renamed");
     } else {
-      const message = resultMessage(result, ui.messages.renameFailed);
-      showNotice(message.raw === "playing" ? ui.messages.renameWhilePlaying : message.localized);
+      const message = resultMessage(result, t("messages.renameFailed"));
+      showNotice(message.raw === "playing" ? t("messages.renameWhilePlaying") : message.localized);
       setStatus(message.localized);
     }
     cancelRename();
@@ -108,8 +108,8 @@ export default function useStudioLibrary({
     if (result.ok) {
       setStatus("deleted");
     } else {
-      const message = resultMessage(result, ui.messages.deleteFailed);
-      showNotice(message.raw === "playing" ? ui.messages.deleteWhilePlaying : message.localized);
+      const message = resultMessage(result, t("messages.deleteFailed"));
+      showNotice(message.raw === "playing" ? t("messages.deleteWhilePlaying") : message.localized);
       setStatus(message.localized);
     }
     setDeleteTarget(null);
@@ -145,7 +145,7 @@ export default function useStudioLibrary({
   const createSection = async () => {
     const name = newSectionName.trim();
     if (!name) { cancelAddSection(); return; }
-    const ok = await apiAction("/api/studio/sections", { name }, ui.messages.actionFailed);
+    const ok = await apiAction("/api/studio/sections", { name }, t("messages.actionFailed"));
     if (ok) {
       setStatus("section created");
       cancelAddSection();
@@ -171,7 +171,7 @@ export default function useStudioLibrary({
     const ok = await apiAction(
       "/api/studio/sections/rename",
       { id: section.id, name },
-      ui.messages.actionFailed
+      t("messages.actionFailed")
     );
     if (ok) {
       setStatus("section renamed");
@@ -184,7 +184,7 @@ export default function useStudioLibrary({
     const ok = await apiAction(
       "/api/studio/sections/delete",
       { id: section.id },
-      ui.messages.actionFailed
+      t("messages.actionFailed")
     );
     if (ok) {
       setStatus("section deleted");

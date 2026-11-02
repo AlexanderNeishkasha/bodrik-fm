@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { clearCachedAuthUser, getCachedAuthRole, setCachedAuthUser } from "../lib/authSession";
+import BodrickHat from "./BodrickHat";
 import RoomListPanel from "./RoomListPanel";
 import styles from "./RoomsScreen.module.css";
 
@@ -68,19 +69,22 @@ export default function RoomsScreen({ rooms, roomsStatus, onNavigateToRoom }) {
       <div className={`${styles.shell} mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-16`}>
         {showPanel ? (
           <main
-            className={`${styles.panel} ${styles.panelEnter} panel-shadow-hero space-y-6 rounded-[32px] border border-[var(--theme-border)] bg-[var(--theme-card)] p-10`}
+            className={`${styles.panel} ${styles.panelEnter} panel-shadow-hero rounded-[32px] border border-[var(--theme-border)] bg-[var(--theme-card)] p-10`}
           >
-            <h1 className="text-2xl font-semibold font-display tracking-[0.08em]">Бодрик FM</h1>
-            <p className="text-sm text-[var(--theme-muted)]">Доступные комнаты</p>
-            <RoomListPanel rooms={rooms} roomsStatus={roomsStatus} onNavigateToRoom={onNavigateToRoom} />
-            <div className={`${styles.actions} flex flex-wrap items-center gap-4`}>
-              <Link
-                href="/studio"
-                onClick={openStudio}
-                className={`${styles.studioLink} btn-accent inline-flex w-fit rounded-full bg-[var(--theme-accent)] px-5 py-2 text-sm font-semibold text-[var(--theme-text-dark)]`}
-              >
-                Открыть студию
-              </Link>
+            <BodrickHat />
+            <div className={`${styles.content} space-y-6`}>
+              <h1 className="text-2xl font-semibold font-display tracking-[0.08em]">Бодрик FM</h1>
+              <p className="text-sm text-[var(--theme-muted)]">Доступные комнаты</p>
+              <RoomListPanel rooms={rooms} roomsStatus={roomsStatus} onNavigateToRoom={onNavigateToRoom} />
+              <div className={`${styles.actions} flex flex-wrap items-center gap-4`}>
+                <Link
+                  href="/studio"
+                  onClick={openStudio}
+                  className={`${styles.studioLink} btn-accent inline-flex w-fit rounded-full bg-[var(--theme-accent)] px-5 py-2 text-sm font-semibold text-[var(--theme-text-dark)]`}
+                >
+                  Открыть студию
+                </Link>
+              </div>
             </div>
           </main>
         ) : null}

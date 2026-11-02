@@ -37,6 +37,43 @@ fn parse_service_secret(raw: Option<&str>) -> Result<Option<std::sync::Arc<str>>
     }
 }
 
+/// Load the optional session cookie domain (`AUTH_COOKIE_DOMAIN`); empty or absent keeps
+/// the cookie host-only.
+///
+/// # Errors
+/// Rejects a non-Unicode or malformed configured domain.
+pub(crate) fn auth_cookie_domain() -> Result<Option<std::sync::Arc<str>>, String> {
+    let raw = match env::var("AUTH_COOKIE_DOMAIN") {
+        Ok(value) => Some(value),
+        Err(env::VarError::NotPresent) => None,
+        Err(_) => return Err("invalid AUTH_COOKIE_DOMAIN".into()),
+    };
+    parse_cookie_domain(raw.as_deref())
+}
+
+/// Accept only a lowercase dotted host name, so it is safe inside a Set-Cookie header.
+///
+/// # Errors
+/// Rejects labels that are empty, too long, or contain characters outside `[a-z0-9-]`.
+fn parse_cookie_domain(raw: Option<&str>) -> Result<Option<std::sync::Arc<str>>, String> {
+    let Some(value) = raw.map(str::trim).filter(|value| !value.is_empty()) else {
+        return Ok(None);
+    };
+    let valid_label = |label: &str| {
+        (1..=63).contains(&label.len())
+            && !label.starts_with('-')
+            && !label.ends_with('-')
+            && label
+                .bytes()
+                .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+    };
+    if value.len() <= 253 && value.contains('.') && value.split('.').all(valid_label) {
+        Ok(Some(std::sync::Arc::from(value)))
+    } else {
+        Err("invalid AUTH_COOKIE_DOMAIN".into())
+    }
+}
+
 /// Load the origin allowlist, defaulting only when the variable is absent.
 ///
 /// # Errors
@@ -155,6 +192,30 @@ mod tests {
         }
     }
 
+    /// Only a plain dotted host name is accepted; empty keeps host-only cookies.
+    #[test]
+    fn cookie_domain_cases() {
+        for (raw, expected) in [
+            (None, Ok(None)),
+            (Some(""), Ok(None)),
+            (Some(" bodrik.fm "), Ok(Some("bodrik.fm"))),
+            (Some("pc.lan"), Ok(Some("pc.lan"))),
+            (Some("localhost"), Err(())),
+            (Some(".bodrik.fm"), Err(())),
+            (Some("Bodrik.fm"), Err(())),
+            (Some("bodrik.fm; Secure"), Err(())),
+            (Some("-x.fm"), Err(())),
+        ] {
+            assert_eq!(
+                parse_cookie_domain(raw)
+                    .map(|value| value.map(|domain| domain.to_string()))
+                    .map_err(|_| ()),
+                expected.map(|value| value.map(str::to_owned)),
+                "{raw:?}"
+            );
+        }
+    }
+
     /// Missing values use localhost; explicit invalid input never silently falls back.
     #[test]
     fn origin_configuration_cases() {
@@ -165,8 +226,8 @@ mod tests {
                 Some(vec!["https://example.test"]),
             ),
             (
-                Some("http://localhost:3000,,http://pc.local:3000"),
-                Some(vec!["http://localhost:3000", "http://pc.local:3000"]),
+                Some("http://localhost:3000,,http://pc.lan:3000"),
+                Some(vec!["http://localhost:3000", "http://pc.lan:3000"]),
             ),
             (Some(""), None),
             (Some(" , "), None),

@@ -35,6 +35,7 @@ fn state() -> AppState {
         jwt_secret: String::new(),
         trust_proxy_headers: false,
         csrf_allowed_origins: Arc::new(Vec::new()),
+        auth_cookie_domain: None,
         login_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
         conference_join_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
         conference_provider: Some(Arc::new(provider)),

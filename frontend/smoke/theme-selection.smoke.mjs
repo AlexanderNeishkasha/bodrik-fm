@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { readdirSync } from "node:fs";
 
-for (const url of ["http://pc.local:3000/studio", "https://pc.local:3443/room/chopper"]) {
+import { devOrigins } from "../devOrigins.mjs";
+
+const { host, meetingHost } = devOrigins();
+
+for (const url of [`https://${host}/studio`, `https://${meetingHost}/room/chopper`]) {
   test(`text selection follows each theme: ${url}`, async ({ page }) => {
     await page.routeWebSocket("**/ws/rooms/*/state/public", () => {});
     await page.goto(url);

@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="758" height="324" viewBox="0 0 758 324" fill="none">
+  <title>Bodrick's purple wizard hat</title>
+  <defs>
+    <path id="silhouette" d="M250.5 36Q263 33 281.5 34Q300 35 318.5 39.5Q337 44 348.5 48Q360 52 376 61Q392 70 409.5 77Q427 84 433.5 88Q440 92 445 97Q450 102 456 113Q462 124 467 127Q472 130 476 134Q480 138 482 143Q484 148 486.5 150.5Q489 153 495 154.5Q501 156 503 159.5Q505 163 510 167.5Q515 172 521.5 173.5Q528 175 532 179.5Q536 184 541.5 184.5Q547 185 561.5 182Q576 179 600 176.5Q624 174 659.5 174.5Q695 175 710.5 178Q726 181 733 184Q740 187 744 191Q748 195 748 202Q748 209 741.5 216.5Q735 224 726.5 229.5Q718 235 704 241Q690 247 677 251C637 259 564 253 510 258C482 260 459 270 439 276C424 280.5 410 284 395 287Q369 293 348 296Q327 299 297 300.5Q267 302 236.5 299.5Q206 297 184 292.5Q162 288 144 282Q126 276 119.5 275Q113 274 110 272Q107 270 88 266Q69 262 59 263Q49 264 43.5 268.5Q38 273 36.5 278.5Q35 284 28 282.5Q21 281 18.5 277.5Q16 274 16 271Q16 268 18 264Q20 260 24 256.5Q28 253 37.5 249Q47 245 60 242.5Q73 240 89.5 240Q106 240 118 241.5Q130 243 151 242.5Q172 242 183.5 239.5Q195 237 199 233Q203 229 208.5 228Q214 227 215.5 225.5Q217 224 218 220.5Q219 217 223.5 214Q228 211 229 206Q230 201 232 199Q234 197 234 191Q234 185 236 182Q238 179 237 172.5Q236 166 238 161Q240 156 240 153Q240 150 237.5 147Q235 144 226.5 141Q218 138 208.5 138Q199 138 188 141.5Q177 145 171.5 150Q166 155 164.5 160.5Q163 166 165.5 168Q168 170 169.5 167Q171 164 175 164.5Q179 165 180.5 167Q182 169 182 173Q182 177 177 181.5Q172 186 164 187Q156 188 149 185.5Q142 183 136.5 177.5Q131 172 128.5 164.5Q126 157 126.5 149Q127 141 133 129.5Q139 118 147 110.5Q155 103 173 90Q191 77 204 64Q217 51 227.5 45Q238 39 250.5 36Z"/>
+    <clipPath id="hat-clip"><use href="#silhouette"/></clipPath>
+    <linearGradient id="brim" x1="358" y1="174" x2="379" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#704476"/>
+      <stop offset=".48" stop-color="#754778"/>
+      <stop offset=".83" stop-color="#865081"/>
+      <stop offset="1" stop-color="#563454"/>
+    </linearGradient>
+    <linearGradient id="underside" x1="609" y1="197" x2="626" y2="257" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#291b30"/>
+      <stop offset=".5" stop-color="#39233f"/>
+      <stop offset="1" stop-color="#4e2e51"/>
+    </linearGradient>
+    <linearGradient id="crown" x1="217" y1="63" x2="359" y2="225" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#754775"/>
+      <stop offset=".44" stop-color="#7c497c"/>
+      <stop offset=".76" stop-color="#714172"/>
+      <stop offset="1" stop-color="#50304f"/>
+    </linearGradient>
+    <radialGradient id="crown-light" cx="0" cy="0" r="1" gradientTransform="translate(315 92) rotate(28) scale(140 95)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a16296" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#a16296" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="curl" x1="139" y1="131" x2="239" y2="155" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#986095"/>
+      <stop offset=".5" stop-color="#6b3f6e"/>
+      <stop offset="1" stop-color="#39263f"/>
+    </linearGradient>
+    <linearGradient id="leather" x1="359" y1="175" x2="376" y2="235" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9a4c19"/>
+      <stop offset=".28" stop-color="#ba6428"/>
+      <stop offset=".58" stop-color="#a75620"/>
+      <stop offset="1" stop-color="#75360f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="369" y1="161" x2="430" y2="224" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe19a"/>
+      <stop offset=".27" stop-color="#f4b948"/>
+      <stop offset=".55" stop-color="#e6a02e"/>
+      <stop offset=".76" stop-color="#ffd165"/>
+      <stop offset="1" stop-color="#ad691c"/>
+    </linearGradient>
+    <linearGradient id="buckle-leather" x1="392" y1="176" x2="407" y2="208" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8e4318"/>
+      <stop offset="1" stop-color="#b76729"/>
+    </linearGradient>
+  </defs>
+
+  <g clip-path="url(#hat-clip)">
+    <use href="#silhouette" fill="url(#brim)"/>
+
+    <!-- The upturned right brim reveals its darker underside. -->
+    <path d="M450 280C512 250 601 207 658 194C696 186 724 188 742 198C739 218 705 237 663 248C607 270 545 273 450 280Z" fill="url(#underside)"/>
+    <path d="M507 250C568 239 611 222 654 213C684 205 707 201 728 200C702 196 676 202 650 207C595 219 552 240 507 250Z" fill="#63406a" opacity=".18"/>
+    <path d="M549 252C581 251 620 245 646 234C615 241 583 244 549 252ZM635 248C668 239 696 226 713 214C690 226 665 234 635 248Z" fill="#77507b" opacity=".16"/>
+    <path d="M450 280C512 250 601 207 658 194C696 186 724 188 742 198" stroke="#2c1c30" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M448 276C512 245 600 203 658 190C697 182 727 186 740 194" stroke="#a36c98" stroke-opacity=".45" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Broad fabric folds follow the original brim and crown. -->
+    <path d="M26 269C47 246 78 249 111 255C157 264 193 282 254 285C324 289 388 274 454 253C387 280 322 297 255 294C190 292 146 277 105 266C68 256 43 254 26 269Z" fill="#a06999" opacity=".32"/>
+    <path d="M74 244C127 241 156 255 207 258C259 263 303 258 344 250C281 269 235 271 188 264C144 258 114 247 74 244Z" fill="#3f2945" opacity=".38"/>
+    <path d="M170 247C224 258 280 250 345 235C410 220 449 207 491 198C434 220 385 237 333 248C263 265 218 264 170 247Z" fill="#4b2c4d" opacity=".45"/>
+    <path d="M315 273C379 265 442 244 489 224C541 203 578 192 620 187C572 197 533 213 492 230C432 255 381 269 315 273Z" fill="#ad729f" opacity=".17"/>
+    <path d="M115 25H512V161C439 169 377 183 322 201C280 215 240 228 208 234L115 208Z" fill="url(#crown)"/>
+    <path d="M137 140C151 116 176 104 193 87C214 66 226 48 251 42C282 34 326 47 359 61C398 79 428 83 445 109C457 126 462 137 479 151C415 150 358 167 305 189C270 202 248 211 225 220C242 188 250 170 244 149C229 131 207 124 182 136C163 144 153 156 153 167C143 163 137 154 137 140Z" fill="url(#crown-light)"/>
+    <path d="M211 90C194 108 175 113 158 128C143 142 137 155 143 169C149 181 162 184 174 176C171 186 156 187 147 182C129 174 126 158 133 142C143 118 166 108 183 94C197 82 204 71 216 62C209 72 204 80 211 90Z" fill="url(#curl)" opacity=".7"/>
+    <path d="M153 170C148 155 166 138 185 131C204 124 222 131 240 149C221 136 205 134 190 139C174 144 161 153 158 160C155 165 159 172 165 171C161 175 156 175 153 170Z" fill="#35233b"/>
+
+    <g fill="#3c2742">
+      <path d="M242 151C229 134 215 123 198 118C209 119 220 125 229 133C217 118 205 113 196 107C213 110 225 122 232 132C224 115 216 108 215 94C222 109 230 120 236 131C229 107 225 89 229 74C230 94 238 112 241 132C243 114 249 100 261 88C251 105 248 119 247 138C254 125 261 115 271 111C258 126 249 140 246 155Z"/>
+      <path d="M233 122C225 109 219 99 221 89C221 81 225 76 229 71C224 87 227 104 233 122ZM240 112C234 97 240 86 249 80C243 90 240 101 240 112ZM250 120C251 107 258 99 267 95C260 103 256 112 250 120Z" opacity=".7"/>
+      <path d="M240 159C252 145 272 137 294 135C276 140 257 148 240 159ZM237 175C253 164 269 156 287 153C268 161 251 169 237 181ZM232 197C256 182 276 171 298 166C277 175 252 188 232 203Z" opacity=".72"/>
+      <path d="M259 183C291 155 332 139 365 132C333 144 296 162 259 183Z" opacity=".45"/>
+      <path d="M391 114C412 107 436 109 451 120C432 115 412 114 391 114ZM429 124C447 121 461 126 472 137C456 130 445 128 429 124ZM444 141C464 138 477 145 486 155C469 149 456 146 444 141Z" opacity=".6"/>
+    </g>
+    <g fill="#a46b9c" opacity=".28">
+      <path d="M247 139C252 124 264 112 281 107C265 116 255 127 247 139Z"/>
+      <path d="M244 162C266 146 286 140 309 137C281 144 262 154 244 166Z"/>
+      <path d="M237 187C265 167 285 160 307 156C285 165 261 177 237 192Z"/>
+      <path d="M235 207C264 190 286 183 311 180C284 189 259 199 235 212Z"/>
+      <path d="M359 132C392 123 424 120 450 126C419 124 392 129 359 132Z"/>
+      <path d="M423 146C445 141 465 146 479 152C459 149 443 148 423 146Z"/>
+    </g>
+    <path d="M134 142C148 118 177 101 193 83C215 58 230 38 259 36C287 33 321 41 348 51" stroke="#b27ca5" stroke-opacity=".3" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- The leather band remains one continuous shape behind the buckle. -->
+    <path d="M207 231C231 226 260 216 292 206C358 185 418 167 479 160L497 160L506 171L521 175L534 185C487 197 435 211 383 225C310 244 249 253 201 248C194 247 196 242 201 238Z" fill="#2d2025" opacity=".6"/>
+    <path d="M208 229C237 223 260 215 292 205C357 184 421 164 480 158C488 157 494 157 499 160L506 171L522 175L534 185C489 195 437 208 382 222C310 240 251 249 204 247C195 247 196 242 201 237Z" fill="url(#leather)" stroke="#34251f" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M214 232C259 220 307 203 351 191M444 168C461 164 482 161 494 162" stroke="#df883c" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M207 243C258 244 308 233 356 222M449 200C475 194 500 188 527 183" stroke="#d57b30" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+    <g fill="#64300f">
+      <path d="M223 235C237 231 249 228 261 227C247 232 235 236 223 235ZM260 237C283 231 306 227 331 219C305 231 284 236 260 237Z"/>
+      <path d="M276 217L293 212L286 216ZM306 230C317 224 331 220 345 219L327 225Z"/>
+      <path d="M447 176C461 170 474 170 489 171C474 173 459 173 447 176ZM454 186C477 178 500 177 520 181C500 179 477 183 454 186Z"/>
+      <path d="M474 192C490 184 507 183 521 185C505 187 489 190 474 192Z"/>
+    </g>
+    <g fill="#442613">
+      <path d="M246 235L257 231L254 234L247 236Z"/>
+      <path d="M287 218L299 214L297 216L289 219Z"/>
+      <path d="M317 209C320 206 327 205 331 206L329 208L319 210Z"/>
+      <path d="M341 188L350 186L348 189L343 190Z"/>
+    </g>
+    <path d="M348 199L361 196L363 201L350 203L345 202Z" fill="#dc963d" stroke="#774519" stroke-width="1.4" stroke-linejoin="round"/>
+
+    <!-- Curved gold frame, inset leather and the small buckle tongue. -->
+    <path d="M369 165C385 160 408 156 422 157C430 157 433 163 437 175L448 205C451 213 445 218 438 220L383 231C375 232 370 228 368 220L358 184C355 173 358 168 369 165Z" fill="#2c2221" opacity=".55"/>
+    <path d="M367 163C385 158 406 154 421 155C429 155 432 160 435 171L447 202C450 211 446 216 438 218L382 229C374 230 369 226 367 218L357 181C354 171 358 166 367 163Z" fill="url(#gold)" stroke="#382a21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M369 168C384 162 406 159 420 159C426 159 428 164 431 172" stroke="#fff0b2" stroke-opacity=".8" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M362 178L372 216C374 224 378 224 384 223L436 213" stroke="#ffd778" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>
+    <path d="M378 177C389 173 404 170 414 171C420 171 422 174 424 182L431 201C433 205 430 208 425 209L391 216C385 217 382 214 380 208L373 185C372 181 373 179 378 177Z" fill="#89521b" stroke="#ad6e24" stroke-width="1.5"/>
+    <path d="M380 178C390 175 404 172 413 173C418 173 419 176 421 183L427 199C429 203 427 205 423 206L391 213C387 214 384 211 383 207L376 186C375 181 376 180 380 178Z" fill="url(#buckle-leather)" stroke="#39271b" stroke-width="2.7"/>
+    <path d="M380 190C387 189 391 187 397 186L385 187L379 187ZM386 202C391 201 397 198 400 197L387 200ZM404 178C410 176 414 177 418 179L416 176L407 176Z" fill="#512b14"/>
+    <path d="M421 183C424 182 427 182 428 184L429 188L420 189L417 187Z" fill="#edb54e" stroke="#684318" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M437 197L440 205C442 210 438 212 434 213" stroke="#9c5e1c" stroke-width="2" stroke-linecap="round"/>
+
+    <path d="M21 273C23 261 40 250 61 248M40 263C68 250 104 263 136 274C181 289 223 296 269 296C352 297 425 274 484 252" stroke="#ad789f" stroke-opacity=".36" stroke-width="2" stroke-linecap="round"/>
+    <use href="#silhouette" stroke="#2c252b" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+</svg>

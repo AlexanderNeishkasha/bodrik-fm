@@ -177,7 +177,6 @@ function command(value) {
 export function createParticipantsSource({
   requestRoom,
   getSession,
-  getLanguage,
   getCapabilities = () => ({}),
   execute = () => Promise.reject(new Error("Participant commands unavailable")),
   origin = "https://meeting.invalid",
@@ -219,7 +218,6 @@ export function createParticipantsSource({
       pendingCommand,
       error,
       actionError,
-      language: getLanguage() === "en" ? "en" : "ru",
       selfId: typeof capabilities.selfId === "string" ? capabilities.selfId : "",
       presenter: capabilities.presenter === true,
       visible: capabilities.visible === true,

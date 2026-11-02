@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { createSpeakerTest } from "../features/meeting/room/speakerTest.mjs";
+import { createSpeakerTest, stopOnRoomExit } from "../features/meeting/room/speakerTest.mjs";
 
 for (const scenario of ["completion", "replacement", "leave", "routing failure", "play failure", "leave while routing"]) {
   test(`speaker melody lifecycle: ${scenario}`, async () => {
@@ -55,3 +55,23 @@ test("speaker test publishes start/stop and updates active volume", async () => 
   assert.deepEqual(states, [true, false]);
   off();
 });
+
+for (const [scenario, statuses, stops] of [
+  ["exit button leaves the room", ["admitted", "left"], 1],
+  ["kick ends the room", ["admitted", "kicked"], 1],
+  ["failure after reconnecting", ["admitted", "reconnecting", "failed"], 1],
+  ["reconnecting keeps playing", ["admitted", "reconnecting", "admitted"], 0],
+  ["prejoin and joining keep playing", ["idle", "joining"], 0],
+]) {
+  test(`speaker melody on room status change: ${scenario}`, () => {
+    let state = { status: statuses[0] };
+    const listeners = new Set();
+    const client = { getState: () => state, subscribe: (listener) => (listeners.add(listener), () => listeners.delete(listener)) };
+    let stopped = 0;
+    const off = stopOnRoomExit(client, { stop: () => { stopped++; } });
+    for (const status of statuses.slice(1)) { state = { status }; listeners.forEach((listener) => listener()); }
+    assert.equal(stopped, stops);
+    off();
+    assert.equal(listeners.size, 0);
+  });
+}

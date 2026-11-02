@@ -69,7 +69,7 @@ test("actual rich JSX renders safe formatting/code/links but no script, event or
 });
 test("actual external image requires explicit consent; uploaded image is lazy and referrer-free", async () => {
   const external = await render('<img src="https://foreign.invalid/picture.png" onerror="unsafe()">');
-  assert.ok(external.includes("Load external image"));
+  assert.ok(external.includes("Загрузить внешнее изображение"));
   assert.equal(external.includes("<img"), false);
   const uploaded = await render('<img src="https://meeting.invalid/uploads/chat/abcd.png" alt="Shared">');
   assert.equal((uploaded.match(/<img/g) || []).length, 1);

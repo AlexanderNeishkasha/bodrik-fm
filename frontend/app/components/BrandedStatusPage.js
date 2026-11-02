@@ -3,11 +3,13 @@
 import { useEffect, useReducer, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
 import BodrickFlyby from "./BodrickFlyby";
-import { statusPageHref } from "../lib/statusNavigation.mjs";
+import { playerOrigin, statusPageHref } from "../lib/statusNavigation.mjs";
 
 /** Shared themed destination for site errors and meeting outcomes. */
 export default function BrandedStatusPage({ eyebrow, title, description, actions = [], children, language = "ru" }) {
   const reducedMotion = useSyncExternalStore(subscribeMotion, motionSnapshot, () => true);
+  // Server rendering has no location; hydrate with that, then link to the browser's player host.
+  const origin = useSyncExternalStore(subscribeNever, () => playerOrigin(window.location), () => playerOrigin(null));
   const firstAction = useRef(null);
   const [interactionToken, bumpInteraction] = useReducer(value => value + 1, 0);
   useEffect(() => { firstAction.current?.focus(); }, [title]);
@@ -22,13 +24,18 @@ export default function BrandedStatusPage({ eyebrow, title, description, actions
         <div className="flex flex-wrap gap-3">
           {actions.map((action, index) => {
             const className = `inline-flex items-center justify-center rounded-full border px-6 py-2 text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-wait ${index === 0 ? "border-[var(--theme-accent)] bg-[var(--theme-accent)] text-[var(--theme-text-dark)] hover:bg-[var(--theme-accent-bright)]" : "border-[var(--theme-border)] text-[var(--theme-text)] hover:bg-[var(--theme-panel-hover)]"}`;
-            return action.href ? <Link key={action.label} ref={index === 0 ? firstAction : undefined} href={statusPageHref(action.href)} className={className}>{action.label}</Link>
+            return action.href ? <Link key={action.label} ref={index === 0 ? firstAction : undefined} href={statusPageHref(action.href, origin)} className={className}>{action.label}</Link>
               : <button key={action.label} ref={index === 0 ? firstAction : undefined} type="button" className={className} disabled={action.disabled} onClick={action.onClick}>{action.label}</button>;
           })}
         </div>
       </main>
     </div>
   </div>;
+}
+
+/** The page's origin never changes while it is open. */
+function subscribeNever() {
+  return () => {};
 }
 
 /** Observe the system motion preference for the decorative flyby. */

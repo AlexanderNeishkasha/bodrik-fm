@@ -4,10 +4,10 @@ import { themePreference } from "../../../app/lib/themePreference.mjs";
  * Player theme names (`app/themes/<name>.css`, `app/lib/theme.js`); the meeting applies
  * the player's own theme CSS. A test keeps this list equal to the theme files.
  */
-export const MEETING_THEMES = Object.freeze(["aurora", "crimson", "emberveil", "grove", "ivory", "lucifer", "midnight", "mono", "mythic", "pirate", "prism", "saffron", "spectrum"]);
+export const MEETING_THEMES = Object.freeze(["aurora", "crimson", "emberveil", "grove", "ivory", "lucifer", "midnight", "mythic", "noir", "pirate", "prism", "saffron", "spectrum"]);
 
 /** The player's default theme for unknown names. */
-const DEFAULT_THEME = "mono";
+const DEFAULT_THEME = "pirate";
 
 /** A known player theme name, else the default. */
 const normalizeTheme = (value) => (MEETING_THEMES.includes(value) ? value : DEFAULT_THEME);

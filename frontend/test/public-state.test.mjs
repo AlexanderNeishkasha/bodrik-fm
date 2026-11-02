@@ -11,7 +11,7 @@ test("public snapshots normalize valid fields and media-path fallback", () => {
         is_playing: true,
         position: 12.5,
         sync_token: 7,
-        theme: " mono ",
+        theme: " pirate ",
       },
       {
         roomSlug: "room",
@@ -19,7 +19,7 @@ test("public snapshots normalize valid fields and media-path fallback", () => {
         isPlaying: true,
         position: 12.5,
         syncToken: 7,
-        theme: "mono",
+        theme: "pirate",
       },
     ],
     [

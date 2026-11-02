@@ -51,6 +51,10 @@
 }
 
 @media (max-width: 480px) {
+    .shell.shell {
+        gap: 1.5rem;
+    }
+
     .roomControls.roomControls {
         align-items: stretch;
     }
@@ -66,13 +70,24 @@
         padding-inline: 0;
     }
 
+    .headerTop.headerTop {
+        flex-wrap: nowrap;
+        gap: 0.375rem;
+    }
+
     .sessionActions.sessionActions {
+        flex: 0 1 auto;
+        justify-content: flex-end;
         min-width: 0;
+        width: auto;
+        gap: 0.25rem;
     }
 
     .headerButton.headerButton {
-        padding-inline: 0.8rem;
-        letter-spacing: 0.12em;
+        gap: 0.25rem;
+        padding-inline: 0.5rem;
+        font-size: 0.625rem;
+        letter-spacing: 0.03em;
     }
 }
 
@@ -99,9 +114,19 @@
 }
 
 .queueColumn { display: contents; }
-.meetingPlacement { min-width: 0; order: 1; }
+.meetingPlacement { min-width: 0; order: 0; }
 @media (min-width: 1024px) {
     .queueColumn { display: flex; min-width: 0; flex-direction: column; gap: 2rem; }
     .queueColumn > section { flex: 1; }
     .meetingPlacement { order: 0; flex: none; }
+}
+
+/*
+ * The fixed hotkeys card (HotkeysPanel: md+, fine pointers, about 200px tall) sits over the
+ * bottom-right corner; reserve room so the library and theme picker can scroll clear of it.
+ */
+@media (min-width: 768px) and (pointer: fine) {
+    :global([data-hotkeys-studio="true"]) .shell.shell {
+        padding-bottom: 15rem;
+    }
 }

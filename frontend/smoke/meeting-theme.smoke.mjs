@@ -1,12 +1,13 @@
 import { expect, firefox, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 for (const engine of ["chromium", "firefox"]) {
   test(`meeting restores its saved theme before room state and after refresh: ${engine}`, async ({ browser }) => {
     const owned = engine === "firefox" ? await firefox.launch() : null;
     const context = await (owned || browser).newContext({ ignoreHTTPSErrors: true, permissions: [], reducedMotion: "no-preference" });
     await context.addInitScript(() => {
-      if (!localStorage.getItem("bodrik_fm_theme")) localStorage.setItem("bodrik_fm_theme", "midnight");
+      if (!localStorage.getItem("bodrik_fm_theme_v2")) localStorage.setItem("bodrik_fm_theme_v2", "midnight");
       /** This theme check requires no physical devices or permission prompts. */
       navigator.mediaDevices.getUserMedia = async () => { throw new DOMException("Unavailable", "NotAllowedError"); };
       window.visibleThemes = [];
@@ -29,8 +30,8 @@ for (const engine of ["chromium", "firefox"]) {
     let stream;
     await page.routeWebSocket("**/ws/rooms/*/state/public", socket => { stream = socket; });
     try {
-      await page.goto(`/room/${encodeURIComponent(process.env.SMOKE_ROOM || "chopper")}`);
-      await expect(page.getByRole("textbox", { name: "Введите имя" })).toBeVisible();
+      await page.goto(`/room/${encodeURIComponent(smokeRoom())}`);
+      await expect(page.getByRole("button", { name: "Присоединиться к встрече" })).toBeVisible();
       await expect.poll(() => page.evaluate(() => window.visibleThemes.length)).toBeGreaterThan(0);
       expect(await page.evaluate(() => [...new Set(window.visibleThemes)])).toEqual(["midnight"]);
       await expect.poll(() => Boolean(stream)).toBe(true);
@@ -39,10 +40,10 @@ for (const engine of ["chromium", "firefox"]) {
       await expect(page.locator("html")).toHaveAttribute("data-theme", "aurora");
       await expect.poll(() => page.evaluate(() => window.themeTransitions.includes("background-color"))).toBe(true);
       await expect(page.locator("html")).not.toHaveClass(/theme-transition/);
-      expect(await page.evaluate(() => localStorage.getItem("bodrik_fm_theme"))).toBe("aurora");
+      expect(await page.evaluate(() => localStorage.getItem("bodrik_fm_theme_v2"))).toBe("aurora");
       stream = null;
       await page.reload();
-      await expect(page.getByRole("textbox", { name: "Введите имя" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Присоединиться к встрече" })).toBeVisible();
       await expect.poll(() => page.evaluate(() => window.visibleThemes.length)).toBeGreaterThan(0);
       expect(await page.evaluate(() => [...new Set(window.visibleThemes)])).toEqual(["aurora"]);
       await driver.join(`Theme${engine}${Date.now().toString(36).slice(-4)}`);
@@ -51,6 +52,8 @@ for (const engine of ["chromium", "firefox"]) {
       await expect(page.locator("html")).toHaveAttribute("data-theme", "midnight");
       await expect.poll(() => page.evaluate(() => window.dockThemeTransitions.includes("background-color"))).toBe(true);
       await expect(page.locator("html")).not.toHaveClass(/theme-transition/);
+      // Under load the previous theme's transitions may still be starting; let them finish first.
+      await expect.poll(() => page.evaluate(() => document.getAnimations().filter(animation => animation instanceof CSSTransition).length)).toBe(0);
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.evaluate(() => { window.themeTransitions = []; window.dockThemeTransitions = []; });
       stream.send(JSON.stringify({ theme: "crimson" }));

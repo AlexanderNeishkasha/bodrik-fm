@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
-import { ABOUT_COPY, normalizeAboutSnapshot, SOURCE_REPOSITORY_URL } from "./aboutModel.mjs";
+import { normalizeAboutSnapshot, SOURCE_REPOSITORY_URL } from "./aboutModel.mjs";
 import styles from "./AboutDialog.module.css";
 import Icon from "../../../components/ui/Icon";
 import { assetUrl } from "../../../app/lib/asset";
+import { t } from "../../../app/lang/index.js";
 
 /** Render one accessible read-only About dialog; closing the view never ends a meeting. */
 export default function AboutDialog({ snapshot, onClose, onReady }) {
   const dialogRef = useRef(null);
   const titleId = useId();
   const model = normalizeAboutSnapshot(snapshot);
-  const copy = ABOUT_COPY[model.language];
+  const copy = t("meeting.aboutModel");
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -29,7 +30,6 @@ export default function AboutDialog({ snapshot, onClose, onReady }) {
       ref={dialogRef}
       className={styles.dialog}
       aria-labelledby={titleId}
-      lang={model.language}
       onCancel={(event) => { event.preventDefault(); event.stopPropagation(); onClose(); }}
       onKeyDown={(event) => event.stopPropagation()}
       onClick={(event) => { event.stopPropagation(); if (event.target === event.currentTarget) onClose(); }}

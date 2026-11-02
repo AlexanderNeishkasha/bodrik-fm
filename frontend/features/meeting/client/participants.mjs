@@ -89,7 +89,6 @@ export function createMeetingParticipants({ client, layout, chat, slug, origin, 
   const source = createParticipantsSource({
     requestRoom: async () => roomFromState(state()),
     getSession: () => state().selfId || null,
-    getLanguage: () => state().language || "ru",
     getCapabilities: () => ({ selfId: state().selfId, presenter: state().presenter, visible, hidden: layout.getSnapshot().hidden, volumes: layout.getSnapshot().volumes }),
     execute,
     origin,

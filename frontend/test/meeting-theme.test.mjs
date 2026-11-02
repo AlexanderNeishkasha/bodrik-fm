@@ -23,9 +23,9 @@ function setup(initial, blocked = false) {
 
 for (const [name, saved, expected, blocked] of [
   ["saved selection", "midnight", "midnight", false],
-  ["no saved theme", null, "mono", false],
-  ["unknown saved theme", "unknown", "mono", false],
-  ["blocked storage", "midnight", "mono", true],
+  ["no saved theme", null, "pirate", false],
+  ["unknown saved theme", "unknown", "pirate", false],
+  ["blocked storage", "midnight", "pirate", true],
 ]) {
   test(`room theme startup: ${name}`, () => {
     const { source, send, writes, count } = setup(saved, blocked);
@@ -33,7 +33,7 @@ for (const [name, saved, expected, blocked] of [
     send({ theme: "aurora" });
     assert.equal(source.getSnapshot(), "aurora");
     assert.equal(count(), 1);
-    assert.deepEqual(writes, blocked ? [] : [["bodrik_fm_theme", "aurora"]]);
+    assert.deepEqual(writes, blocked ? [] : [["bodrik_fm_theme_v2", "aurora"]]);
     source.stop();
   });
 }

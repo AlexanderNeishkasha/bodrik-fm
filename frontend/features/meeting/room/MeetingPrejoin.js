@@ -3,81 +3,44 @@
 import { useEffect, useRef, useState } from "react";
 import { Camera, Mic, MicOff, Video, VideoOff } from "lucide-react";
 
-import { profileAvatarPath } from "../client/protocol.mjs";
 import SelectControl from "../../../components/ui/SelectControl";
 import { useCaptureState } from "../client/useMeetingState";
 import { bindMediaTrack } from "../media/mediaTrackBinding.mjs";
+import { forgetProfile, readProfiles } from "../client/profiles.mjs";
+import ProfilePicker, { AvatarCircle } from "./ProfilePicker";
 import styles from "./MeetingPrejoin.module.css";
+import { t } from "../../../app/lang/index.js";
 
-/** localStorage key for the remembered display name. */
-const NAME_KEY = "meeting.name";
-/** localStorage key for the last uploaded avatar path. */
-const AVATAR_KEY = "meeting.avatar";
 /** Accepted avatar image types and size (the server enforces the same). */
 const AVATAR_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const AVATAR_MAX_BYTES = 10 * 1024 * 1024;
 
-/** RU/EN copy. */
-const COPY = {
-  ru: { title: "Встреча Бодрик FM", name: "Введите имя", join: "Присоединиться к встрече", micOn: "Микрофон включён", micOff: "Микрофон выключен", camOn: "Камера включена", camOff: "Камера выключена", camera: "Камера", microphone: "Микрофон", speaker: "Динамик", avatar: "Загрузить аватар", avatarInvalid: "Нужно изображение PNG, JPEG или WebP до 10 МБ." },
-  en: { title: "Bodrik FM meeting", name: "Enter your name", join: "Join meeting", micOn: "Microphone on", micOff: "Microphone off", camOn: "Camera on", camOff: "Camera off", camera: "Camera", microphone: "Microphone", speaker: "Speaker", avatar: "Upload avatar", avatarInvalid: "Use a PNG, JPEG or WebP image up to 10 MB." },
-};
-
-/** Remembered name, if storage is available. */
-function storedName() {
-  try {
-    return globalThis.localStorage?.getItem(NAME_KEY) || "";
-  } catch {
-    return "";
-  }
-}
-
-/** Remember a value for next time, ignoring blocked storage. */
-function remember(key, value) {
-  try {
-    globalThis.localStorage?.setItem(key, value);
-  } catch {
-    // Private mode: nothing to remember.
-  }
-}
-
-/** Remembered uploaded avatar path, if any. */
-function storedAvatar() {
-  try {
-    const value = globalThis.localStorage?.getItem(AVATAR_KEY) || "";
-    return profileAvatarPath(value, window.location);
-  } catch {
-    return "";
-  }
-}
-
-/** Initials for the avatar placeholder. */
-function initials(name) {
-  return name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "?";
-}
-
-/** One device select bound to a capture preference. */
-function DeviceSelect({ label, devices, value, onChange, disabled = false }) {
+/** One device select bound to a capture preference, with an optional coupled-route explanation. */
+function DeviceSelect({ label, devices, value, onChange, disabled = false, description }) {
   if (!devices?.length) return null;
   // No saved choice: show the browser default (or the first device) rather than a blank.
   value ||= devices.find((device) => device.value === "default")?.value || devices[0].value;
   return <div className={styles.select}>
     <span>{label}</span>
+    {description && <small>{description}</small>}
     <SelectControl label={label} options={devices} value={value || ""} disabled={disabled}
       onChange={(event) => onChange(event.target.value)} />
   </div>;
 }
 
 /** Prejoin card: local preview, device choice, name and join. */
-export default function MeetingPrejoin({ client, slug, language = "ru", busy = false, onJoin }) {
-  const text = COPY[language === "en" ? "en" : "ru"];
+export default function MeetingPrejoin({ client, slug, busy = false, onJoin }) {
+  const text = t("meeting.meetingPrejoin");
   const capture = useCaptureState(client);
   const video = useRef(null);
-  const [name, setName] = useState(storedName);
+  const [profiles, setProfiles] = useState(() => readProfiles(globalThis.localStorage, globalThis.location));
+  // Most recently used profile first; null opens the new-profile form.
+  const [selected, setSelected] = useState(() => profiles[0]?.name ?? null);
+  const profile = profiles.find((item) => item.name === selected) || null;
+  const [name, setName] = useState("");
   const [audio, setAudio] = useState(true);
   const [camera, setCamera] = useState(false);
   const [cameraPending, setCameraPending] = useState(false);
-  const [avatar] = useState(storedAvatar);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [avatarError, setAvatarError] = useState(false);
@@ -103,6 +66,13 @@ export default function MeetingPrejoin({ client, slug, language = "ru", busy = f
     setAvatarPreview(previewUrl.current);
     setAvatarFile(file);
   }
+  /** Forget a saved profile; removing the chosen one falls back to the next. */
+  function removeProfile(profileName) {
+    const next = forgetProfile(globalThis.localStorage, globalThis.location, profileName);
+    setProfiles(next);
+    if (profileName === selected) setSelected(next[0]?.name ?? null);
+  }
+
   const previewTrack = capture.cameraOn ? client.capture.track("camera") : null;
 
   // Start microphone preview only; camera acquisition requires an explicit toggle.
@@ -153,10 +123,11 @@ export default function MeetingPrejoin({ client, slug, language = "ru", busy = f
   function submit(event) {
     event.preventDefault();
     if (cameraPending) return;
-    const trimmed = name.trim();
+    // A saved profile joins as is; a new one reuses a same-name profile's picture unless replaced.
+    const trimmed = profile ? profile.name : name.trim();
     if (!trimmed) return;
-    remember(NAME_KEY, trimmed);
-    onJoin({ name: trimmed, audio, video: camera, avatar, avatarFile });
+    const avatar = profile ? profile.avatar : avatarFile ? "" : profiles.find((item) => item.name === trimmed)?.avatar || "";
+    onJoin({ name: trimmed, audio, video: camera, avatar, avatarFile: profile ? null : avatarFile });
   }
 
   return <main className={styles.page}>
@@ -171,8 +142,8 @@ export default function MeetingPrejoin({ client, slug, language = "ru", busy = f
               className={audio ? undefined : styles.off} onClick={toggleAudio}>{audio ? <Mic size={22} /> : <MicOff size={22} />}</button>
           </div>
           <DeviceSelect label={text.camera} devices={capture.cameras} value={capture.camera || capture.activeCamera} disabled={!camera} onChange={(value) => choose("camera", value)} />
-          <DeviceSelect label={text.microphone} devices={capture.inputDevices} value={capture.inputDevice || capture.activeInputDevice} onChange={(value) => choose("inputDevice", value)} />
-          <DeviceSelect label={text.speaker} devices={capture.outputDevices} value={capture.outputDevice} onChange={(value) => choose("outputDevice", value)} />
+          <DeviceSelect label={capture.coupledAudioRouting ? text.audioDevice : text.microphone} description={capture.coupledAudioRouting ? text.routeHint : undefined} devices={capture.inputDevices} value={capture.inputDevice || capture.activeInputDevice} onChange={(value) => choose("inputDevice", value)} />
+          {capture.outputSelectionAvailable && <DeviceSelect label={text.speaker} devices={capture.outputDevices} value={capture.outputDevice} onChange={(value) => choose("outputDevice", value)} />}
         </div>
         <div className={styles.previewSlot} aria-hidden={!camera}>
           <div className={styles.preview}>
@@ -180,20 +151,24 @@ export default function MeetingPrejoin({ client, slug, language = "ru", busy = f
           </div>
         </div>
       </div>
-      <input className={styles.name} aria-label={text.name} placeholder={text.name} value={name} maxLength={32} required
-        onChange={(event) => setName(event.target.value)} />
-      <div className={styles.avatarRow}>
-        <span className={styles.avatar} aria-hidden="true"
-          style={avatarPreview || avatar ? { backgroundImage: `url("${avatarPreview || avatar}")` } : undefined}>
-          {!avatarPreview && !avatar && initials(name)}
-        </span>
-        <label className={styles.avatarButton}>
-          <Camera size={16} aria-hidden="true" /> {text.avatar}
-          <input type="file" accept={AVATAR_TYPES.join(",")} aria-label={text.avatar} onChange={pickAvatar} />
-        </label>
+      {profiles.length > 0 && <ProfilePicker profiles={profiles} selected={profile ? selected : null} text={text}
+        onSelect={setSelected} onAdd={() => setSelected(null)} onRemove={removeProfile} />}
+      {/* Stays mounted so choosing a profile or "+" can slide it closed or open; inert while closed. */}
+      <div className={styles.newProfile} data-open={!profile} inert={!!profile}>
+        <div className={styles.newProfileBody}>
+          <input className={styles.name} aria-label={text.name} placeholder={text.name} value={name} maxLength={32} required={!profile}
+            onChange={(event) => setName(event.target.value)} />
+          <div className={styles.avatarRow}>
+            <AvatarCircle name={name} src={avatarPreview} />
+            <label className={styles.avatarButton}>
+              <Camera size={16} aria-hidden="true" /> {text.avatar}
+              <input type="file" accept={AVATAR_TYPES.join(",")} aria-label={text.avatar} onChange={pickAvatar} />
+            </label>
+          </div>
+          {avatarError && <p className={styles.note} role="alert">{text.avatarInvalid}</p>}
+        </div>
       </div>
-      {avatarError && <p className={styles.note} role="alert">{text.avatarInvalid}</p>}
-      <button className={styles.join} type="submit" disabled={busy || cameraPending || !name.trim()}>{text.join}</button>
+      <button className={styles.join} type="submit" disabled={busy || cameraPending || (!profile && !name.trim())}>{text.join}</button>
     </form>
   </main>;
 }

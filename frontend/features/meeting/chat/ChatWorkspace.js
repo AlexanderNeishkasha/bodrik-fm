@@ -4,11 +4,11 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import styles from "./ChatWorkspace.module.css";
 import ChatComposer from "./ChatComposer";
 import ChatTranscript from "./ChatTranscript";
+import { t } from "../../../app/lang/index.js";
 
 /** Chat history and composer for the panel; the conversation selector lives in the panel header. */
-export default function ChatWorkspace({ source, origin, language = "ru", submit, onReady }) {
+export default function ChatWorkspace({ source, origin, submit, onReady }) {
   const snapshot = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot);
-  language = snapshot.language || language;
   const history = useRef(null);
   const composer = useRef(null);
   const dragDepth = useRef(0);
@@ -58,7 +58,7 @@ export default function ChatWorkspace({ source, origin, language = "ru", submit,
       clearDrag();
       composer.current?.attachFiles(event.dataTransfer.files);
     }}>
-    {dragging && <div className={styles.dropOverlay} role="status"><span>{language === "en" ? "Drop a file or image here" : "Перетащите сюда файл или изображение"}</span></div>}
+    {dragging && <div className={styles.dropOverlay} role="status"><span>{t("meeting.chatWorkspace.drop")}</span></div>}
     <div ref={history} className={styles.history}
       onWheel={(event) => {
         const pane = history.current;
@@ -84,9 +84,9 @@ export default function ChatWorkspace({ source, origin, language = "ru", submit,
         // Scroll anchoring/resizing may emit scroll events: only explicit user intent leaves bottom-follow mode.
         if (pane && !followBottom.current && pane.scrollHeight - pane.scrollTop - pane.clientHeight <= 32) followBottom.current = true;
       }}><div>{snapshot.selected === "all" && (snapshot.historyLoading || snapshot.historyError) && <div role="status">
-        {snapshot.historyLoading ? language === "en" ? "Loading…" : "Загрузка…" : <button type="button" onClick={() => source.loadOlder?.()}>{language === "en" ? "Retry loading history" : "Загрузить историю снова"}</button>}
-      </div>}<ChatTranscript key={snapshot.sessionKey} source={source} origin={origin} language={language} /></div></div>
+        {snapshot.historyLoading ? t("meeting.chatWorkspace.loading") : <button type="button" onClick={() => source.loadOlder?.()}>{t("meeting.chatWorkspace.retry")}</button>}
+      </div>}<ChatTranscript key={snapshot.sessionKey} source={source} origin={origin} /></div></div>
     {submit && <ChatComposer ref={composer} key={`${snapshot.sessionKey}:${snapshot.selected}`} submit={(body, options) => submit({ body, targetId: snapshot.selected }, options)}
-      language={language} disabled={snapshot.canSend === false || snapshot.available === false} />}
+      disabled={snapshot.canSend === false || snapshot.available === false} />}
   </div>;
 }

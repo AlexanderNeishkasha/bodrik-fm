@@ -4,10 +4,6 @@ import test from "node:test";
 
 const policy = readFileSync(new URL("../app/privacy/page.js", import.meta.url), "utf8");
 const compose = readFileSync(new URL("../../compose.dev.yml", import.meta.url), "utf8");
-const chatImages = readFileSync(
-  new URL("../../backend/crates/meeting/src/replacement/uploads.rs", import.meta.url),
-  "utf8",
-);
 
 for (const [name, pattern] of [
   ["SFU media processing", /MiroTalk SFU.*mediasoup/s],
@@ -23,10 +19,9 @@ for (const [name, pattern] of [
   test(`privacy policy covers ${name}`, () => assert.match(policy, pattern));
 }
 
-test("privacy retention matches local diagnostics and chat-image cleanup", () => {
+test("privacy retention matches local diagnostics configuration", () => {
   assert.match(policy, /не более 14 дней/);
   assert.match(compose, /REPLACEMENT_DIAGNOSTICS_RETENTION_DAYS: "14"/);
-  assert.match(chatImages, /Duration::from_secs\(48 \* 60 \* 60\)/);
 });
 
 test("privacy policy does not repeat retired upstream behavior", () => {

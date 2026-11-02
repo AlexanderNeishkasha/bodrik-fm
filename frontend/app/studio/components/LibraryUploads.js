@@ -1,4 +1,4 @@
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 
 export default function LibraryUploads({ uploads, displayName }) {
   if (uploads.length === 0) {
@@ -34,7 +34,7 @@ export default function LibraryUploads({ uploads, displayName }) {
           </div>
           <span className="text-xs uppercase tracking-[0.2em] text-[var(--theme-muted)]">
             {upload.status === "error"
-              ? ui.studio.errorLabel
+              ? t("studio.errorLabel")
               : `${Math.round((upload.progress ?? 0) * 100)}%`}
           </span>
         </div>

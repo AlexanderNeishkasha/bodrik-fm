@@ -47,8 +47,9 @@ pub async fn init_hls_cache(state: &AppState) {
     }
 }
 
-/// Optionally optimize/package an owned original and probe its finite duration.
-/// Unknown duration and failed HLS/faststart preserve original-file fallback.
+/// Optionally optimize/package an owned original and measure its playable audio duration.
+/// Complete HLS takes precedence over a bounded decode of the original; failed
+/// preparation or unknown duration still preserves original-file fallback.
 pub async fn process_uploaded_file(
     state: &AppState,
     path: &std::path::Path,
@@ -60,5 +61,16 @@ pub async fn process_uploaded_file(
     }
     process::faststart(path, key).await;
     hls::generate(state, path, key).await;
-    probe_duration(path).await
+    prepared_duration(path, &hls_dir(state, key)).await
 }
+
+/// Prefer the complete prepared timeline; decode the original only without usable HLS.
+async fn prepared_duration(path: &std::path::Path, cache: &std::path::Path) -> Option<f64> {
+    match hls::duration(cache).await {
+        Some(duration) => Some(duration),
+        None => probe_duration(path).await,
+    }
+}
+
+#[cfg(test)]
+mod tests;

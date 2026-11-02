@@ -4,23 +4,19 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { X } from "lucide-react";
 
 import styles from "./ShareDialog.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** RU/EN copy per confirmation kind. */
-const COPY = {
-  ru: { ban: { title: "Забанить участника?", body: "{name} не сможет вернуться в эту комнату 24 часа.", confirm: "Забанить" }, cancel: "Отмена" },
-  en: { ban: { title: "Ban this participant?", body: "{name} will not be able to return to this room for 24 hours.", confirm: "Ban" }, cancel: "Cancel" },
-};
-
 /** The room's confirmation modal (player style, like Studio's delete dialog). */
-export default function ConfirmDialog({ confirmations, language = "ru" }) {
+export default function ConfirmDialog({ confirmations }) {
   const request = useSyncExternalStore(confirmations.subscribe, confirmations.getSnapshot, confirmations.getSnapshot);
   if (!request) return null;
-  return <Dialog key={request.id} request={request} confirmations={confirmations} language={language} />;
+  return <Dialog key={request.id} request={request} confirmations={confirmations} />;
 }
 
 /** One open confirmation; focus starts on Cancel and Escape cancels. */
-function Dialog({ request, confirmations, language }) {
-  const all = COPY[language === "en" ? "en" : "ru"];
+function Dialog({ request, confirmations }) {
+  const all = t("meeting.confirmDialog");
   const text = all[request.kind] || all.ban;
   const ref = useRef(null);
   const cancel = useRef(null);

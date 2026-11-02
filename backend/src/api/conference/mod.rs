@@ -9,7 +9,6 @@ mod db_tests;
 pub(crate) mod embedded;
 mod guest;
 mod handlers;
-mod hosts;
 mod music_bridge;
 mod policy;
 mod provider;
@@ -26,9 +25,7 @@ pub(crate) use cleanup::{
 };
 pub(crate) use db::allowed_by_user_id;
 pub(crate) use guest::{guest_invite, public_join, public_status};
-pub(crate) use handlers::{
-    set_enabled, set_music_output, set_music_volume, studio_join, studio_status,
-};
+pub(crate) use handlers::{set_enabled, set_music_output, set_music_volume, studio_status};
 pub use provider::Provider;
 pub(crate) use service::set_access;
 pub(crate) use tickets::{Issuer as TicketIssuer, routes as ticket_routes};
@@ -54,7 +51,6 @@ pub fn routes() -> Router<AppState> {
             "/api/studio/conference",
             get(studio_status).post(set_enabled),
         )
-        .route("/api/studio/conference/join", post(studio_join))
         .route(
             "/api/studio/conference/music-volume",
             post(set_music_volume),

@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import useStudioActions from "./useStudioActions";
 import useAccountManagement from "./useAccountManagement";
 import useStudioAuthState from "./useStudioAuthState";
@@ -17,6 +17,7 @@ import { deferEffect } from "../../lib/deferEffect";
 import buildWorkspaceProps from "../lib/buildWorkspaceProps";
 import buildHotkeysArgs from "../lib/buildHotkeysArgs";
 import { API_BASE, MEDIA_BASE } from "../lib/constants";
+import { meetingVolumeControls } from "../lib/meetingVolumeControls.mjs";
 import { displayName } from "../lib/format";
 import { logoutAndResetStudioAsUser, parseStudioAsUserId, parseStudioAsUserIdValue } from "../lib/studioAsUser.mjs";
 
@@ -95,9 +96,9 @@ export default function useStudioPageState() {
     setStatus,
     setLibraryBusy,
     state,
-    renameWhilePlayingMessage: ui.messages.renameWhilePlaying,
-    deleteWhilePlayingMessage: ui.messages.deleteWhilePlaying,
-    noTrackLabel: ui.studio.noTrack,
+    renameWhilePlayingMessage: t("messages.renameWhilePlaying"),
+    deleteWhilePlayingMessage: t("messages.deleteWhilePlaying"),
+    noTrackLabel: t("studio.noTrack"),
   });
   const { sendAction, setTheme, setRoomSlug, setRoomListed } = useStudioActions({
     apiBase: API_BASE,
@@ -106,7 +107,7 @@ export default function useStudioPageState() {
     setStatus,
     setThemeBusy,
     setSlugBusy,
-    actionFailedMessage: ui.messages.actionFailed,
+    actionFailedMessage: t("messages.actionFailed"),
   });
   const { roomSlugInput, roomListedInput, setRoomSlugInput, setRoomListedInput } = useStudioRoomDraft({
     user,
@@ -150,6 +151,14 @@ export default function useStudioPageState() {
   const { scheduleSeek, onSeek } = useStudioSeek({ isSeekingRef, setSeekValue, sendAction });
   const { showHotkeys, setShowHotkeys, isHydrated } = useStudioHotkeysState();
   const [interactionToken, bumpInteraction] = useReducer((value) => value + 1, 0);
+  const volumeControls = meetingVolumeControls({
+    state,
+    conference,
+    localVolume,
+    localMuted,
+    toggleLocalMute,
+    onLocalVolumeChange,
+  });
   useStudioHotkeysBinding(
     buildHotkeysArgs({
       isAuthed,
@@ -157,7 +166,7 @@ export default function useStudioPageState() {
       toggleEdit: libraryState.toggleEdit,
       state,
       sendAction,
-      toggleLocalMute,
+      toggleLocalMute: volumeControls.onToggleMute,
       changeLocalVolume,
       unlockAudio,
       localMuted,

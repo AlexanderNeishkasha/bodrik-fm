@@ -28,10 +28,10 @@ export default function ThemeToggle({ currentTheme, onThemeChange, isBusy }) {
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() => handleChange("mono")}
+          onClick={() => handleChange("pirate")}
           disabled={isBusy}
           className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] transition disabled:opacity-60 ${
-            activeTheme === "mono"
+            activeTheme === "pirate"
               ? "bg-[var(--theme-accent)] text-[var(--theme-text-dark)]"
               : "btn-ghost"
           }`}
@@ -160,10 +160,10 @@ export default function ThemeToggle({ currentTheme, onThemeChange, isBusy }) {
         </button>
         <button
           type="button"
-          onClick={() => handleChange("pirate")}
+          onClick={() => handleChange("noir")}
           disabled={isBusy}
           className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] transition disabled:opacity-60 ${
-            activeTheme === "pirate"
+            activeTheme === "noir"
               ? "bg-[var(--theme-accent)] text-[var(--theme-text-dark)]"
               : "btn-ghost"
           }`}

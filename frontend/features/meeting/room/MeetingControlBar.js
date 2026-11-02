@@ -4,18 +4,15 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronUp, Info, MessageSquare, Mic, MicOff, Monitor, MonitorOff, PhoneOff, Settings, Share2, Users, Video, VideoOff } from "lucide-react";
 
 import { useCaptureState, useMeetingState } from "../client/useMeetingState";
+import { usePushToTalk } from "./usePushToTalk";
 import CameraQuickMenu from "./CameraQuickMenu";
 import MicQuickMenu from "./MicQuickMenu";
 
 import { transitionPanel } from "./panelMotion.mjs";
 import styles from "./MeetingControlBar.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** RU/EN labels. */
-const COPY = {
-  ru: { accessDenied: "Доступ не предоставлен", mute: "Выключить микрофон", unmute: "Включить микрофон", micDevices: "Выбор микрофона и динамика", cameraOff: "Выключить камеру", cameraOn: "Включить камеру", cameraDevices: "Выбор камеры", screenOn: "Демонстрация экрана", screenOff: "Остановить демонстрацию", chat: "Чат", participants: "Участники", settings: "Настройки", more: "Дополнительно", invite: "Поделиться комнатой", about: "О программе", leave: "Покинуть встречу", microphone: "Микрофон", speaker: "Динамик", camera: "Камера" },
-  en: { accessDenied: "Access not granted", mute: "Mute microphone", unmute: "Unmute microphone", micDevices: "Choose microphone and speaker", cameraOff: "Turn camera off", cameraOn: "Turn camera on", cameraDevices: "Choose camera", screenOn: "Share screen", screenOff: "Stop sharing", chat: "Chat", participants: "Participants", settings: "Settings", more: "More", invite: "Share room", about: "About", leave: "Leave meeting", microphone: "Microphone", speaker: "Speaker", camera: "Camera" },
-};
-
 /** Idle time before the bar fades when auto-hide is on. */
 const IDLE_MS = 4000;
 
@@ -65,12 +62,15 @@ function Menu({ label, open, onClose, bare = false, alignEnd = false, children }
 }
 
 /** Bottom meeting control bar for the headless client. */
-export default function MeetingControlBar({ client, chat, participants, settings, onOpenSettings, onInvite, onAbout, onError, language = "ru", shortcuts = true, autoHide = false }) {
-  const text = COPY[language === "en" ? "en" : "ru"];
+export default function MeetingControlBar({ client, chat, participants, settings, onOpenSettings, onInvite, onAbout, onError, shortcuts = true, autoHide = false }) {
+  const text = t("meeting.meetingControlBar");
   const state = useMeetingState(client);
   const capture = useCaptureState(client);
   const chatState = useSource(chat, null);
   const layout = useSource(client.layout, null);
+  const audioSettings = useSource(settings.sources.audio, null);
+  const pushToTalk = audioSettings?.pushToTalk === true;
+  const talkHandlers = usePushToTalk({ client, enabled: pushToTalk, onError });
   const [menu, setMenu] = useState("");
   const [idle, setIdle] = useState(false);
 
@@ -116,7 +116,7 @@ export default function MeetingControlBar({ client, chat, participants, settings
   }
 
   const actions = {
-    audio: () => microphone && run(() => client.setMicrophoneMuted(!microphone.paused)),
+    audio: () => !pushToTalk && microphone && run(() => client.setMicrophoneMuted(!microphone.paused)),
     video: () => run(() => client.setCameraEnabled(!camera)),
     screen: () => capture.screenAvailable !== false && run(() => client.setScreenSharing(!screen), text.accessDenied),
     chat: () => transitionPanel(() => chat?.toggle()),
@@ -140,15 +140,18 @@ export default function MeetingControlBar({ client, chat, participants, settings
   const closeMenu = () => setMenu("");
   const muted = !microphone || microphone.paused;
 
-  return <nav style={{ viewTransitionName: "meeting-controls" }} className={`${styles.bar} ${idle && !menu ? styles.hidden : ""}`} aria-label={language === "en" ? "Meeting controls" : "Управление встречей"}>
+  return <nav style={{ viewTransitionName: "meeting-controls" }} className={`${styles.bar} ${idle && !menu ? styles.hidden : ""}`} aria-label={text.controls}>
     <div className={styles.split}>
       <button type="button" className={muted ? styles.off : undefined} disabled={!microphone} aria-pressed={!muted}
-        aria-label={muted ? text.unmute : text.mute} title={muted ? text.unmute : text.mute} onClick={actions.audio}>
+        aria-label={pushToTalk ? text.holdToTalk : muted ? text.unmute : text.mute}
+        title={pushToTalk ? text.holdToTalk : muted ? text.unmute : text.mute}
+        {...talkHandlers}
+        onClick={actions.audio}>
         {muted ? <MicOff size={24} /> : <Mic size={24} />}
       </button>
       <button type="button" className={styles.chevron} aria-haspopup="menu" aria-expanded={menu === "mic"} aria-label={text.micDevices} onClick={() => toggle("mic")}><ChevronUp size={16} /></button>
       <Menu label={text.micDevices} open={menu === "mic"} onClose={closeMenu} bare>
-        <MicQuickMenu audio={settings.sources.audio} language={language} onError={onError}
+        <MicQuickMenu audio={settings.sources.audio} onError={onError}
           onOpenSettings={() => { closeMenu(); settings.openSection("tabAudioDevices"); }} />
       </Menu>
     </div>
@@ -159,7 +162,7 @@ export default function MeetingControlBar({ client, chat, participants, settings
       </button>
       <button type="button" className={styles.chevron} aria-haspopup="menu" aria-expanded={menu === "camera"} aria-label={text.cameraDevices} onClick={() => toggle("camera")}><ChevronUp size={16} /></button>
       <Menu label={text.cameraDevices} open={menu === "camera"} onClose={closeMenu} bare>
-        <CameraQuickMenu video={settings.sources.video} language={language} onError={onError}
+        <CameraQuickMenu video={settings.sources.video} onError={onError}
           onOpenSettings={() => { closeMenu(); settings.openSection("tabVideoDevices"); }} />
       </Menu>
     </div>

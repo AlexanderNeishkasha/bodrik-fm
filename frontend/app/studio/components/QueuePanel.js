@@ -5,7 +5,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import Icon from "../../components/Icon";
 import listStyles from "./StudioListPanel.module.css";
 
@@ -59,7 +59,7 @@ function QueueItem({ entry, onForcePlay, onRemove, displayName }) {
               onForcePlay(index);
             }}
             className="btn-accent inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)]"
-            aria-label={ui.studio.forcePlay}
+            aria-label={t("studio.forcePlay")}
           >
             <Icon name="play" className="h-4 w-4" />
           </button>
@@ -69,7 +69,7 @@ function QueueItem({ entry, onForcePlay, onRemove, displayName }) {
               onRemove(index);
             }}
             className="btn-ghost inline-flex h-8 w-8 items-center justify-center rounded-full transition"
-            aria-label={ui.studio.removeFromQueue}
+            aria-label={t("studio.removeFromQueue")}
           >
             <Icon name="trash" className="h-4 w-4" />
           </button>
@@ -98,7 +98,7 @@ export default function QueuePanel({
       ref={setNodeRef}
     >
       <h2 className="text-lg font-semibold font-display tracking-[0.08em]">
-        {ui.studio.queue}
+        {t("studio.queue")}
       </h2>
       {hasItems ? (
         <SortableContext items={queueIds} strategy={verticalListSortingStrategy}>
@@ -115,7 +115,7 @@ export default function QueuePanel({
           </ol>
         </SortableContext>
       ) : (
-        <p className="text-sm text-[var(--theme-muted)]">{ui.studio.queueEmpty}</p>
+        <p className="text-sm text-[var(--theme-muted)]">{t("studio.queueEmpty")}</p>
       )}
     </section>
   );

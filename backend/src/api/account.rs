@@ -92,6 +92,7 @@ async fn delete_account_command(
     payload: DeleteAccountPayload,
 ) -> Response {
     let command_state = state.clone();
+    let clear_domain = auth::session_cookie_domain(&state, &headers).map(str::to_owned);
     let (room_id, assets) = match tokio::task::spawn_blocking(move || {
         delete_account_sync(&command_state, &headers, payload)
     })
@@ -109,7 +110,7 @@ async fn delete_account_command(
         media::cleanup_media_artifacts(&state, &key).await;
     }
     let mut response = json_message(StatusCode::OK, "ok").into_response();
-    auth::append_clear_auth_cookies(response.headers_mut());
+    auth::append_clear_auth_cookies(response.headers_mut(), clear_domain.as_deref());
     response
 }
 

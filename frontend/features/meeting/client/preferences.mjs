@@ -3,8 +3,8 @@ const STORAGE_KEY = "meeting.preferences.v1";
 
 /** Defaults and validators for each preference. */
 const SPEC = Object.freeze({
-  language: { initial: "ru", valid: (value) => value === "ru" || value === "en" },
   shortcuts: { initial: true, valid: (value) => typeof value === "boolean" },
+  pushToTalk: { initial: false, valid: (value) => typeof value === "boolean" },
   masterVolume: { initial: 100, valid: (value) => Number.isInteger(value) && value >= 0 && value <= 100 },
 });
 
@@ -22,7 +22,7 @@ function parseMeetingPreferences(raw) {
   return Object.freeze({ ...ROOM_BEHAVIOR, ...Object.fromEntries(Object.entries(SPEC).map(([key, { initial, valid }]) => [key, valid(stored?.[key]) ? stored[key] : initial])) });
 }
 
-/** Personal meeting preferences (language, shortcuts, master speaker volume), persisted locally. */
+/** Personal meeting preferences, persisted locally; obsolete language values are ignored. */
 export function createPreferences({ storage } = {}) {
   let snapshot = parseMeetingPreferences(read(storage));
   const listeners = new Set();
@@ -53,14 +53,5 @@ function read(storage) {
     return storage?.getItem(STORAGE_KEY) ?? null;
   } catch {
     return null;
-  }
-}
-
-/** Read the saved language for entry pages that have not created a meeting client yet. */
-export function storedMeetingLanguage() {
-  try {
-    return parseMeetingPreferences(globalThis.localStorage?.getItem(STORAGE_KEY)).language;
-  } catch {
-    return "ru";
   }
 }

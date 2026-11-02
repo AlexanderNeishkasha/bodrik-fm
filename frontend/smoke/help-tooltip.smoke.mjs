@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("setting help opens only from its question mark, with keyboard dismissal", async ({ page }) => {
   const driver = nextDriver(page);
-  await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+  await page.goto(driver.path(smokeRoom()));
   await driver.join(`help-${Date.now()}`);
   await page.getByRole("button", { name: "Настройки", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Настройки встречи" });

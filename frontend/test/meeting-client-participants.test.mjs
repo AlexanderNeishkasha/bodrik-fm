@@ -13,11 +13,15 @@ function baseState() {
     selfId: "me",
     presenter: true,
     speakerId: "",
+    musicConnected: true,
     participants: {
       me: { id: "me", stamp: stamp("me"), name: "Me", avatar: "", presenter: true, bot: false },
       bob: { id: "bob", stamp: stamp("bob"), name: "Bob", avatar: "", presenter: false, bot: false },
     },
-    producers: { p1: { id: "p1", participantId: "bob", kind: "audio", paused: true, system: false } },
+    producers: {
+      p1: { id: "p1", participantId: "bob", kind: "audio", paused: true, system: false },
+      music: { id: "music", participantId: "bodrik-music", kind: "audio", paused: false, system: true },
+    },
   };
 }
 
@@ -60,15 +64,16 @@ test("room projection carries names, roles and derived microphone state", () => 
   assert.deepEqual(peers.map(([id, { peer_info }]) => [id, peer_info.peer_name, peer_info.peer_presenter, peer_info.peer_audio]), [
     ["me", "Me", true, false],
     ["bob", "Bob", false, false],
+    ["bodrik-music", "Бодрик FM", false, true],
   ]);
 });
 
 test("snapshot follows client participants and capabilities", () => {
   const { source, client } = setup();
-  assert.deepEqual(source.getSnapshot().peers.map((peer) => peer.name), ["Me", "Bob"]);
+  assert.deepEqual(source.getSnapshot().peers.map((peer) => peer.name), ["Me", "Bob", "Бодрик FM"]);
   assert.equal(source.getSnapshot().presenter, true);
   client.setState({ participants: { me: baseState().participants.me } });
-  assert.deepEqual(source.getSnapshot().peers.map((peer) => peer.name), ["Me"]);
+  assert.deepEqual(source.getSnapshot().peers.map((peer) => peer.name), ["Me", "Бодрик FM"]);
 });
 
 test("server commands map to Rust actions with current stamps", async () => {

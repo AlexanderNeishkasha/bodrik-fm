@@ -13,9 +13,9 @@ use std::{
 use tokio::task::JoinHandle;
 
 /// Owned loopback listener; failures/panics cannot leave a detached fixture server.
-struct Server {
+pub(super) struct Server {
     /// Credential-free ephemeral test URL.
-    url: String,
+    pub(super) url: String,
     /// Listener task aborted when its fixture scope ends.
     task: JoinHandle<()>,
 }
@@ -27,7 +27,7 @@ impl Drop for Server {
 }
 
 /// Start one isolated real HTTP route composition, including ConnectInfo injection.
-async fn serve(router: Router) -> Server {
+pub(super) async fn serve(router: Router) -> Server {
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
         .await
         .expect("listener");
@@ -44,13 +44,9 @@ async fn serve(router: Router) -> Server {
 }
 
 /// Create an entitled isolated player database; no applied migration or production data is changed.
-fn state() -> AppState {
+pub(super) fn state() -> AppState {
     let db = rusqlite::Connection::open_in_memory().expect("database");
     db.execute_batch("CREATE TABLE users(id INTEGER PRIMARY KEY,login TEXT,role TEXT,password_hash TEXT,is_active INTEGER); INSERT INTO users VALUES(10,'owner','user','unused',1),(20,'other','user','unused',1); CREATE TABLE rooms(id INTEGER PRIMARY KEY, slug TEXT, owner_user_id INTEGER,is_listed INTEGER DEFAULT 1); CREATE TABLE room_conferences(room_id INTEGER PRIMARY KEY, provider TEXT, allowed INTEGER, enabled INTEGER, provider_room_id TEXT, generation INTEGER); INSERT INTO rooms(id,slug,owner_user_id) VALUES(1,'public-room',10),(2,'other-room',20); INSERT INTO room_conferences VALUES(1,'mirotalk',1,1,'conference-one',3);").expect("schema");
-    db.execute_batch(include_str!(
-        "../../../../migrations/0019_conference_hosts.sql"
-    ))
-    .expect("host tables");
     AppState {
         temp_upload_dir: String::new(),
         media_dir: String::new(),
@@ -58,6 +54,7 @@ fn state() -> AppState {
         jwt_secret: "synthetic-cookie-key-unrelated-to-tickets".into(),
         trust_proxy_headers: false,
         csrf_allowed_origins: Arc::new(vec!["http://localhost:3000".into()]),
+        auth_cookie_domain: None,
         login_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 60)),
         conference_join_rate_limiter: Arc::new(auth::LoginRateLimiter::new(30, 60)),
         conference_provider: Some(Arc::new(super::super::Provider::embedded(
@@ -366,110 +363,46 @@ async fn revocation_during_discovery_denies_ticket() {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-/// A Studio host pass makes this browser host of the room on later entries too; other
-/// browsers and reused passes stay guests.
-#[tokio::test]
-async fn host_pass_remembers_the_browser() {
-    let app = state();
-    let discovery = serve(Router::new().route(
-        "/internal/replacement/v1/incarnation",
-        get(|| async { Json(serde_json::json!({"version":1,"meetingInstanceId":"instance-one","issuer":"player","audience":"meeting"})) }),
-    ))
-    .await;
-    let issuer = Issuer::new(
-        "synthetic-replacement-ticket-key-32",
-        "player",
-        "meeting",
-        &discovery.url,
-        Arc::from("synthetic-discovery-secret-32-bytes"),
-    )
-    .expect("issuer");
-    let token = super::super::hosts::mint_grant(
-        &app,
-        1,
-        SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("clock")
-            .as_secs(),
-    )
-    .expect("grant");
-    let server = serve(routes(app, Some(issuer))).await;
-    let client = reqwest::Client::new();
-    /// Request a guest ticket with an optional device cookie and pass; return role and Set-Cookie.
-    async fn ticket(
-        client: &reqwest::Client,
-        url: &str,
-        cookie: Option<&str>,
-        grant: Option<&str>,
-    ) -> (String, Option<String>) {
-        let mut request = client
-            .post(format!("{url}/api/rooms/public-room/conference/ticket"))
-            .header("origin", "http://localhost:3000")
-            .json(&grant.map_or_else(
-                || serde_json::json!({}),
-                |grant| serde_json::json!({"hostGrant": grant}),
-            ));
-        if let Some(cookie) = cookie {
-            request = request.header("cookie", cookie);
-        }
-        let response = request.send().await.expect("request");
-        assert_eq!(response.status(), StatusCode::OK);
-        let set_cookie = response.headers().get(header::SET_COOKIE).map(|value| {
-            value
-                .to_str()
-                .expect("ascii")
-                .split(';')
-                .next()
-                .expect("pair")
-                .to_owned()
-        });
-        let body: serde_json::Value = response.json().await.expect("body");
-        let payload = body["ticket"]
-            .as_str()
-            .expect("ticket")
-            .split('.')
-            .nth(1)
-            .expect("payload")
-            .to_owned();
-        let claims: serde_json::Value =
-            serde_json::from_slice(&base64_url_decode(&payload)).expect("claims");
-        (
-            claims["role"].as_str().expect("role").to_owned(),
-            set_cookie,
-        )
+/// Request a guest ticket for `public-room` with optional cookies; return role and the
+/// first Set-Cookie pair.
+pub(super) async fn ticket(
+    client: &reqwest::Client,
+    url: &str,
+    cookie: Option<&str>,
+) -> (String, Option<String>) {
+    let mut request = client
+        .post(format!("{url}/api/rooms/public-room/conference/ticket"))
+        .header("origin", "http://localhost:3000")
+        .json(&serde_json::json!({}));
+    if let Some(cookie) = cookie {
+        request = request.header("cookie", cookie);
     }
-    let (role, cookie) = ticket(&client, &server.url, None, Some(&token)).await;
-    assert_eq!(role, "presenter", "pass redeemed");
-    let cookie = cookie.expect("device cookie issued");
-    for (name, cookie, grant, expected) in [
-        (
-            "same browser, plain link",
-            Some(cookie.as_str()),
-            None,
-            "presenter",
-        ),
-        (
-            "same browser, reused pass",
-            Some(cookie.as_str()),
-            Some(token.as_str()),
-            "presenter",
-        ),
-        ("other browser, plain link", None, None, "guest"),
-        (
-            "other browser, reused pass",
-            None,
-            Some(token.as_str()),
-            "guest",
-        ),
-    ] {
-        assert_eq!(
-            ticket(&client, &server.url, cookie, grant).await.0,
-            expected,
-            "{name}"
-        );
-    }
+    let response = request.send().await.expect("request");
+    assert_eq!(response.status(), StatusCode::OK);
+    let set_cookie = response.headers().get(header::SET_COOKIE).map(|value| {
+        value
+            .to_str()
+            .expect("ascii")
+            .split(';')
+            .next()
+            .expect("pair")
+            .to_owned()
+    });
+    let body: serde_json::Value = response.json().await.expect("body");
+    let payload = body["ticket"]
+        .as_str()
+        .expect("ticket")
+        .split('.')
+        .nth(1)
+        .expect("payload")
+        .to_owned();
+    let claims: serde_json::Value =
+        serde_json::from_slice(&base64_url_decode(&payload)).expect("claims");
+    (
+        claims["role"].as_str().expect("role").to_owned(),
+        set_cookie,
+    )
 }
-
 /// Decode unpadded base64url (JWT payload) for assertions.
 fn base64_url_decode(input: &str) -> Vec<u8> {
     let alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";

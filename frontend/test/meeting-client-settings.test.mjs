@@ -42,6 +42,7 @@ function fakeClient({ presenter = true } = {}) {
       if (action.type === "roomControl") return { config: { isLobbyEnabled: action.action.status === true }, moderator: {} };
       return {};
     },
+    async setMicrophoneMuted(muted) { commands.push({ muted }); },
     async setCapturePreference(key, value) {
       preferenceCalls.push([key, value]);
     },
@@ -67,6 +68,78 @@ test("audio and video settings show active devices and change capture preference
   assert.equal(sources.audio.getSnapshot().error, "rejected");
   sources.audio.setVolume(40, true);
   assert.equal(sources.audio.getSnapshot().speakerVolume, 40);
+});
+
+/** Run with in-memory browser storage and an x.test page location; restores both. */
+async function withProfileStorage(initial, run) {
+  const saved = ["localStorage", "location"].map((key) => [key, Object.getOwnPropertyDescriptor(globalThis, key)]);
+  const values = new Map(initial);
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+    removeItem: (key) => values.delete(key),
+  } });
+  Object.defineProperty(globalThis, "location", { configurable: true, value: { protocol: "https:", host: "x.test" } });
+  try {
+    await run(() => JSON.parse(values.get("meeting.profiles") ?? "null"));
+  } finally {
+    for (const [key, descriptor] of saved) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
+  }
+}
+
+const AVATAR = "/uploads/avatars/00000000-0000-0000-0000-000000000000.png";
+
+test("confirmed in-meeting profile edits update the saved profile in use", async () => {
+  const other = { name: "Other", avatar: "" };
+  await withProfileStorage([["meeting.profiles", JSON.stringify([{ name: "Me", avatar: "" }, other])]], async (profiles) => {
+    const client = fakeClient();
+    const { sources } = createMeetingSettings({ client, navigatorRef: {} });
+    await sources.profile.execute("name", " Updated ");
+    assert.deepEqual(profiles(), [{ name: "Updated", avatar: "" }, other], "rename replaces, not duplicates");
+    client.setState({ participants: { me: { id: "me", name: "Updated", avatar: "" } } });
+    await sources.profile.execute("avatar", {});
+    assert.deepEqual(profiles(), [{ name: "Updated", avatar: AVATAR }, other]);
+    const command = client.command;
+    client.command = async () => { throw new Error("Denied"); };
+    await assert.rejects(sources.profile.execute("name", "Rejected"));
+    await assert.rejects(sources.profile.execute("resetAvatar"));
+    assert.deepEqual(profiles(), [{ name: "Updated", avatar: AVATAR }, other], "rejected changes are not saved");
+    client.command = command;
+    await sources.profile.execute("resetAvatar");
+    assert.deepEqual(profiles(), [{ name: "Updated", avatar: "" }, other]);
+  });
+});
+test("coupled audio selector uses the existing input preference and follows capture mode changes", async () => {
+  const client = fakeClient();
+  client.capture.set({ coupledAudioRouting: true, outputSelectionAvailable: false });
+  const { sources } = createMeetingSettings({ client, navigatorRef: {} });
+  assert.equal(sources.audio.getSnapshot().coupledAudioRouting, true);
+  assert.equal(sources.audio.getSnapshot().outputSelectionAvailable, false);
+  await sources.audio.execute("inputDevice", "speakerphone");
+  assert.deepEqual(client.preferenceCalls, [["inputDevice", "speakerphone"]]);
+  client.capture.set({ coupledAudioRouting: false, outputSelectionAvailable: true });
+  assert.equal(sources.audio.getSnapshot().coupledAudioRouting, false);
+  assert.equal(sources.audio.getSnapshot().outputSelectionAvailable, true);
+});
+
+test("push-to-talk is persisted only after muting and cannot silently enable on failure", async () => {
+  const client = fakeClient();
+  const settings = createMeetingSettings({ client, navigatorRef: {} });
+  assert.equal(settings.sources.audio.getSnapshot().pttAvailable, true);
+  await settings.sources.audio.execute("pushToTalk", true);
+  assert.deepEqual(client.commands.at(-1), { muted: true });
+  assert.equal(client.preferences.getSnapshot().pushToTalk, true);
+  await settings.sources.audio.execute("pushToTalk", false);
+  assert.equal(client.preferences.getSnapshot().pushToTalk, false);
+  assert.equal(client.commands.length, 1, "disabling does not automatically unmute");
+  client.setMicrophoneMuted = async () => { throw new Error("mute rejected"); };
+  await assert.rejects(settings.sources.audio.execute("pushToTalk", true), /mute rejected/);
+  assert.equal(client.preferences.getSnapshot().pushToTalk, false);
+  await assert.rejects(settings.sources.audio.execute("pushToTalk", "yes"));
+  settings.dispose();
 });
 
 test("policy commands map to Rust actions and results update state", async () => {
@@ -112,10 +185,9 @@ test("profile and personal commands", async () => {
   await sources.profile.execute("avatar", { type: "image/png" });
   assert.equal(client.commands.at(-1).change.value, "/uploads/avatars/00000000-0000-0000-0000-000000000000.png");
   await assert.rejects(sources.profile.execute("name", " "));
-  await sources.personal.execute("language", "en");
-  assert.equal(client.preferences.getSnapshot().language, "en");
+  await sources.personal.execute("shortcuts", false);
+  assert.equal(client.preferences.getSnapshot().shortcuts, false);
   await assert.rejects(sources.personal.execute("participantView", "speaker-left"));
-  assert.equal(shell.getSnapshot().language, "en");
 });
 
 test("moderator settings are listed only for presenters", () => {
@@ -126,6 +198,16 @@ test("moderator settings are listed only for presenters", () => {
   assert.ok(!guest.getSnapshot().available.includes("tabModerator"));
   guestClient.setState({ presenter: true });
   assert.ok(guest.getSnapshot().available.includes("tabModerator"), "promotion refreshes the shell");
+});
+
+test("keyboard shortcut settings are hidden on mobile devices", () => {
+  const desktop = createMeetingSettings({ client: fakeClient(), navigatorRef: {} }).shell.getSnapshot().available;
+  const mobile = createMeetingSettings({
+    client: fakeClient(),
+    navigatorRef: { userAgentData: { mobile: true } },
+  }).shell.getSnapshot().available;
+  assert.ok(desktop.includes("tabShortcuts"));
+  assert.ok(!mobile.includes("tabShortcuts"));
 });
 
 test("presenter ban list loads and unbans through room control", async () => {
@@ -177,7 +259,6 @@ test("camera effect is a video setting with only none, light and strong blur", a
   for (const removed of ["image", "transparent"]) await assert.rejects(sources.video.execute("effect", removed), /Invalid camera effect/);
 });
 
-
 test("speaker test playback does not mark settings pending and toggles off", async () => {
   const client = fakeClient();
   let resolvePlay;
@@ -200,7 +281,6 @@ test("speaker test playback does not mark settings pending and toggles off", asy
   settings.dispose();
 });
 
-
 test("removed recording settings have no source, section or policy command", async () => {
   const client = fakeClient();
   const settings = createMeetingSettings({ client, navigatorRef: {} });
@@ -210,24 +290,4 @@ test("removed recording settings have no source, section or policy command", asy
   await assert.rejects(settings.sources.policy.execute("hostOnly", true), /Unsupported policy setting/);
   assert.deepEqual(client.commands, []);
   settings.dispose();
-});
-
-test("profile avatars persist a reusable path and removal clears it", async () => {
-  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
-  const values = new Map();
-  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
-    setItem: (key, value) => values.set(key, value),
-    removeItem: key => values.delete(key),
-  } });
-  try {
-    const sources = createMeetingSettings({ client: fakeClient(), navigatorRef: {} });
-    await sources.sources.profile.execute("avatar", { type: "image/png" });
-    assert.equal(values.get("meeting.avatar"), "/uploads/avatars/00000000-0000-0000-0000-000000000000.png");
-    await sources.sources.profile.execute("resetAvatar");
-    assert.equal(values.has("meeting.avatar"), false);
-    sources.dispose();
-  } finally {
-    if (descriptor) Object.defineProperty(globalThis, "localStorage", descriptor);
-    else delete globalThis.localStorage;
-  }
 });

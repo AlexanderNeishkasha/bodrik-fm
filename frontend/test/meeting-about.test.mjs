@@ -4,15 +4,15 @@ import { build } from "esbuild";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { ABOUT_COPY, normalizeAboutSnapshot, SOURCE_REPOSITORY_URL } from "../features/meeting/about/aboutModel.mjs";
+import { normalizeAboutSnapshot, SOURCE_REPOSITORY_URL } from "../features/meeting/about/aboutModel.mjs";
+import { t } from "../app/lang/index.js";
 
 test("About ignores obsolete fork metadata", () => {
   assert.equal(normalizeAboutSnapshot({ sourceRevision: "a".repeat(40) }).sourceUrl, undefined);
 });
 
-test("About snapshot is bounded, read-only metadata and language falls back to Russian", () => {
+test("About snapshot is bounded read-only metadata", () => {
   const model = normalizeAboutSnapshot({ language: "invalid", version: "x".repeat(100), token: "secret" });
-  assert.equal(model.language, "ru");
   assert.equal(model.version.length, 64);
   assert.equal(model.token, undefined);
 });
@@ -34,11 +34,11 @@ async function renderer() {
   return evaluated.exports.render;
 }
 
-for (const language of ["ru", "en"]) {
+for (const language of ["ru"]) {
   test(`shared About component renders safe localized content: ${language}`, async () => {
     const render = await renderer();
     const html = render({ language, version: '<script>alert("x")</script>', sourceRevision: "a".repeat(40) });
-    assert.ok(html.includes(ABOUT_COPY[language].title));
+    assert.ok(html.includes(t("meeting.aboutModel.title")));
     assert.ok(html.includes("AGPL-3.0"));
     assert.ok(html.includes('rel="noopener noreferrer"'));
     assert.equal((html.match(/<svg /g) || []).length, 5);
@@ -46,7 +46,7 @@ for (const language of ["ru", "en"]) {
     assert.ok(html.includes('viewBox="0 0 24 24"'));
     assert.ok(html.includes('/meeting-assets/LICENSE'));
     assert.ok(html.includes(`href="${SOURCE_REPOSITORY_URL}"`));
-    assert.ok(html.includes(ABOUT_COPY[language].sourceLink));
+    assert.ok(html.includes(t("meeting.aboutModel.sourceLink")));
     assert.equal(html.includes('publicly available'), false);
     assert.equal(html.includes('<script>'), false);
   });

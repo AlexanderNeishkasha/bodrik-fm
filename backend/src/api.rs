@@ -56,6 +56,8 @@ pub struct AppState {
     pub trust_proxy_headers: bool,
     /// Canonical HTTP(S) origins allowed to make state-changing requests.
     pub csrf_allowed_origins: Arc<Vec<String>>,
+    /// Parent domain for the session cookie (shared with the meeting subdomain), if any.
+    pub auth_cookie_domain: Option<Arc<str>>,
     /// Shared registration/login failure throttle.
     pub login_rate_limiter: Arc<auth::LoginRateLimiter>,
     /// Separate conference admission throttle.
@@ -268,6 +270,7 @@ pub async fn migrate_only(db_path: &str, migrations_dir: &str) -> Result<(), Str
             jwt_secret: String::new(),
             trust_proxy_headers: false,
             csrf_allowed_origins: Arc::new(Vec::new()),
+            auth_cookie_domain: None,
             login_rate_limiter: Arc::new(auth::LoginRateLimiter::new(5, 600)),
             conference_join_rate_limiter: Arc::new(auth::LoginRateLimiter::new(30, 60)),
             conference_provider: None,

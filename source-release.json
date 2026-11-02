@@ -1,11 +1,11 @@
 {
   "repository": "https://github.com/AlexanderNeishkasha/bodrik-fm",
   "version": "1.1.7",
-  "sourceCommit": "e5de4dcfcd3586e32234e25420e4e52f5ea4f916",
+  "sourceCommit": "370ffe5485f356297f45ffabf3d497e63f93fe11",
   "files": [
     {
       "path": ".dockerignore",
-      "sha256": "60e1c84cb72d12c0b03d681af93df70dfc4edfb24be8010d5a5ae828e7b2d31c"
+      "sha256": "a0353be014500c5536542a838fbd40ae9455ac4d525cdb0e6ac4be4c1c02bf9b"
     },
     {
       "path": "backend/.dockerignore",
@@ -13,11 +13,35 @@
     },
     {
       "path": "backend/Cargo.lock",
-      "sha256": "ba8eed67d042496f8dae2df427544256905af0d1e833470c215a4fa98905290d"
+      "sha256": "649d8005dd6cafe1296753c41b8fc8b9ee28ed8d33214a001172b5cc93dd0731"
     },
     {
       "path": "backend/Cargo.toml",
-      "sha256": "2c28dd76533baf37c9e00b511a8d3701d84e5bbcba108c4a496173467d8e2086"
+      "sha256": "ae70a1776b842c6725411407f0c38e2368d87605b4385467073863ffda509a15"
+    },
+    {
+      "path": "backend/crates/log-alerts/Cargo.toml",
+      "sha256": "1f1e978b08ab940fba1b552a5a917c7f087a4a34b4bebf9116342c62ea4252fa"
+    },
+    {
+      "path": "backend/crates/log-alerts/src/delivery.rs",
+      "sha256": "aea9487d9c1e517b2c30364b2e75f45e97329999a20fbd86609945121325d6a0"
+    },
+    {
+      "path": "backend/crates/log-alerts/src/delivery/tests.rs",
+      "sha256": "535dec16071d8f0ad29fc15584e86a68652473ffdab3b0416cbb21c3daf046a9"
+    },
+    {
+      "path": "backend/crates/log-alerts/src/main.rs",
+      "sha256": "c1b223bbb1a621fd1b607859566cbacc94fcfe04d21db18e017c319acf6a867a"
+    },
+    {
+      "path": "backend/crates/log-alerts/src/webhook.rs",
+      "sha256": "a3713751ee9e292fd3bfc3931fea4a3c427b79868eda5208ace2ff682f20a36f"
+    },
+    {
+      "path": "backend/crates/log-alerts/src/webhook/tests.rs",
+      "sha256": "fdd552c9114199a06a709a3be008b88ae1abdbd87a8407e3f198771893925ee3"
     },
     {
       "path": "backend/crates/meeting/Cargo.toml",
@@ -193,11 +217,11 @@
     },
     {
       "path": "backend/crates/meeting/src/replacement/music.rs",
-      "sha256": "97d3537cbbc2447562d75f9968cb6690e4cdd800a813ebac35039a97339b4ab6"
+      "sha256": "317474d97c4aa0de35184ab5c1cb830732bdb2b5c7a332154dbd1f60904b82f8"
     },
     {
       "path": "backend/crates/meeting/src/replacement/music/tests/flow.rs",
-      "sha256": "7f4a2ca5a3ca0ddc3abc06988043ee0dc75b68c0b477a1bd87dd04e9db514d42"
+      "sha256": "856bb31159db3961222618871f587608872672f54ba257665022e721f2413e6f"
     },
     {
       "path": "backend/crates/meeting/src/replacement/native.rs",
@@ -229,7 +253,7 @@
     },
     {
       "path": "backend/crates/meeting/src/replacement/participant.rs",
-      "sha256": "899e7e9d1327ee3ce49166606ede716697d03292c741556363c9fae0adf80771"
+      "sha256": "86bf5bd849d700d3b97d6adadaac6af8f3cacc2658cee128b71077a379e9bd5f"
     },
     {
       "path": "backend/crates/meeting/src/replacement/persistent_chat.rs",
@@ -377,7 +401,11 @@
     },
     {
       "path": "backend/dockerfile",
-      "sha256": "54ff0731af3d38ba0fd4a547c555af285e3b48b3a07f140d7aa0276756b4e79b"
+      "sha256": "7c3aa9d858f66ea3ab7c4839cb5842660654d818e34e06ff37a57facd3dbe3f1"
+    },
+    {
+      "path": "backend/entrypoint.sh",
+      "sha256": "2f38720733555d3e35c0b6f0636cc9d02b286607c30decc8c5ee73f9613c99ba"
     },
     {
       "path": "backend/migrations/0001_init.sql",
@@ -460,12 +488,16 @@
       "sha256": "bc4bd28bf89d9420e87763326a57a34a61774342ca764050423650039778b25c"
     },
     {
+      "path": "backend/migrations/0021_rename_mono_pirate_themes.sql",
+      "sha256": "8a8e0c815fba079dd059e60ce6411aa91784a5937c4fda44b83ce39b860fa7af"
+    },
+    {
       "path": "backend/src/api.rs",
-      "sha256": "26df45f87b99aa56cdd82bfdbcfe9cb4fcfe1d9ed84ac7912ea33b41503a9ed7"
+      "sha256": "a3d6f294433f3e0afc43fe2871dd62e591cfd056490fbfbe925dcde0d6ff72ab"
     },
     {
       "path": "backend/src/api/account.rs",
-      "sha256": "fcb3d0a2f66413c1d37ac2ddc439d0182ebc039aa88850db3a6f41d035a7eaaa"
+      "sha256": "b0a75c588391eedec0ddf5f7991bbaafe9bcba1187b4c0b3bd0a80a5a651a532"
     },
     {
       "path": "backend/src/api/admin.rs",
@@ -473,7 +505,7 @@
     },
     {
       "path": "backend/src/api/auth.rs",
-      "sha256": "6f2a942c7e6e67245451912455f72cada2b4277ba27ae20d230d37b96e326256"
+      "sha256": "0255741f90434961f69464e525f3102fc75c5672fb42832bd83def7996a5e103"
     },
     {
       "path": "backend/src/api/auth/client.rs",
@@ -481,7 +513,7 @@
     },
     {
       "path": "backend/src/api/auth/cookies.rs",
-      "sha256": "32d611789994c6d39519c9bd6ce7d8532dc773b2e6fc71ef0186c639ebdbf9f5"
+      "sha256": "9858dbd3534630ea715f9ba1bb3325600b35ba8a2cd9dc566b39e76141a4fe88"
     },
     {
       "path": "backend/src/api/auth/password_policy.rs",
@@ -493,7 +525,7 @@
     },
     {
       "path": "backend/src/api/auth/tests.rs",
-      "sha256": "b6f10702710594e473aebba4eb1f01fe51c3e2a12021ee229cafc1197cc61808"
+      "sha256": "f9bd425b12a480707a73b0174a7499f0029d53ebf31d6d84413e9e4dbeddaa58"
     },
     {
       "path": "backend/src/api/blocking.rs",
@@ -513,7 +545,7 @@
     },
     {
       "path": "backend/src/api/conference/chat/direct/storage_tests.rs",
-      "sha256": "bd8329414d04c1e1fea71a2597f0dfd925a7d8db331bddb4579ba2e5be224a31"
+      "sha256": "4982ff986b27b982d120c4f3a4b0ce16e76abd976f490ed42663602c5fff4a56"
     },
     {
       "path": "backend/src/api/conference/chat/files.rs",
@@ -545,7 +577,7 @@
     },
     {
       "path": "backend/src/api/conference/db_tests.rs",
-      "sha256": "62c5a3da1879be13ce093ee3802d28777df4be9d8949d1b07011ed6904c0e56b"
+      "sha256": "b18019fa4b01dab3e1576b4f2179280b436a4e67a850535711461dcc5eb29c69"
     },
     {
       "path": "backend/src/api/conference/embedded.rs",
@@ -557,15 +589,11 @@
     },
     {
       "path": "backend/src/api/conference/handlers.rs",
-      "sha256": "0af2f39d6056a8b1e2c900fb7072b00996c012b5ecbd695cd03d43cf0af42c36"
-    },
-    {
-      "path": "backend/src/api/conference/hosts.rs",
-      "sha256": "7682d131fcf327fb93c3941e30f16e2b3ee4c5d1cb2432349484991b6462012c"
+      "sha256": "f197c04d9fb7801d5bbb5ffa7aabc568afcaba88a30ddc6fcefbe7536cd4c718"
     },
     {
       "path": "backend/src/api/conference/mod.rs",
-      "sha256": "eefe25b30f03fcf4cebd8890a79341e7cf400d278e06eb2bae67ac11bae05439"
+      "sha256": "994a93710f968da8fa1cc269f51f041370ccb6278c70bbeb8e0fd05cef1d47b5"
     },
     {
       "path": "backend/src/api/conference/music_bridge.rs",
@@ -589,19 +617,23 @@
     },
     {
       "path": "backend/src/api/conference/service_tests.rs",
-      "sha256": "6713cdc2c7fe4cc19f53e4549ec276ff23a393c33ccb69c26c1a44a5115d9361"
+      "sha256": "74a518ecc839c4d8400345c3f7c5e9deb95c721941c1f9cc95998f6e41f0793d"
     },
     {
       "path": "backend/src/api/conference/tickets.rs",
-      "sha256": "70f65e6565b7d909b67224e85b7dbab1c7fef70747fedefeef6d1eab30e1b72a"
+      "sha256": "b2b09420b50753148eb7354da5d0d997a16212cf2bf0fa8c0d367a532cf27641"
     },
     {
       "path": "backend/src/api/conference/tickets/device.rs",
       "sha256": "6658b4e84988305cf79f2d4ae653c3cedf4e2f0d0d8647eb8d7dedcc43400534"
     },
     {
+      "path": "backend/src/api/conference/tickets/owner_route_tests.rs",
+      "sha256": "54e8bd7ab32cb676782eb102c150cec3220ecc7ab04d9441c8599bb7020ebdcf"
+    },
+    {
       "path": "backend/src/api/conference/tickets/route_tests.rs",
-      "sha256": "ae78e87ef09a53aa88df342296a15bcc7a106319f22e60b073e5e9e3386bfecf"
+      "sha256": "5835ea4d7f08c0ad44a7a3261fd183a891e97641866228248fce1a4ba5fa225f"
     },
     {
       "path": "backend/src/api/conference/tickets/tests.rs",
@@ -625,7 +657,7 @@
     },
     {
       "path": "backend/src/api/db/rooms.rs",
-      "sha256": "22735307f3b509d95b272711feaed5a26ac1ddc141001bc12cf531a6a363ca7d"
+      "sha256": "a201e0629a88a18780b0096f78c77518b3c997260006401906b1945ae1430e75"
     },
     {
       "path": "backend/src/api/db/schema.rs",
@@ -657,7 +689,7 @@
     },
     {
       "path": "backend/src/api/media.rs",
-      "sha256": "acde325fe50aeb1779d5d50f5cf4c8a6de70a2fc2dbfc18bc99ed9e4a095899a"
+      "sha256": "3ae031b49970b7bd2c75c3f71bfee79b92cb0ed7dbf153fcedd8b1d91cd68181"
     },
     {
       "path": "backend/src/api/media/artifacts.rs",
@@ -665,15 +697,19 @@
     },
     {
       "path": "backend/src/api/media/hls.rs",
-      "sha256": "9d290a7a901d7fee5d07fedf35f2c143923d0d56aded6adb1bb9c83949f879c5"
+      "sha256": "b9020720a56f9b5a15ed5ec71e30b02d4047a8172a40e48cda9384e610003468"
     },
     {
       "path": "backend/src/api/media/process.rs",
-      "sha256": "57546879e8f6cea585ab98327c9c5de66cd57e083c6592c143c5d143dabaa07e"
+      "sha256": "ecdc8406f4b7d2c11fe628a9459fa6af238b0a69cae66ebba18f57f1dde3ea86"
     },
     {
       "path": "backend/src/api/media/storage.rs",
       "sha256": "b1e92ce18568b7a16b920dffcf318f7b341be7909a552596b1989fa2b64384bc"
+    },
+    {
+      "path": "backend/src/api/media/tests.rs",
+      "sha256": "effdd7ea62947a0810802b5ffa4cd3c2622dc01088583c67c94351c6031bcefc"
     },
     {
       "path": "backend/src/api/op_error.rs",
@@ -701,7 +737,7 @@
     },
     {
       "path": "backend/src/api/runtime/tests.rs",
-      "sha256": "10a8f9515fa6f6b3961fe798f49112b056ca5e3fdef4e3d46a26d78544d35c2f"
+      "sha256": "ef5b6901076172548e8a4fc7b6f5ec3a881f27f58201c0104e538a43565d5430"
     },
     {
       "path": "backend/src/api/state_socket.rs",
@@ -725,7 +761,7 @@
     },
     {
       "path": "backend/src/api/studio/preferences.rs",
-      "sha256": "0e7d682a4c60b9281354581fc8ecd001892e8ce11e924c53319844f8e29b9164"
+      "sha256": "3cf67f50d699f2306a09ce4c12cdf6adb41a1f5898bc85f245d82fa0c4ab6a05"
     },
     {
       "path": "backend/src/api/studio/queue.rs",
@@ -757,19 +793,19 @@
     },
     {
       "path": "backend/src/api/youtube.rs",
-      "sha256": "9d40f4de338a4190d99121329eefa847397c29e73e9a9bf9a235908464b67651"
+      "sha256": "6ba88f217af9e0a80107baf810ef453edf21cad636a3e268248a48376128f418"
     },
     {
       "path": "backend/src/api/youtube/policy.rs",
-      "sha256": "a26aabd52a2a28905d7d218b5ac3f511591d2d80c68dcf5c217668064e0f2a3d"
+      "sha256": "8f53fe6be77b313d2cf68bbcf3f1bf0aa83369312c1008fb97171f82bdfa5f5e"
     },
     {
       "path": "backend/src/api/youtube/policy/tests.rs",
-      "sha256": "1b33c2667fdb1c5db25dd4b2a1ad422d4fb0767f2523d66645b14a314eef5aa0"
+      "sha256": "37e9bf7b834eadfef347a6f4889d99579d2297b3f261b3c8cc7cf81adc354ef7"
     },
     {
       "path": "backend/src/api/youtube_download_runner.rs",
-      "sha256": "686c684c68d807a4b7cfb1f1f9b71dd5814aa0d06b52d19095924ee401432651"
+      "sha256": "d4e0d50a8b3792befcdd304d3575cc1674c0a509e1b3aa56479a25f05aefd076"
     },
     {
       "path": "backend/src/api/youtube_download_runner/native.rs",
@@ -781,11 +817,11 @@
     },
     {
       "path": "backend/src/config.rs",
-      "sha256": "7c68c6fc65faac0036b35e7c0aea6800b1c997734bf98bc189dbeea53d0af5fe"
+      "sha256": "0ce020b3bdc9571c63cbbc65d05daf24bc2f1c0d43149590d95c1ac56838793c"
     },
     {
       "path": "backend/src/main.rs",
-      "sha256": "1c17ed35dd05a5f4d1e214906c2e86015f2fe3f3731156cd355768a3a28e5b70"
+      "sha256": "fc121ae68dd79853e42938fcb16672e0d13129015d14f0ce26d85573254e1659"
     },
     {
       "path": "backend/src/meeting.rs",
@@ -809,7 +845,7 @@
     },
     {
       "path": "backend/src/stream/streamer/tests.rs",
-      "sha256": "c73696957f8ac92608bb87e1f5e2c4e12fdf0962824e682e7d36351570ec4baf"
+      "sha256": "f3ac032962b591ed9b15fc2e19bb86de4197ffe1afee89e3cb60070efc2f8ea5"
     },
     {
       "path": "backend/src/stream/types.rs",
@@ -817,7 +853,7 @@
     },
     {
       "path": "compose.dev.yml",
-      "sha256": "031bc67b048ccbe0900eb0c82aba8f1ed1f9f2b069b071d7a412531595964600"
+      "sha256": "4c3ade2ff735711872f38b90de3c66c850f3df65f79e4101b230e61572d71dd7"
     },
     {
       "path": "frontend/.dockerignore",
@@ -828,28 +864,28 @@
       "sha256": "9fe6a54e8f23add63223adbfeec7867bafec360dd4e26e0ad694ca08a27afa2e"
     },
     {
-      "path": "frontend/app/assets/bodrick_cartoon.png",
-      "sha256": "11c9eda6b19328355310e34d8cc5a1f2c0b86b28942e953c6983c24de0e275c0"
+      "path": "frontend/app/assets/bodrick_cartoon.svg",
+      "sha256": "31af80a8267492dea0bb064212e037b1f8b27bea886d14ac595926ed247634ed"
     },
     {
-      "path": "frontend/app/assets/bodrick_hat.png",
-      "sha256": "8626719eb61cfb3129f5a6354f55e4770b107df3008fca0e503b5275dee5944e"
+      "path": "frontend/app/assets/bodrick_hat.svg",
+      "sha256": "532e1f3b13fb30fc2d70c19023ee9a35f1251f8c8052d66a4d097dd59da83617"
     },
     {
-      "path": "frontend/app/assets/bodrik_angry.png",
-      "sha256": "32b68605406a19301dd6dfc3f8fc67b6d6675fd80f0bc2063c56be1319dc4db7"
+      "path": "frontend/app/assets/bodrik_angry.svg",
+      "sha256": "501dc51631c42db068d9df39324f6e2a9431ffa294c708c7976b7977264211a1"
     },
     {
-      "path": "frontend/app/assets/bodrik_joy.png",
-      "sha256": "f81eb9a08dd7f33fb9ac29e296f8eb274fde45144c1af84721a417f9cfb4baf4"
+      "path": "frontend/app/assets/bodrik_joy.svg",
+      "sha256": "b21aef5affcc563ec824d0ac5dea8d692ceac5f214face5007ca5b7b9bb371b6"
     },
     {
-      "path": "frontend/app/assets/bodrik_treacherous.png",
-      "sha256": "11c2bdf0e075494c5d39e4d9f724db94c45132b1d974c3be4fceadfa749323bb"
+      "path": "frontend/app/assets/bodrik_treacherous.svg",
+      "sha256": "f0ba2199c8720da437d8045fabbdf0bcce362ed2e2276c4b01e10ef1412fb1ef"
     },
     {
       "path": "frontend/app/bye/page.js",
-      "sha256": "2fd9596f787062ea1e415184081d9a6d648858ab064553d1f2d3f8da2889cf6b"
+      "sha256": "9a067c2d983f977a3bb8d7e75ac01b4050cde980c0384dc25c4d896f03a1786d"
     },
     {
       "path": "frontend/app/components/AssetImage.js",
@@ -861,11 +897,19 @@
     },
     {
       "path": "frontend/app/components/BodrickFlyby.js",
-      "sha256": "1e2ea6b08021f8be32ae19105ffb639145e593b3ab01626648ed34de7122292a"
+      "sha256": "f05bab5430dcdf207b616ce1c3357dda8590e6ab6578be17d3c840baac634e87"
+    },
+    {
+      "path": "frontend/app/components/BodrickHat.js",
+      "sha256": "72d81d231f88acec92e08f59e33bd61e492ba3e65c8cb7bbee8ef54a64acd573"
+    },
+    {
+      "path": "frontend/app/components/BodrickHat.module.css",
+      "sha256": "5971faa473cb5cb837aff021928f88f65ff4a16d27a6cf5c1f1c59cab8e2026f"
     },
     {
       "path": "frontend/app/components/BrandedStatusPage.js",
-      "sha256": "67c213321368ab4c3e9e6f8e7e92775f7c5f2c04d6e6b5b99c204ada1fb46158"
+      "sha256": "8fee9df2c8efea3f3ccd36104bef381dd89cb2d11c00caacdc3348989ffd5a5f"
     },
     {
       "path": "frontend/app/components/HotkeysPanel.js",
@@ -881,23 +925,19 @@
     },
     {
       "path": "frontend/app/components/MainPlayerPanel.js",
-      "sha256": "f818e893b8713bbb2955612ca3cec44211ae024f825e421d122d16ae0a7c568f"
+      "sha256": "b1a64c73b8ddd98c89429ebd8742dd7aa7a3acbbf31aa07f06ea23f45b324c96"
     },
     {
       "path": "frontend/app/components/MainPlayerPanel.module.css",
-      "sha256": "cbaf10d26ce7c37c3276a4f81cdb4fde3315fe48b3444c00780b533d0a79ccd4"
-    },
-    {
-      "path": "frontend/app/components/NotFoundPanel.js",
-      "sha256": "86ef9ae701c2c4fa026567c7d2269728cf46fd4cc4fc5e682d1e11a8eb6926bb"
+      "sha256": "7bdaddbcb18e4f688e3c4974993058fe8e1ae65d953b1bd4cd98cd7cb1652cdd"
     },
     {
       "path": "frontend/app/components/PageTransition.js",
-      "sha256": "c0aa1d24f1aa19d9f71409c9b02d7e8dc43c9cbe24c2759917f21ecc1d2b7fc7"
+      "sha256": "317f221be5828e75cd964c464d5254147c492b832234e2080b236d1012cc8973"
     },
     {
       "path": "frontend/app/components/PlayerApp.js",
-      "sha256": "2364017821eb3dcf3b37695aea4e215acb9fe24cbeee9fef1c962b977613137a"
+      "sha256": "4f5f62b884400bc2106c7ebbca882f9fe6b021332cf8c20ee832b74d9a699c73"
     },
     {
       "path": "frontend/app/components/RoomListPanel.js",
@@ -905,11 +945,11 @@
     },
     {
       "path": "frontend/app/components/RoomsScreen.js",
-      "sha256": "12c5b9d5893638515a0eb3e6dc664d9c27e526a416cc0275735a37fc606a8c90"
+      "sha256": "4403d938c785c4e0419a87f7ed977a5eda5f0b54994b9e9d1be39278fcaf7283"
     },
     {
       "path": "frontend/app/components/RoomsScreen.module.css",
-      "sha256": "b16db8fc47e20c74db27914c7b3d6ae253ec199e5c25469dd48ca27ff3085e66"
+      "sha256": "220e221167fe9f11d08432919e4733a8a378b08a8a7f5dd27832b76b3401ee7f"
     },
     {
       "path": "frontend/app/error.js",
@@ -1121,7 +1161,7 @@
     },
     {
       "path": "frontend/app/fonts/fonts.css",
-      "sha256": "888123a74bf4c3024e3e1c0cf63c2e4de67ada963176aa01e0e0381119aed2b0"
+      "sha256": "ef9c3a98a336db5ec30b2bafc3a6c116768e476c3132a4a7d598fbbb86b72481"
     },
     {
       "path": "frontend/app/fonts/licenses/alegreya-sans.txt",
@@ -1200,16 +1240,24 @@
       "sha256": "7d1285586c2a90a3e4b82a273b3010181916f407d8b05076758e1b4ce3ecae87"
     },
     {
+      "path": "frontend/app/lang/eng.js",
+      "sha256": "0c89b549b68e8bcc17543d29f431012ec4f66e0d2b8cc06ac3878d9956c64fab"
+    },
+    {
+      "path": "frontend/app/lang/index.js",
+      "sha256": "25253d1c7ac5358a1448880615041964c5c73cf4c2d3f72b6ca8ba12c2b0f38d"
+    },
+    {
       "path": "frontend/app/lang/package.json",
       "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
     },
     {
       "path": "frontend/app/lang/ru.js",
-      "sha256": "7659ec8a949160139981754493976eca2d2b102be64811f1dec134a02c8d35ba"
+      "sha256": "6454521e2160de9138ca41de5dae528db31671b8730aab7b7205477fc790b277"
     },
     {
       "path": "frontend/app/layout.js",
-      "sha256": "39afbaca0711f8d4591c2a67c5efcf7012be42c03e73290d9e7033cd4fcc8686"
+      "sha256": "2488760c0d9d36df2b27e7a2358e98714109003630827b0738db14652cc9f36e"
     },
     {
       "path": "frontend/app/lib/abortError.mjs",
@@ -1217,7 +1265,7 @@
     },
     {
       "path": "frontend/app/lib/apiMessage.js",
-      "sha256": "3bb846769bbea8384eb1698b53161ef71315957eeb8e5b5061c8de0e4ecfa5d8"
+      "sha256": "69dd2a17559efd9c2b9d87269160c13076cfe2856516efba69f8375a8fc73c36"
     },
     {
       "path": "frontend/app/lib/asset.js",
@@ -1273,7 +1321,7 @@
     },
     {
       "path": "frontend/app/lib/statusNavigation.mjs",
-      "sha256": "11a4b9bf51a7f0f670e16b9506e5f4f5321121eb5809e8d25cdfad360a5f6802"
+      "sha256": "f2ed1d91579aab991bc6f727d802a4f0f3aa859575bbbd616f3a4989ccf4db2d"
     },
     {
       "path": "frontend/app/lib/storageKeys.js",
@@ -1281,11 +1329,15 @@
     },
     {
       "path": "frontend/app/lib/theme.js",
-      "sha256": "1ae1ecf1f97b38a908fceffaf90c974b7bdf668890001e6dac3e12576ee7ee82"
+      "sha256": "7ef35cd816c81384a3e868bc5c0f055495f9902410fd99a14a4c400a421d6160"
+    },
+    {
+      "path": "frontend/app/lib/themeColor.mjs",
+      "sha256": "43750ddd0c0224fe13c81b07a5fa47680805d63ad72c13795e664ac6dd49b90a"
     },
     {
       "path": "frontend/app/lib/themePreference.mjs",
-      "sha256": "5b6de49ef2d8e01fa874ab970cfc8259696c8a59dc1d6df3f7fa08550760fd29"
+      "sha256": "e5f15bccf53327010920058700330ebc22e74cd1c115bd632d4522c2f1d17fee"
     },
     {
       "path": "frontend/app/lib/useAnimatedReorder.js",
@@ -1345,7 +1397,7 @@
     },
     {
       "path": "frontend/app/not-found.js",
-      "sha256": "bf6f9c5e8d056a1857f1e4e3abc50fcb907280b1565adc3a12c67c3caf17230d"
+      "sha256": "02ce39b74d0d1d33a45356f2425cba1c7ecb3c6acc6b46b9a19838fb3d161d15"
     },
     {
       "path": "frontend/app/page.js",
@@ -1353,7 +1405,7 @@
     },
     {
       "path": "frontend/app/privacy/page.js",
-      "sha256": "5782e5589b201e80e17f20749b9111156b48e08cf3184067443b134d1606e49e"
+      "sha256": "495ab9ab0b58b0a1ce938e84dc4d62639aef1fe1b5dfe283d59ebd27339630b5"
     },
     {
       "path": "frontend/app/puppet_master/AdminPage.module.css",
@@ -1361,7 +1413,7 @@
     },
     {
       "path": "frontend/app/puppet_master/components/AdminUserCard.js",
-      "sha256": "f49d5bab101b7f986f6f41fdc5df69321c98f4138d615f96fbdf2eff86fd8b73"
+      "sha256": "9aa6bbde731cde5ebd6eb402f44e4693d19f91795f96d358d0f11d93be5b696f"
     },
     {
       "path": "frontend/app/puppet_master/components/AdminUserCard.module.css",
@@ -1373,7 +1425,7 @@
     },
     {
       "path": "frontend/app/puppet_master/hooks/useAdminUsers.js",
-      "sha256": "91fd4cc0085dd1ab376bdd0ee3439733f757286997e6b5b24d1315481fd05ae1"
+      "sha256": "8b0ccfc80158d5aec9ab03854961f2620e05a9e37302d4e06a75869529b1c4a1"
     },
     {
       "path": "frontend/app/puppet_master/lib/adminPolicy.mjs",
@@ -1381,15 +1433,11 @@
     },
     {
       "path": "frontend/app/puppet_master/page.js",
-      "sha256": "a63c9e5e30bc3c2c87eef1dc978c07726df8f87b440c7b3219bad4ed33ba621e"
-    },
-    {
-      "path": "frontend/app/studio/components/AccountModal.js",
-      "sha256": "9799942a39251cc386850f2155f4e2219bf123b8f1fbf195157a9bc421c25a0a"
+      "sha256": "13774bd3af169bb2b64d10786b2a3accda82bdfabcf96cb93148644a0d222f86"
     },
     {
       "path": "frontend/app/studio/components/AuthPanel.js",
-      "sha256": "6149a21e80b9a77a7101882a418e9448351e7fa07d814d1ea6ea11a46041b0b8"
+      "sha256": "f756f2edf2c2f73aded7bc6a91d366df63d41f79c8d3d73bd97643495fc0222b"
     },
     {
       "path": "frontend/app/studio/components/AuthPanel.module.css",
@@ -1401,15 +1449,15 @@
     },
     {
       "path": "frontend/app/studio/components/ConferenceControls.js",
-      "sha256": "9af6236a47c5ed5a342de20ba045e6824be37190c64b7b939c526de7acc7dbf7"
+      "sha256": "37e3c6889073b658d456155aa2b4e67d1d6819c6ef7e2530b779138a8cae3f62"
     },
     {
       "path": "frontend/app/studio/components/ConferenceControls.module.css",
-      "sha256": "65796fc0aa04cba7c833459aef5f265de122475e0bbe5c55547ff803856e3730"
+      "sha256": "be2c72b5545f62bb09b5bddc64c2a532565e962566235e175e45511a1844d256"
     },
     {
       "path": "frontend/app/studio/components/DeleteModal.js",
-      "sha256": "4a996330fdee23882d0d3ce404df8d5041370fa2ec19b52df046642445aa0138"
+      "sha256": "2c2467baa563434bdc2b59022ab447b64ff5f54b276dcb536d006d398c8c8d6e"
     },
     {
       "path": "frontend/app/studio/components/HighlightedSongName.js",
@@ -1421,7 +1469,7 @@
     },
     {
       "path": "frontend/app/studio/components/LibraryDownloads.js",
-      "sha256": "976af8a78203bf5e0d3d8079132370d4a707bbf80e7ed6a63332b8ae14d7c067"
+      "sha256": "53103d68d97d286192083388dc884573345e24aa23bdbe18f662fa280d64e114"
     },
     {
       "path": "frontend/app/studio/components/LibraryFadeItem.js",
@@ -1429,7 +1477,7 @@
     },
     {
       "path": "frontend/app/studio/components/LibraryHeader.js",
-      "sha256": "c0e08cfd8a8f9759fc871e17e9940bf102f254fe668624f9445269bb4265d5f2"
+      "sha256": "4b2b6e6e895f527e4bdb653dc2e3c4eff2c03ae7760f60f3e7040214b9137969"
     },
     {
       "path": "frontend/app/studio/components/LibraryHeader.module.css",
@@ -1437,7 +1485,7 @@
     },
     {
       "path": "frontend/app/studio/components/LibraryItem.js",
-      "sha256": "78988657da09649e4cb0a5f5348dc21b44a34f6b00d5230182070ade9db07a8a"
+      "sha256": "bce607e6377705f4c71fc0ae519b0d3e943482103ecd34306accda207f2fb81c"
     },
     {
       "path": "frontend/app/studio/components/LibraryLooseTracksList.js",
@@ -1449,11 +1497,11 @@
     },
     {
       "path": "frontend/app/studio/components/LibraryPanel.js",
-      "sha256": "fda826c67d66edee746a0614c8c53cbab4377c37111bc7ee4adb3bd91c4ea76a"
+      "sha256": "61d2fcbe29e35e9a27217d0cc1767ba7d40c6a946ed9c5c88cd9626014deb9be"
     },
     {
       "path": "frontend/app/studio/components/LibrarySection.js",
-      "sha256": "c9d9cab7db749596c75c9d8c61b593825231b61eadf45fcb2ee97d7bdaf309bf"
+      "sha256": "1a41daed04bddfd1ed5f1411a1ebf548d40a37394d92f627fa71d8d33a0c52ee"
     },
     {
       "path": "frontend/app/studio/components/LibrarySectionsList.js",
@@ -1461,35 +1509,39 @@
     },
     {
       "path": "frontend/app/studio/components/LibraryUploads.js",
-      "sha256": "2325d0b79257317c3f2ed3cd92f77349bb966c6519cb331d3e596271d4560785"
+      "sha256": "82b8b7b3801d99dd21b9cdbee35f08a6701fc1937638eeb23ad000f39f302326"
     },
     {
       "path": "frontend/app/studio/components/NowPlayingControls.js",
-      "sha256": "daf956c27e3489ae9a5bc8df88bb92a0bdb24df36c2f4d79433b677aa067730b"
+      "sha256": "7636f4096912f7eb05163c7d03035bcc4838dcd910e47cc93241ae0ed3167be1"
     },
     {
       "path": "frontend/app/studio/components/NowPlayingHeader.js",
-      "sha256": "2e576c4dc161a71cff418eeab896777ccb7ef1214186587357234098dd5bb6cb"
+      "sha256": "c6117f06474a836e2fb6ad130469c2b727c019d046a436058a2fc0e74814c6c9"
     },
     {
       "path": "frontend/app/studio/components/NowPlayingPanel.js",
-      "sha256": "9bdfa945e323451dab3519a65e60bed11b5f426aa90a8d9432fe32cfe62a3efa"
+      "sha256": "4cd21e3d1fe0efaa7248ab39adf21f7c40e57b5e2e4b40c3f95623ef75a8e52f"
     },
     {
       "path": "frontend/app/studio/components/NowPlayingSeek.js",
-      "sha256": "d238a89a616bda1021d00473b7ed1b1744a24948d13d86badbcefa41ba7a006a"
+      "sha256": "5a7deb41baa1d13cf8b60fdbc592c1bc0d06486f84d651399930dc39a58f2dcb"
     },
     {
       "path": "frontend/app/studio/components/NowPlayingVolume.js",
-      "sha256": "4ebeaf4797c7de3475ce52b179efb0625dc222dc2563640b45eac20f5486e077"
+      "sha256": "bb305f2d9ffdabfc49884aa4279f8a01bf55353fad523817766754f2aa5a5588"
     },
     {
       "path": "frontend/app/studio/components/QueuePanel.js",
-      "sha256": "2dfa41820232c740940ea6b1b03c53da9ebeb15d95e6b958589dac529a4cb22f"
+      "sha256": "085edcbe322ae227899bdb1600c6015c6d5d336a96767514b4c0cb07cde56e82"
     },
     {
       "path": "frontend/app/studio/components/SectionCreateForm.js",
-      "sha256": "475607c62dbf2c6ce96a7f22e414feb2afdb9c9336199bc3633fac8536227e0a"
+      "sha256": "1de1ec4a9b5a4823d8bbe6a3251418a7ece104504f26ae768e6eb8328f8fc15e"
+    },
+    {
+      "path": "frontend/app/studio/components/SettingsModal.js",
+      "sha256": "7d068ea31e37448418b1d432e4ab905cbcf087545546d93808ed59953d4d4515"
     },
     {
       "path": "frontend/app/studio/components/StudioListPanel.module.css",
@@ -1497,15 +1549,15 @@
     },
     {
       "path": "frontend/app/studio/components/StudioScreen.js",
-      "sha256": "daa0da5bd2e90950b9bcf2e581004fed39835a747219e90cc2d75f7b9d58a5b8"
+      "sha256": "f2489626e6124bb5e561262b6a26ea0f688b6ef38870bc7fb0aef5de6cb599cc"
     },
     {
       "path": "frontend/app/studio/components/StudioScreen.module.css",
-      "sha256": "b64ec4775194d73307ce457f4a58248f3389240d536752c7e152fdccb53590e9"
+      "sha256": "e527dd9aef702a30ceeb9a1baed0a3dbe6f711ac4412db32816f251bd3550c3e"
     },
     {
       "path": "frontend/app/studio/components/StudioWorkspace.js",
-      "sha256": "2c1ff4bb75580dd99d3a23be9a8a926d3106c2681b2e88dd54d925f12bf55000"
+      "sha256": "95396a015f85c8e870d5834de8d5a71f0736d692ed094cac04d2eb6162565b58"
     },
     {
       "path": "frontend/app/studio/components/TelemostOutput.module.css",
@@ -1513,7 +1565,7 @@
     },
     {
       "path": "frontend/app/studio/components/ThemeToggle.js",
-      "sha256": "aca2668a6ec7818bb9e0b32d2301ae23e3fbd791978851e3834b0ac41ddc1013"
+      "sha256": "7c406001aa2ec15b5a600f4ce984d7103478c91ff0b7b345780437015edb9a70"
     },
     {
       "path": "frontend/app/studio/components/Toast.js",
@@ -1521,23 +1573,19 @@
     },
     {
       "path": "frontend/app/studio/components/YoutubeDownloadForm.js",
-      "sha256": "c86708a504de703be5a0ad17e6094c1c4cab3fe08beae6fcc828c212be4d0d35"
+      "sha256": "dfc8f514cbff283f8f73693005e7f3adade417bff81f36ff51722a8cc5e0af98"
     },
     {
       "path": "frontend/app/studio/hooks/useAccountManagement.js",
-      "sha256": "984a0c617194664d354f33fc05d3196edb90aa493edce29d420b65006daea2f2"
+      "sha256": "3e38a392e29a91b19f721b32eab12b41218a982f1bd35a89f127ed3131a8936f"
     },
     {
       "path": "frontend/app/studio/hooks/useConference.js",
-      "sha256": "1b0fd684d68adb9cbb5f94f9ae89ad198a4b1076387348e5ecb5c1f926b37cf2"
+      "sha256": "470bda1f771f71065fc309d5f73c625be01a046ed79734ce3ecd5da232613a87"
     },
     {
       "path": "frontend/app/studio/hooks/useLibraryPresence.js",
       "sha256": "c4f95d5279b2e3fb182a0ab80c12bbc90b8737c6dc07077979674a36621e8b20"
-    },
-    {
-      "path": "frontend/app/studio/hooks/useMeetingPresence.js",
-      "sha256": "d8965d08d3dce54b3464bee4c5cfff0aea3043411bdb9839e1ddf3188e4d2577"
     },
     {
       "path": "frontend/app/studio/hooks/useStoredCollapsedSections.js",
@@ -1565,7 +1613,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioAuth.js",
-      "sha256": "0e11dde40b1408c242ed02ebc93be3f893cdd087e5f9f9de0dd6a617485ca00e"
+      "sha256": "1467d25be913ae6cf8c3a18da166858508b6430058861cc1e5cd875c8ce66573"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioAuthState.js",
@@ -1597,7 +1645,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioLibrary.js",
-      "sha256": "ffef0793028565035b7db6764ff78be07a01f93ffa472ce6a982ab8d7ddd9eab"
+      "sha256": "c1b66f9a7903c83b5751238f08468fe4f4f0b1b139b6617e06edd915fc4fc49e"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioLibraryRequests.js",
@@ -1605,7 +1653,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioLibraryState.js",
-      "sha256": "bde03ff676a29146db818bb9c9d8703be1d24691941f1e984d6ef191a2e36791"
+      "sha256": "efe43a14fda98c3efead9b256ed77b58116023dab13dbc6fa3e334f0eec8da93"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioNotice.js",
@@ -1613,7 +1661,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioPageState.js",
-      "sha256": "55a64e9fd03ee96f0c6b8668ad0e887331b370d23d0a77a3023aa01f39f21627"
+      "sha256": "a2dd399d31bd8e5fdf9f6dff2ee7119e8c57f9deac937a3ce0f88b9b3373241a"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioPlaybackState.js",
@@ -1641,7 +1689,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioUploads.js",
-      "sha256": "4249af4836c543d0bb9f038d0c7f9040d69866c3294b5f85f3476a50b30510bd"
+      "sha256": "fc2d89f11fa7d9d0a13628fc9c72f0381ac1e5924f685419bfe662b2bf44e4a0"
     },
     {
       "path": "frontend/app/studio/hooks/useStudioVolumeState.js",
@@ -1649,7 +1697,7 @@
     },
     {
       "path": "frontend/app/studio/hooks/useStudioYoutubeDownload.js",
-      "sha256": "1e6f53937f3cb9421df57b11171a36c295e5db04e5c2ab560600bc03167da956"
+      "sha256": "4e6d5d691ce6f602ab11ab5aae4f12c6b10551a64ecc629e1c3e50af04db5f1b"
     },
     {
       "path": "frontend/app/studio/hooks/useUploadDrop.js",
@@ -1670,6 +1718,10 @@
     {
       "path": "frontend/app/studio/lib/constants.js",
       "sha256": "7076faf4124b55cb42219e9cff43e9c50ae2b4b1e845c422f971bf9b42867ff4"
+    },
+    {
+      "path": "frontend/app/studio/lib/copyText.mjs",
+      "sha256": "9ed887e5dcae970fa7381eccb5d0109547b81ba8b3f196713ebddc878a3a2c1c"
     },
     {
       "path": "frontend/app/studio/lib/format.js",
@@ -1697,11 +1749,7 @@
     },
     {
       "path": "frontend/app/studio/lib/localizeApiMessage.js",
-      "sha256": "fa81696f214bc51e7d611f78c790c6943287c03279d59e836881171d15485307"
-    },
-    {
-      "path": "frontend/app/studio/lib/meetingMotion.mjs",
-      "sha256": "4bf4d5c0934ceee87d947056cbe581bc8478152740b248b6448e40f14ee2b0c7"
+      "sha256": "a2f6259c8352fa17f2776c0be0e9cb0a9accb83582df373c3601a5d6599d17f7"
     },
     {
       "path": "frontend/app/studio/lib/meetingVolumeControls.mjs",
@@ -1745,7 +1793,7 @@
     },
     {
       "path": "frontend/app/studio/lib/youtube.js",
-      "sha256": "f1da3f8e6a41aa219f08ae8fd408fcab814346f4ca207138a72e6fd111127da8"
+      "sha256": "0056feab9acf274e001e61bd738a0ca1d6dcc44e23375e3bab694ec73937bc2d"
     },
     {
       "path": "frontend/app/studio/page.js",
@@ -1753,7 +1801,7 @@
     },
     {
       "path": "frontend/app/template.js",
-      "sha256": "8764af7061f381c2b2e252190f83e36b796dd5a5140731020ebccd003af00867"
+      "sha256": "e0ba7dba381d87619f37843df710d3ee83f02f67f4f4cfa00cc8dda66e3ed0b5"
     },
     {
       "path": "frontend/app/terms/page.js",
@@ -1781,23 +1829,23 @@
     },
     {
       "path": "frontend/app/themes/lucifer.css",
-      "sha256": "869c236cc98bedfa5412968fd2c74d40d35116ce9f8c6d4f885e8179193e9cc9"
+      "sha256": "b91b74dc9624242f28eba8c4ca3fc7e4dc65ec57a69cf5a22e89af5caa3eae29"
     },
     {
       "path": "frontend/app/themes/midnight.css",
       "sha256": "454e70c7d094cdc3af0d80b4410967c8e19555a424271205e8708eed67b63e8c"
     },
     {
-      "path": "frontend/app/themes/mono.css",
-      "sha256": "9d162b7b5c58d93041ff3ac800871b008beb4824aa4a1804403e703ee661dd2b"
-    },
-    {
       "path": "frontend/app/themes/mythic.css",
       "sha256": "1d459f4e58b6ce5eec277c8aab56977e2d2a665f082cc11c5b437e065e07c368"
     },
     {
+      "path": "frontend/app/themes/noir.css",
+      "sha256": "6f541c374009a755ea2ec65c888864e53973a84e075188b086c336c6e0e8b80a"
+    },
+    {
       "path": "frontend/app/themes/pirate.css",
-      "sha256": "23b79af76a08e1b22270db9b156492c0fe6a8f3c884adc4e149b76f5fc4ac1d5"
+      "sha256": "c056b4622ac4c5448572931137b350b3d3928e0ff3bcaa72a94f056efe1bd340"
     },
     {
       "path": "frontend/app/themes/prism.css",
@@ -1817,7 +1865,19 @@
     },
     {
       "path": "frontend/assets/meeting/README.md",
-      "sha256": "4cd2310cbc5b5f0ced47461e066719677f99fa311d4be3483636c3ee8a161dd8"
+      "sha256": "1072ca2430e15ad0c9dfbe05117b3ac792b93b49cb0cafaa5a6b0aaf5fec7d72"
+    },
+    {
+      "path": "frontend/assets/meeting/denoisers/DeepFilterNet-LICENSE-APACHE",
+      "sha256": "1eaee808c5fb6b4e895ba30425285a5cdc5dd25bba2cd230f264c2200c331aec"
+    },
+    {
+      "path": "frontend/assets/meeting/denoisers/DeepFilterNet-LICENSE-MIT",
+      "sha256": "24e6bb09c928af8d8e56268082f87413247ce36b39dd5d33add2f9893968065e"
+    },
+    {
+      "path": "frontend/assets/meeting/denoisers/README.md",
+      "sha256": "f6cdd5e41d83c4ecbd05e139427de3e49c4145626e33385ca164fb4071390c42"
     },
     {
       "path": "frontend/assets/meeting/sounds/alert.wav",
@@ -1853,7 +1913,7 @@
     },
     {
       "path": "frontend/bun.lock",
-      "sha256": "e53d182de5967a644d087df29458573dc8a5198b18db28b2054217b01b51b455"
+      "sha256": "89fea8fb1ccf7691afd814c3251812512309e776dab3892160b8b6415d1a1dab"
     },
     {
       "path": "frontend/components.json",
@@ -1869,11 +1929,11 @@
     },
     {
       "path": "frontend/components/ui/HelpTooltip.js",
-      "sha256": "44496f7dad1f52719cd58a731e991e77cd1a83ef0280e7920ab994adacb31aaf"
+      "sha256": "412f3a1fe498aff7113bac1f02775ba8f52e0456279639a534463ab22689e3a8"
     },
     {
       "path": "frontend/components/ui/HelpTooltip.module.css",
-      "sha256": "b74f7026b427a57d7bbd1120e716a7913a3cd737436635552e7650471fa5c702"
+      "sha256": "3f7916dca637292cd7687c075fe8dd358d849fcec2e5629876a6fe229a790a0a"
     },
     {
       "path": "frontend/components/ui/Icon.js",
@@ -1928,6 +1988,10 @@
       "sha256": "87038447b2c222f9411e453f0a20298f9c6fa375b8da56f0f638b50acbfa44cd"
     },
     {
+      "path": "frontend/devOrigins.mjs",
+      "sha256": "636798be50e65159ae9d871649bde09407c6f2d7755fe0689ebc73b735b708b5"
+    },
+    {
       "path": "frontend/dockerfile",
       "sha256": "213472df9884d00e91fea812c14ea5e3aeb739cc87aa1ab8d43e68486fa0ba52"
     },
@@ -1941,7 +2005,7 @@
     },
     {
       "path": "frontend/features/meeting/MeetingApp.js",
-      "sha256": "7fd034b0dd7d2557286e8ea8ebe77a4e26c2f88bcb25717739441f69d8b6a270"
+      "sha256": "a861046686460ec6879f27f8f305df458714f44d893490fb06dc807551d821d4"
     },
     {
       "path": "frontend/features/meeting/MeetingApp.module.css",
@@ -1961,7 +2025,7 @@
     },
     {
       "path": "frontend/features/meeting/about/AboutDialog.js",
-      "sha256": "d963588be2ad3509a2aef23b64d95e4a0eb821f3d668f6740892f1cbf46a63f2"
+      "sha256": "dd029f4712f1f0d2cadbe93949a4539fd37669fb4d511c576894f84adcf57cf3"
     },
     {
       "path": "frontend/features/meeting/about/AboutDialog.module.css",
@@ -1969,15 +2033,15 @@
     },
     {
       "path": "frontend/features/meeting/about/aboutModel.mjs",
-      "sha256": "603f873e0cf132fbe644bf4a1336e0f1758eb8f1d64b6aa4e7b3ef102870fdc0"
+      "sha256": "61508c2d90cc3b020ab10231ce7e4407b047fa2432db243a4084b7c953068e24"
     },
     {
       "path": "frontend/features/meeting/chat/ChatComposer.js",
-      "sha256": "13328089c6d7672143e934ec6b833f3b23e1ac226607b1caf0f4b472fafbff1d"
+      "sha256": "9dd63f2879900669f4364cf6e115e3da0802b45897b8a21b88a84dae2cd0dc64"
     },
     {
       "path": "frontend/features/meeting/chat/ChatFileAttachment.js",
-      "sha256": "77d3e5868e7944c73826864d7d4d0844a8a68ae42eea2476b11174ffe04ec8c2"
+      "sha256": "14d1eee9f7221a0e64e566914dd923466d6106fa06f248811f687627c4ef2888"
     },
     {
       "path": "frontend/features/meeting/chat/ChatFileAttachment.module.css",
@@ -1985,7 +2049,7 @@
     },
     {
       "path": "frontend/features/meeting/chat/ChatMessageActions.js",
-      "sha256": "c85c8053f1cad4aef4ab7e9047ee1b52098578151f762f810ba7731842d69269"
+      "sha256": "ea3165218f71ab4139ed5dded2195f1cd6f36a44da258b1e6de5306b0ae13375"
     },
     {
       "path": "frontend/features/meeting/chat/ChatMessageActions.module.css",
@@ -1993,7 +2057,7 @@
     },
     {
       "path": "frontend/features/meeting/chat/ChatMessageContent.js",
-      "sha256": "c18cd7111d098627a75fceb0e4444f3b22121010608a9b9835a9c3753e184c28"
+      "sha256": "79b0677c30b60a2c38637b00cdaeee85c9e3f49290af93fe90283fc4bda2a1ec"
     },
     {
       "path": "frontend/features/meeting/chat/ChatMessageContent.module.css",
@@ -2001,7 +2065,7 @@
     },
     {
       "path": "frontend/features/meeting/chat/ChatPanel.js",
-      "sha256": "0372c5501f5eb4f6d757dd4177101388c1d69e40f67eda42d92d9c733cc9e45e"
+      "sha256": "4ceb9e294ddc18cd8d4575c831efa05b60a82ad2921ff45dd0b63c0313c37f74"
     },
     {
       "path": "frontend/features/meeting/chat/ChatPanel.module.css",
@@ -2009,15 +2073,15 @@
     },
     {
       "path": "frontend/features/meeting/chat/ChatPersistentImage.js",
-      "sha256": "78be2908e3cd5682fee3717ba793559014b9bc11b3ef636904fb9f7be4b84538"
+      "sha256": "6e7da54060f124684b44e26c545adea3529a731cb1b6322156b5005cf2722b91"
     },
     {
       "path": "frontend/features/meeting/chat/ChatRichContent.js",
-      "sha256": "a6c277d41bc57fd5ca619c5785477581fbe38fa3fb438040f943291d67a4a7d2"
+      "sha256": "af4a85711d278cae09c3530284cdcc6b7b7716ea93a42e1709f1b13e232cd452"
     },
     {
       "path": "frontend/features/meeting/chat/ChatTranscript.js",
-      "sha256": "0396f3c9fdb09cd45861a7f35aceb1de3c99f1ea7b3370e92baae785ca307f72"
+      "sha256": "e12c8d5b36d0f7951490cb76ec6293dfd196ff47785a34b06104365962a40b0d"
     },
     {
       "path": "frontend/features/meeting/chat/ChatTranscript.module.css",
@@ -2025,7 +2089,7 @@
     },
     {
       "path": "frontend/features/meeting/chat/ChatWorkspace.js",
-      "sha256": "150caaacee19528e659327da7daa58e50c6762cd7ad9d675d561430b90583e28"
+      "sha256": "4c6ec01bec0a63c23fe873caf5cd7c6b98ad37acba6488d4532216f7d2349669"
     },
     {
       "path": "frontend/features/meeting/chat/ChatWorkspace.module.css",
@@ -2033,7 +2097,7 @@
     },
     {
       "path": "frontend/features/meeting/chat/chatAttachment.mjs",
-      "sha256": "8d42fd0e65fc129dbf2f9d299c9ddfbe3d133955a911e9a82b1019dbe7abc4aa"
+      "sha256": "57ec710ee9a74246392eed19c5c2561e0dbc2645514de28f299a4fe1690a50bb"
     },
     {
       "path": "frontend/features/meeting/chat/chatAvatar.mjs",
@@ -2064,12 +2128,28 @@
       "sha256": "0d8df1bfeae7d2d0e39088e3e3e99597b33fd9fcd8bc8af3d97f84e995499a3e"
     },
     {
+      "path": "frontend/features/meeting/client/capabilities.mjs",
+      "sha256": "73ce73807a4aaee64b2a8ae9816da9bd9d34c91b2bb1abfe9fb829aacb34e33b"
+    },
+    {
       "path": "frontend/features/meeting/client/capture.mjs",
-      "sha256": "08c25a54a113cb44d62c8290a08e4fbe16d59c158ba395085d40bddb037dae2c"
+      "sha256": "2fe9b27b4ba62ce97eb900bffd43bed3a02ad687687bd9b19ae478c7a67dcd0a"
     },
     {
       "path": "frontend/features/meeting/client/chat.mjs",
-      "sha256": "850e5c1f9605c2485ac1fcef7e18e93387c3aab42c6fd2c44413418130af8ea7"
+      "sha256": "feaa56336f58a9b4bcf5bdd1220e2beba70596262970bddecbd3c58fb910ef2d"
+    },
+    {
+      "path": "frontend/features/meeting/client/connectionQuality.mjs",
+      "sha256": "84f41263bc18ebf8b8d29a912394bf63b254e3ad26b9d677d2d95f22d2ecc016"
+    },
+    {
+      "path": "frontend/features/meeting/client/denoisedGain.mjs",
+      "sha256": "e7410b1c45b02a270a8d559dc435fc41d3d681587a831c0bcabab2ffb7accc74"
+    },
+    {
+      "path": "frontend/features/meeting/client/denoisedGainWorklet.mjs",
+      "sha256": "68c9127a1815ebec320899fffd5697ea42200e33105d9d7f342840ea0ac609df"
     },
     {
       "path": "frontend/features/meeting/client/downloadBlob.mjs",
@@ -2081,11 +2161,11 @@
     },
     {
       "path": "frontend/features/meeting/client/files.mjs",
-      "sha256": "63eca508d9017a9e82a87e295b1a3b76739476e6ffbe51e1e63ababdbe6bff6b"
+      "sha256": "2b466ac1a05fd839fded539732c4348e1cd7361731d8bb1a37dab31976717e58"
     },
     {
       "path": "frontend/features/meeting/client/iceConfig.mjs",
-      "sha256": "2cd76a59064173ef50fd8f3b5b988704ddd9658aa2b93c016eddf44015d3be44"
+      "sha256": "5a47d088722dba378eeffd73730779fd3e49569f09b196e876966a581f5aae58"
     },
     {
       "path": "frontend/features/meeting/client/inputLevelMeter.mjs",
@@ -2097,35 +2177,55 @@
     },
     {
       "path": "frontend/features/meeting/client/media.mjs",
-      "sha256": "de5d823c552106cbcde5d5906ab14c3c064ba36eb30c5e597b6c107869d889d1"
+      "sha256": "de36f711bce36baa668312c3087c1db6937626d53d176724d3e6a77e758d7a61"
+    },
+    {
+      "path": "frontend/features/meeting/client/mediaRecovery.mjs",
+      "sha256": "ea2b8c19e3756a6345fe9f5fc6e56c27e64c17e84122aa5c63fe88c98c800e70"
     },
     {
       "path": "frontend/features/meeting/client/meetingClient.mjs",
-      "sha256": "87c8656cbbc0f7f54c28ef44ab4170781d72f8c6d63aa74ca82f7d8507d1ed88"
+      "sha256": "8f0b731a4ea7eedc9eb12f683e6536c834acb3f70dd6b2432cdc2ae6354941b5"
     },
     {
       "path": "frontend/features/meeting/client/microphoneComparison.mjs",
-      "sha256": "2c6c4ffa234d383b5fbdb6ba2f9c6fc5302063206689b1d190ad49e38bb18c67"
+      "sha256": "1ef5f95bd24a3819544c2c91e8a74d94a490c0771239f47c8fbefee29c367a39"
+    },
+    {
+      "path": "frontend/features/meeting/client/noiseModes.mjs",
+      "sha256": "96cff28d6c3e4d30ddf4f9e00eb7cda9e2125b76391910448eebda6641a99fe6"
+    },
+    {
+      "path": "frontend/features/meeting/client/noiseProcessing.mjs",
+      "sha256": "2c14aeea052cdc38600f56dfca2763dcead9c282982b4d4f74110f122a2c9133"
     },
     {
       "path": "frontend/features/meeting/client/notifications.mjs",
-      "sha256": "860f7815bad21082ee612ef10862f7c68d7833ff0036e287cdc6364c4ff32576"
+      "sha256": "5e697e791e531fcdc1ce57ef818712000438ddfb114cff968cb35ffc3eb35882"
     },
     {
       "path": "frontend/features/meeting/client/participants.mjs",
-      "sha256": "cc736d1779e2fc65545b98c6a842f6e7268bf7f7691152e6761fd5eb0aa60888"
+      "sha256": "692bbf854f7e89afba778d1dd768808bcc6299c772dbf7b3911cfbeb0a1525c4"
     },
     {
       "path": "frontend/features/meeting/client/preferences.mjs",
-      "sha256": "166cc544939da173a4b73aa2b9afeff1c4b5f0633453d5aaf43937b5ead6c49f"
+      "sha256": "aa2d02f454282ab1f57c365dae9bb2cda78a5b241f98ca106dba0e2f5ccd898d"
     },
     {
       "path": "frontend/features/meeting/client/processing.mjs",
-      "sha256": "f6c5c15678bfd4ec0379a3df6bad9b16ca03d4049b7751176c5b8f36b528df74"
+      "sha256": "8066feec1529c4e0d6a9e7e5436dc5157014e6f2023996fcf2ca0e20d366ce08"
+    },
+    {
+      "path": "frontend/features/meeting/client/profiles.mjs",
+      "sha256": "f27385287091954d634eb5e59e502b4586a4e7681e63f29f40d2464f02d11174"
     },
     {
       "path": "frontend/features/meeting/client/protocol.mjs",
-      "sha256": "48a56015134fb96ef7fb1620012505dbfed331e8d0fa940432c0dd52f22d5e73"
+      "sha256": "e082e502c5adfe38d7cbb12a5e7e85dff882234bd720dafa14e7defbb256f93f"
+    },
+    {
+      "path": "frontend/features/meeting/client/pushToTalk.mjs",
+      "sha256": "36996b2a589ace152f067e9fded9804fd6365735184cbd4e8524c65c894d3667"
     },
     {
       "path": "frontend/features/meeting/client/retryChoice.mjs",
@@ -2137,7 +2237,7 @@
     },
     {
       "path": "frontend/features/meeting/client/roomState.mjs",
-      "sha256": "d45e1b7f5829405418b41892177321296db0ad3befeb3eb844f6b3cf8570f54b"
+      "sha256": "de45fcca70c3a9f13406c0a35ecfad6c132055bcc12d26b5d5238bb385a91790"
     },
     {
       "path": "frontend/features/meeting/client/session.mjs",
@@ -2145,11 +2245,11 @@
     },
     {
       "path": "frontend/features/meeting/client/settings.mjs",
-      "sha256": "9963efbaa99060e184d50649750dcfa0d94f9a7d341b0ead5b05e12ba743ef82"
+      "sha256": "d17acf30d7c684136027ee5463f1427a3c20f3bc5ad90f9f3538866bbd174a98"
     },
     {
       "path": "frontend/features/meeting/client/theme.mjs",
-      "sha256": "9f62bb9feeaa772b5f19dc8b4377d87a66447462a596a1b52374acfeecf05b90"
+      "sha256": "f56bf2fe92f945b284b8abaa7672d3498c0bf749939e4105e9573185262cfb5b"
     },
     {
       "path": "frontend/features/meeting/client/useMeetingState.js",
@@ -2161,7 +2261,7 @@
     },
     {
       "path": "frontend/features/meeting/files/filesModel.mjs",
-      "sha256": "c618d47a323b664cf3a971cd1770ecca158df37d51d58d09019dd6e3cf60a0a3"
+      "sha256": "150bf87a6b5ae1af9da42bb174ba63d6e2af3f78be304d6223e6665babfcc273"
     },
     {
       "path": "frontend/features/meeting/media/MediaRegistryView.module.css",
@@ -2185,7 +2285,7 @@
     },
     {
       "path": "frontend/features/meeting/media/cameraEffects.mjs",
-      "sha256": "bffcfa2c2307a9a22a7987909d346b8c184ab936a181a0690d632b7a87381380"
+      "sha256": "316a213af9ea734158763d95099caf30aac46e89e4c93358c9deddcfbbebd5c3"
     },
     {
       "path": "frontend/features/meeting/media/mediaRegistry.mjs",
@@ -2209,11 +2309,11 @@
     },
     {
       "path": "frontend/features/meeting/meetingTheme.module.css",
-      "sha256": "2296344f5dcf53ff0d0a1c562b4a353bfdcc25f968e7460a7e4d0fe03a51f2b5"
+      "sha256": "3da1299d7c077860fbaf936868c848cb0a811277e5f035714cd90212582318ae"
     },
     {
       "path": "frontend/features/meeting/participants/ParticipantsDock.js",
-      "sha256": "c83f1ae413ff8f1c570b66e483054586496ba5f2e67e7e0859db01d858f4e1c4"
+      "sha256": "7a7b883c2f8d69f49322f0239787a11ce74860930553a9fc0d420f84b275a8da"
     },
     {
       "path": "frontend/features/meeting/participants/ParticipantsDock.module.css",
@@ -2221,7 +2321,7 @@
     },
     {
       "path": "frontend/features/meeting/participants/ParticipantsPanel.js",
-      "sha256": "15aba33034388330aca82c614ba3bfe1ab3e9b958e992e96f4447fdb5121a17b"
+      "sha256": "6486ed83b71cddb397f48b81b522ac5875ea5ae6931959ebc2e9bebf1689a22c"
     },
     {
       "path": "frontend/features/meeting/participants/ParticipantsPanel.module.css",
@@ -2229,15 +2329,15 @@
     },
     {
       "path": "frontend/features/meeting/participants/participantsModel.mjs",
-      "sha256": "4923bc7f6f12e2f475644bbf73e48f773bcd77039d568b7610e2462e2c25eeac"
+      "sha256": "9edc7c1f69c74c6371d67fb367ed99d77a941e58e69fe91da54c025c21bc6b40"
     },
     {
       "path": "frontend/features/meeting/room/CameraQuickMenu.js",
-      "sha256": "d6991012405697700553de910c921c54412d2ad88842e81749a487cefd9d0537"
+      "sha256": "d1f4f66fd23c57c7914740d7dd7317305d01721fe59f1271290afd3a1241571e"
     },
     {
       "path": "frontend/features/meeting/room/CardActions.js",
-      "sha256": "0c50a03baf541b87c564861e8ecf5e09d372ae5d8a31e1f252a8c1c39c4979e1"
+      "sha256": "863f3da0e4ad651e5b021d3ee47f10a1e23974141e4fa864ff8f371cb04e8106"
     },
     {
       "path": "frontend/features/meeting/room/CardMenu.js",
@@ -2245,19 +2345,19 @@
     },
     {
       "path": "frontend/features/meeting/room/ConfirmDialog.js",
-      "sha256": "7355fb48f512f4f422bcb1aad8dfadb28664529ea6a6efd3355ff8f36c2b274d"
+      "sha256": "10c250dd5115e96e4e17c0d3bd0fa9100489bdced5e9c1390342e80932269789"
     },
     {
       "path": "frontend/features/meeting/room/MeetingControlBar.js",
-      "sha256": "665be4d14102e75a895a4dc120e61bfe2bc497fb7b17f421341f964a0edbc494"
+      "sha256": "617c9fc74267f1e9adc3b8c87071d5d9b687617c5b67c1bf35924553656496d4"
     },
     {
       "path": "frontend/features/meeting/room/MeetingControlBar.module.css",
-      "sha256": "1ada4ea78fb7f5a7937ffaa321ac4a48043eb90003e25d64b12864de5abca7f9"
+      "sha256": "7d2e1b91c915c1558e26a52ffa6e6cbb881eda7999c275d6cd090d881cd79316"
     },
     {
       "path": "frontend/features/meeting/room/MeetingGrid.js",
-      "sha256": "300d72ecf6cbc5628bac41bdf61dcaac615cd16e550ef757a96ab616705ef12d"
+      "sha256": "1708520cfd6d601f163d05c912e8a81f9ae87378f2f314d759d4fddd99c8a81b"
     },
     {
       "path": "frontend/features/meeting/room/MeetingGrid.module.css",
@@ -2265,15 +2365,15 @@
     },
     {
       "path": "frontend/features/meeting/room/MeetingPrejoin.js",
-      "sha256": "16fc077f5b813b04e55b34fce2d65d005606222cb577a452128549c615ce7b6e"
+      "sha256": "fec4f4c5f27b0020bf3002f75f3c736d7829877f371a5056f7022dce333ef16b"
     },
     {
       "path": "frontend/features/meeting/room/MeetingPrejoin.module.css",
-      "sha256": "dc9eb17cb2a87fba14957e6bde4cc9bd033633d6d5db008c4eed362effa5c81e"
+      "sha256": "b0a91579bb226a29ad30807aff543aa93e1417005e59fdec3ad4f5f7f0a08b0d"
     },
     {
       "path": "frontend/features/meeting/room/MeetingRoom.js",
-      "sha256": "4fd1ef834c8ec5b374c462390bc53cf55764feb276ba77482e4cdcaeff9d4b09"
+      "sha256": "09071ee54c88314077e37cb54b5492f7006f7d8366e800b78396a71f2d49042a"
     },
     {
       "path": "frontend/features/meeting/room/MeetingRoom.module.css",
@@ -2281,7 +2381,7 @@
     },
     {
       "path": "frontend/features/meeting/room/MeetingSession.js",
-      "sha256": "bd81ce22f3d338a53c42fe6d268249bb53325287175f806c93690e672805e38c"
+      "sha256": "6a2b6d255d937e091d107d084bb10891b4e23cd0d07276d9c1a6dca534b1d98e"
     },
     {
       "path": "frontend/features/meeting/room/MeetingSession.module.css",
@@ -2289,15 +2389,19 @@
     },
     {
       "path": "frontend/features/meeting/room/MicQuickMenu.js",
-      "sha256": "63616cd2c08d81ed177a8cf1f2ed075e088ccce4d389da979c8599f93a968ec3"
+      "sha256": "c42238799b8f6fe235d4208cc82663f364172bb41bd767ad407f7eb44e2b0eec"
     },
     {
       "path": "frontend/features/meeting/room/MicQuickMenu.module.css",
       "sha256": "ee981b7412e52eb7cfe9a5e8fce2b23bfda35d0a21fdb86d8a115d003b008549"
     },
     {
+      "path": "frontend/features/meeting/room/ProfilePicker.js",
+      "sha256": "b7e2e4612ed2f95074b84ab2347e104f6f2753a0fc7a25dece1b6c82620050df"
+    },
+    {
       "path": "frontend/features/meeting/room/ShareDialog.js",
-      "sha256": "ce1fd433ec842987624d61c7d980c64a0d2e0a75f00a35058ccd21fcab139372"
+      "sha256": "96cf98cd732bd0a61b212869ce082e6754af3a7045cb0b55739bb8c80dd01d7e"
     },
     {
       "path": "frontend/features/meeting/room/ShareDialog.module.css",
@@ -2317,19 +2421,23 @@
     },
     {
       "path": "frontend/features/meeting/room/meetingSessionStore.mjs",
-      "sha256": "1137b50f6795d9028445e4ad5837e46aae0b3cc1fe42819745c55b7e20b5722e"
+      "sha256": "6d2bdb8b0e5f94a2f8598ead0cbf07170a985ed72538ee6d4046ae32a031da53"
     },
     {
       "path": "frontend/features/meeting/room/meetingStatusCopy.mjs",
-      "sha256": "33e5dd9e4e1058a7f750392445ea39e8e07627fa33cdc130cfe3b063943ebd93"
+      "sha256": "005edb6bd1f16cbe7abdc1b1b7df0fcdb45d8e659a24365ea8ceaa2c16e1805b"
     },
     {
       "path": "frontend/features/meeting/room/panelMotion.mjs",
       "sha256": "67aad4b67d2d5b5304686859c21dc4a3b776eeb34c1cb54d2ce00ef68859b94a"
     },
     {
+      "path": "frontend/features/meeting/room/roomHistory.mjs",
+      "sha256": "09ce734472a9a0033a1dfd3a8af8555457e4daf46fe0b4f92ce9c14053d1bc3d"
+    },
+    {
       "path": "frontend/features/meeting/room/speakerTest.mjs",
-      "sha256": "88f1e52ced4d755fea57393b27c5dcf23b88b5c2250991da2979c88193a99e39"
+      "sha256": "15f18261b69e320484c8edc69275bb0b0cce498d61d1b979c0f4a4cc40518b22"
     },
     {
       "path": "frontend/features/meeting/room/useAnimatedCards.js",
@@ -2338,6 +2446,10 @@
     {
       "path": "frontend/features/meeting/room/useBackClose.js",
       "sha256": "be3489bac1f7d7b1b7101b35dc743a30c010cf26ad8d8fb47f4daa97698e2ec1"
+    },
+    {
+      "path": "frontend/features/meeting/room/usePushToTalk.js",
+      "sha256": "4f71faed857742cdbfd7c2438a98db5dd8571af5ee502b6a3ee566b17522d145"
     },
     {
       "path": "frontend/features/meeting/runtime/meetingAdmission.mjs",
@@ -2353,7 +2465,7 @@
     },
     {
       "path": "frontend/features/meeting/settings/AudioSettings.js",
-      "sha256": "4db79eaa221789b74c8254bdbcd1d8a7e983fae0e282ae07abfba1031f1835ff"
+      "sha256": "11b097688eab17f32134744a7d2165eb573ab48f244f7f381921f333add8e906"
     },
     {
       "path": "frontend/features/meeting/settings/AudioSettings.module.css",
@@ -2361,11 +2473,11 @@
     },
     {
       "path": "frontend/features/meeting/settings/MicProcessingSettings.js",
-      "sha256": "c40b12c1a815c81a08c3ec86e0d2fb39bda0b5a4506c7a75f7c928117571fd46"
+      "sha256": "9832b63ec564a36682df53b9b29337ce9676cc5b22b5285f131ebb0ca0ea6555"
     },
     {
       "path": "frontend/features/meeting/settings/PersonalSettings.js",
-      "sha256": "1f532148982a0a9f12678766503688249c43a07a7012e1e7a044e87e18f60aeb"
+      "sha256": "7bbbb1302883cfd664faaaddc037358a8087f8d9d516f6e9d9b7f72c8a901951"
     },
     {
       "path": "frontend/features/meeting/settings/PersonalSettings.module.css",
@@ -2373,11 +2485,11 @@
     },
     {
       "path": "frontend/features/meeting/settings/PolicySettings.js",
-      "sha256": "669a36e9a413cec599c46a9eab467eb5b5c4f5c5dd9e603ce2d652083201566e"
+      "sha256": "4a4beba7d524ae1fd6ab3451941ca6e9e362ffad7b521afcec5371a1a597a921"
     },
     {
       "path": "frontend/features/meeting/settings/ProfileSettings.js",
-      "sha256": "bacdb7f34cf9775d9643eb5e1d16d25563b121986039e3d232e6b2ab2886de15"
+      "sha256": "41db68cdc8cb316bd8b96647436a6656082654858e004f5c323c0dbd8a099c65"
     },
     {
       "path": "frontend/features/meeting/settings/ProfileSettings.module.css",
@@ -2385,7 +2497,7 @@
     },
     {
       "path": "frontend/features/meeting/settings/RoomInfo.js",
-      "sha256": "7bd77eb35070838a3a2ecd4f82157ad1ef4c8adbef8d69a0b95ac2c538468a6f"
+      "sha256": "f944d9b57e5992ac5d07e7ec2682bd1151c676be740bdc13077120c44e098ba8"
     },
     {
       "path": "frontend/features/meeting/settings/RoomInfo.module.css",
@@ -2405,11 +2517,11 @@
     },
     {
       "path": "frontend/features/meeting/settings/SettingsShell.js",
-      "sha256": "5d376b7f68dcb1be1ebf341d4e2a98ec99df69af0d3d1b1ecbefb685d16b5a3c"
+      "sha256": "7875eee59fe4ef59057b756887a96d92518e27a9735fbaef55ff97a5ad57d777"
     },
     {
       "path": "frontend/features/meeting/settings/SettingsShell.module.css",
-      "sha256": "4b5996f89063e7e390ac5c6a11aad36a9ff7176fe293f60b76a45ecdcb211454"
+      "sha256": "5f56a4b0a6102d8f80fc32aaf9add5d46b44628dd51dc9c50570cb4b634a3dfe"
     },
     {
       "path": "frontend/features/meeting/settings/SettingsWorkspace.js",
@@ -2417,11 +2529,11 @@
     },
     {
       "path": "frontend/features/meeting/settings/SpeakerVolumeSettings.js",
-      "sha256": "771f6cd5d2caa2d88d686d06a45dc433c291e9f9de72858205bc16ff107171a1"
+      "sha256": "281fca0701dc072e002bd8a5b234d570d561a1a49d55ca00d16bc1e971e58914"
     },
     {
       "path": "frontend/features/meeting/settings/VideoSettings.js",
-      "sha256": "5d39e4a1a9653066e7a2f40263e3e743fffa331144785e12f1355097292f42f2"
+      "sha256": "976d42024d31df93e2c990493a0f494c6754573b939751e06117b6ad5c2f37a3"
     },
     {
       "path": "frontend/features/meeting/settings/settingsDialogLifecycle.mjs",
@@ -2429,11 +2541,11 @@
     },
     {
       "path": "frontend/features/meeting/settings/settingsShellModel.mjs",
-      "sha256": "86b0807f998e9c0370976ab1bac34dcc821e617a6becc289d5ae85d3d00a4a6a"
+      "sha256": "6c2a8e43029b3818d7c47a1b2f336a3f696745c2c3525d7536dd4d9ee63cc228"
     },
     {
       "path": "frontend/features/meeting/settings/settingsWorkspaceBindings.mjs",
-      "sha256": "112b8c825f107282c0edc8e9971d492b51f1a265528f644870b7abc87a92bc61"
+      "sha256": "d6b614de92657e73a3e5e0b4360fd5b5da38f152ad90be5b6e765a333b5ebef5"
     },
     {
       "path": "frontend/jsconfig.json",
@@ -2445,15 +2557,15 @@
     },
     {
       "path": "frontend/next.config.mjs",
-      "sha256": "517fe41530e3a77e370e0fc58202021b9162babb6b005914fb9d5af75fbc40db"
+      "sha256": "c8e62ca3c74d90f57ef84801508e99bacfd07152a3dc7ffbd58823616517ac54"
     },
     {
       "path": "frontend/package.json",
-      "sha256": "051c71efaa4294ca548d712bb705cfe6049dda977e54e481f78e97eb11632976"
+      "sha256": "1c2d84d94bb36b97f1e1f3dea8187b7442e927faa874c4f90f8402b0a4ebb4d4"
     },
     {
       "path": "frontend/playwright.config.mjs",
-      "sha256": "8fd0c0e644b6b8ef385b7a3b4b0aa31404e06830f4c8caf2fd612bb3c5635d7d"
+      "sha256": "e79b638c9a02e9f0a36061821b493716cd9d6ed5b20b62e2dc90b2e11045fde7"
     },
     {
       "path": "frontend/postcss.config.mjs",
@@ -2493,23 +2605,23 @@
     },
     {
       "path": "frontend/scripts/prepare-meeting-assets.mjs",
-      "sha256": "29cc2f33eef4cfd622d840fee02654cec2b997576c4c1e7e2a9f47482c9ecbc4"
+      "sha256": "25dd4158b748037008eb61a1228a922f7e632b1c00d9f6da8c364cb70be3a9f8"
     },
     {
       "path": "frontend/smoke/admin-navigation.smoke.mjs",
-      "sha256": "08ad1d6fb27e9a4cdbeab6a48442288442e811c8773c8c2ebe1209d803acd081"
+      "sha256": "454f32a00688ce4582174bf7f50ae46c429bc4471784c7197fb5327ce779a20d"
     },
     {
       "path": "frontend/smoke/adminNavigationFixture.mjs",
-      "sha256": "260e1a931fcced0863f3683efcd36ec8c7ee3c5050c4248c382fd4f33db043dd"
+      "sha256": "27155803f96517e9f59592cff2db2676e1ce2c692fb14aa2737a54230695f408"
     },
     {
       "path": "frontend/smoke/card-touch.smoke.mjs",
-      "sha256": "33199a8c76c73f657108d329886b9a2dbf42dc6b065eb8e52aa2af68f96d86dc"
+      "sha256": "66d120997a8a93e498269936df4d4901ae5364936b451246de5d43c0ed462b1e"
     },
     {
       "path": "frontend/smoke/chat-attachments.smoke.mjs",
-      "sha256": "f50c906df1c5f9d68c9ae3b3a9d1317449f8713f5a9b33d909ee7eeb6619b6dc"
+      "sha256": "174dce17ff960e9183f8553f7dfe79e5c4d3cff99d7b3411ed792258f570bf32"
     },
     {
       "path": "frontend/smoke/chatColorFixture.mjs",
@@ -2520,88 +2632,108 @@
       "sha256": "280188552d60c91d5d06edde914c4061504a80ca74cd9a1f2b89c0e56b3697fe"
     },
     {
+      "path": "frontend/smoke/globalSetup.mjs",
+      "sha256": "5379e23db90eedcf8dd43c48849befd541ed5d88123eda15706bac1e95df867d"
+    },
+    {
       "path": "frontend/smoke/help-tooltip.smoke.mjs",
-      "sha256": "3398012f2f485538f8533cf9da1b3ab5f0918407b661cb47dd94c58292991264"
+      "sha256": "8daec608ef55afae030ec45a401c1aaa4f7ee1d738fc8dbafb4f0678b47017c6"
     },
     {
       "path": "frontend/smoke/input-meter.smoke.mjs",
-      "sha256": "6eff408532293a036bbdfba35b1defe3ae05869dd175273e1bb91d763792c214"
+      "sha256": "12de6a06c66749e9f40f2913f4ca29cdf5cd916c2c2d21eae9412c7a8059857c"
+    },
+    {
+      "path": "frontend/smoke/meeting-back.smoke.mjs",
+      "sha256": "17381ba5e96816e705f40502d3baea32782f7c8c4a64306ad3ac11e560f36d86"
     },
     {
       "path": "frontend/smoke/meeting-card-controls.smoke.mjs",
-      "sha256": "1c40a50de7d113e7df09c0457a604d9ba38857583550472ac4a59fec4378cf02"
+      "sha256": "f0ca926c0f5be63f24e66bb510c254c445d8d6193f2e40b64270f6b864d0d971"
     },
     {
       "path": "frontend/smoke/meeting-chat-colors.smoke.mjs",
-      "sha256": "c102f5a11a9b49acfc69423beb541665f1414e229c1f445668c539b18a919e35"
+      "sha256": "579716187a824edec244a08a6ebed7ec52fbf35a54581c88b224f98a61b6d214"
+    },
+    {
+      "path": "frontend/smoke/meeting-host.smoke.mjs",
+      "sha256": "ea147f58abed8477a8042c5ed649be209e7851e24aef8b0b25b0a9fba8bcdc7b"
+    },
+    {
+      "path": "frontend/smoke/meeting-noise.smoke.mjs",
+      "sha256": "1c85db8eccfc954241f140d0e0d11e5ea4b3cee32f739a4f56355e32f28ba580"
     },
     {
       "path": "frontend/smoke/meeting-profile.smoke.mjs",
-      "sha256": "d6d9f3be0a81dbd89b3c18cd0fd63f1d16f7ab9943651db4b67f17dc6abfb7e6"
+      "sha256": "9d1513babfd0dcb0aeee574721945e28466b58cda0c1222b2d1ff3b2d9970ce6"
     },
     {
       "path": "frontend/smoke/meeting-status-pages.smoke.mjs",
-      "sha256": "c86b96ee5216ec1cea1fce6e8e189f3e2c0f75e90bf5a3703417bac593d3c289"
+      "sha256": "418c7063a7f2d3ad31cfad708865f5bca1a2d0e3cc768c7a0da4da82346cb24e"
     },
     {
       "path": "frontend/smoke/meeting-theme.smoke.mjs",
-      "sha256": "5d52202a6b80892100cb7808521f024a4687e0fb8801fb9d6fc854c6efea1be4"
+      "sha256": "b34bcfa6298697010ce8519e8097db013d68ea5728ad37c76b78064455f81725"
     },
     {
       "path": "frontend/smoke/meeting-turn.smoke.mjs",
-      "sha256": "6d75da501a1ac77e04382edb6192ae019eacb64cd8f8e52ab2e63cbec24afd8c"
+      "sha256": "2937260501afff665265c71b52637a163572bcf2be763773fb5c8d79d683adae"
     },
     {
       "path": "frontend/smoke/meeting.smoke.mjs",
-      "sha256": "6f0ead167a336c3b55f6fdd518ef3f1512d605f43f0b67e3f170fd514399871a"
+      "sha256": "10df46668d1138fb0cbbb865cc50d8f3b595f7bed093e3b7799f737c12d81c93"
     },
     {
       "path": "frontend/smoke/meetingDriver.mjs",
-      "sha256": "d1dd9e252226b9ef8bdd12349f158c5792d8bab046b0399145954adaf01f42e2"
+      "sha256": "2cefda8028c0dbf45ae6c96e09cb5eea6ed70984e91026114fd37e57c77d5033"
     },
     {
       "path": "frontend/smoke/meetingFocusChecks.mjs",
-      "sha256": "7e1458fb27d62aba2e3be4173f286bff9e2296eceae9deed575a8e0b65500d13"
+      "sha256": "5423d65037579e1a29515eb788f28bfabff3857ba150144ee34b5ead6fbaeba4"
+    },
+    {
+      "path": "frontend/smoke/meetingParticipants.mjs",
+      "sha256": "7d73045259dfb3c25d2ae54231bd0c5ea84a32ee62ff83af598957a60abc1a35"
     },
     {
       "path": "frontend/smoke/microphone-comparison.smoke.mjs",
-      "sha256": "b79f55294fdd266720e60ceb3f88e745e8df12e0ace96938c7b2f1a2ce956f89"
+      "sha256": "de7792f9246251f4a5480a01582adbaeffee2fc5bf9f62584a68bf2dc86cfd8c"
     },
     {
       "path": "frontend/smoke/panel-motion.smoke.mjs",
-      "sha256": "91ea6372084c391f79856108e8a32aaf1faa42637fc0198c0e1343973f205c7b"
+      "sha256": "253f2613c608b61aff97e5becb63b436bf146e444831832734b43ac2479989a7"
     },
     {
       "path": "frontend/smoke/prejoin-access.smoke.mjs",
-      "sha256": "ef06f7c0acdda4b89a18e3bad4707555c6504ba3992cc112ca13dfdab3f9705f"
+      "sha256": "bd615b44a79bdace68936db4cbea3f2ed2127bd95582ee9c75483abd426d0298"
     },
     {
       "path": "frontend/smoke/prejoin.smoke.mjs",
-      "sha256": "c617760c3b02c2281e3d07ad26a8395c91d3c921fd25fbe8a5ee50a1bca8b528"
-    },
-    {
-      "path": "frontend/smoke/recording-removed.smoke.mjs",
-      "sha256": "5e2ffddac68c1c7bdf181bfcf6ea0c0d5e6e61e45f52585d198804da738b1c73"
+      "sha256": "36aa4318dbce375788ea69c2ebd7ae0f5e19cd62ab2304ca4bdd7c14c025eed0"
     },
     {
       "path": "frontend/smoke/screen-permission.smoke.mjs",
-      "sha256": "57ae7444bba038ca7d71cda524754cfd35532cc00c28ee9c2ac0f1097ad48269"
+      "sha256": "9d63e916660ea708eac246bcb1f3a19c5f53c707550d532088021607c6bd73be"
     },
     {
       "path": "frontend/smoke/select-control.smoke.mjs",
-      "sha256": "8e8e3e39fcad773e709786f2e4b0207cb2cfdb31466994617956d6aba34688f4"
+      "sha256": "74023f078b6f04f238348f764030a6572733c3dc595f0ad01683a251c8ba4e08"
     },
     {
       "path": "frontend/smoke/settings-overlay.smoke.mjs",
-      "sha256": "5db3e7e5041f7c6c8cc9fd1819679a79436380b62b3b828e0bfc56af153ed453"
+      "sha256": "f8a062d9c409f3ad3f03f6f919f7eb73b703795c65a2649e0d1ed649a9946bbb"
     },
     {
       "path": "frontend/smoke/shared-theme.smoke.mjs",
-      "sha256": "54e7c606052c308f075b56521e7de787efafa718beebb1c604eaf3aa9863ae7f"
+      "sha256": "ae21adeb7f935f7f9800b95eb78a6997f51e14384341a24df37d53468300b722"
+    },
+    {
+      "path": "frontend/smoke/smokeRooms.mjs",
+      "sha256": "36be44462d02f14eac40ab1f333a0ee1d0ed743ad30990d8e93523c9284e0cf6"
     },
     {
       "path": "frontend/smoke/speaker-test.smoke.mjs",
-      "sha256": "b69f4ef3d5cee4248e963c19dd00a92aca53ad1cd20292cd19faa52c040a9ca2"
+      "sha256": "8c238209f700982847610b9fd4c9664cf02d917bc0531a31fafef8bb04c927e1"
     },
     {
       "path": "frontend/smoke/studio-library-motion.smoke.mjs",
@@ -2613,11 +2745,11 @@
     },
     {
       "path": "frontend/smoke/studio-meeting-card.smoke.mjs",
-      "sha256": "0940b16f9a8bf3089daa75fdb70fb28b59570b9f0c2ab47a29f88bb081096391"
+      "sha256": "50a7cd90d8f64d0ae3887e1eaa3d1d24e634b642943146a8a59cf090d8262ab9"
     },
     {
       "path": "frontend/smoke/studio-search-dnd.smoke.mjs",
-      "sha256": "719938d437cdbdca7e49b12e898f1b2d4ea85b22bb5747d07f07ac47312d958d"
+      "sha256": "edea3edca1e83c047fe208dc5ca12250cb676b3e0742944d4562ab891151ecad"
     },
     {
       "path": "frontend/smoke/studioLibraryFixture.mjs",
@@ -2625,11 +2757,11 @@
     },
     {
       "path": "frontend/smoke/theme-selection.smoke.mjs",
-      "sha256": "ce6a3cf8040ebdf54dcbec8728506a944089a02451c54094a47a1db8113c91b3"
+      "sha256": "ffd9b17a713a3109dddb07efa9324b0c473a74af91377d805886f0ef751a56d7"
     },
     {
       "path": "frontend/smoke/toast-mobile.smoke.mjs",
-      "sha256": "5c4cecc8965c22b9d93f977ad77bb6336739e2092b74e17faec3b58390910be4"
+      "sha256": "3f65d27021f53664b621fec95613436c42588a1afcc8ef337c07cc93e45292ad"
     },
     {
       "path": "frontend/test/abort-error.test.mjs",
@@ -2645,7 +2777,7 @@
     },
     {
       "path": "frontend/test/api-message.test.mjs",
-      "sha256": "28ebd0bd14a1bc097c68280c96877fe1665abc9833997eea20a698565ff34e9c"
+      "sha256": "75b0349dcf3d78e832f5783d013722917e38dea17b67b65ee496c7894dc26f01"
     },
     {
       "path": "frontend/test/audio-pulse.test.mjs",
@@ -2661,11 +2793,19 @@
     },
     {
       "path": "frontend/test/fonts.test.mjs",
-      "sha256": "8044e65d4fd6e7ff5781c394f40eb0be3eb9bd9009d5f8b5d8ff5580a85781eb"
+      "sha256": "d4ad9656c84be4b7c06948abcabb98881171d88dc95369fbcb3a8cac66958dd3"
+    },
+    {
+      "path": "frontend/test/helpers/meetingQuality.mjs",
+      "sha256": "32484d7fd3e9e6f77290f3f8ed1e6b08006c4a6b9d547c687783ce5ba6ad4298"
     },
     {
       "path": "frontend/test/hls.test.mjs",
       "sha256": "876d73353805c2f9b274ad53f488ff0e9499fc84dec41b0e1a84e2f868c469cd"
+    },
+    {
+      "path": "frontend/test/lang.test.mjs",
+      "sha256": "ed1788ccbfb0ccc582ddadfd75554c9bfbc0bed0af1e374bcf0bbdff1b3747bc"
     },
     {
       "path": "frontend/test/main-routing.test.mjs",
@@ -2673,11 +2813,11 @@
     },
     {
       "path": "frontend/test/media-validation.test.mjs",
-      "sha256": "053eca2c711ce88a1892ca7140f27c24ad001425f6057727901475334953c412"
+      "sha256": "4de10d34115f49ffb5975544fa1d35e0f655a4e4284102a3060cdf9509a0a147"
     },
     {
       "path": "frontend/test/meeting-about.test.mjs",
-      "sha256": "398168174cdf74e34a43531f3ed925992741ed58ae74cb3129fcefb3309aaefa"
+      "sha256": "7ba1b40f84572a6a29c09a457e980b762e9e2c8283ebe9a0ab1d8732f858cded"
     },
     {
       "path": "frontend/test/meeting-admission.test.mjs",
@@ -2701,7 +2841,7 @@
     },
     {
       "path": "frontend/test/meeting-chat-attachment.test.mjs",
-      "sha256": "263e5faee09874143d215571286070d7a9fc55a8c8d5357db2ccfb2405029a80"
+      "sha256": "593c9d8fb1fb22b0b4b10ad291ef3a1a7a3c9971f045fc917fe8d71cfa02d322"
     },
     {
       "path": "frontend/test/meeting-chat-avatar.test.mjs",
@@ -2709,23 +2849,23 @@
     },
     {
       "path": "frontend/test/meeting-chat-compose.test.mjs",
-      "sha256": "fbad26fcf1a99f97115edb26f2302bd00188989ad5106fffa09df87329a63b00"
+      "sha256": "45836f490bc68760acc101f82f487999d63f251d2d54d6c7c72a4adab4893a98"
     },
     {
       "path": "frontend/test/meeting-chat-content.test.mjs",
-      "sha256": "d7649de4292fe82f7d4a3ec22f7b3c55bb402bb6f293647f9a2640b42c9745f9"
+      "sha256": "7574bdf03c2a1c5aa57dbeb27b7dc1bb813aa3cbee0a3a6573c69984d128c3b9"
     },
     {
       "path": "frontend/test/meeting-chat-panel.test.mjs",
-      "sha256": "ba9d58a4cc514772cc8ab27e71ddd9ba897e31a51078d0e57c0e7cd719900cb5"
+      "sha256": "e92f3887de57c68010780142bdbcc40d0f5766442737b12018c907d0df0f5387"
     },
     {
       "path": "frontend/test/meeting-chat-rich.test.mjs",
-      "sha256": "f2ba969d3d096aed8f3ec731116418cf0a6a199d6ad3b82fa67f6c115a013417"
+      "sha256": "9b2a9acb773db0a1b5c9ef5ec2d6b8c8cfe98d92ca7c2b67e3e2b59841bb878b"
     },
     {
       "path": "frontend/test/meeting-chat-transcript.test.mjs",
-      "sha256": "77597d4b6e146fd1176c766da721c68a168a0583fac4f037ccbe27aa21e734c6"
+      "sha256": "726905d02198deea1a54e3f743cbceee53698864ae67d3b7c63a456bb6716222"
     },
     {
       "path": "frontend/test/meeting-chat-visual.test.mjs",
@@ -2737,7 +2877,7 @@
     },
     {
       "path": "frontend/test/meeting-client-capture.test.mjs",
-      "sha256": "395c247fa656c46d86f47cfae3a1da2f438f84a9b40cd521c3ca2c9a3d76971f"
+      "sha256": "23f388696bb80b4dfceb9a9f90173ce63b05babd9b317f7504dd00c2e90e0cee"
     },
     {
       "path": "frontend/test/meeting-client-chat.test.mjs",
@@ -2753,27 +2893,23 @@
     },
     {
       "path": "frontend/test/meeting-client-notifications.test.mjs",
-      "sha256": "283889ca9a2600c6a19f7e41a93ccd5b55f05fca2740cbc8e58a08d15617ea2c"
+      "sha256": "f85c7d5894e95f5814ba3b56cb5961fdb500aaeedbd3b37221e38e20b499b5ba"
     },
     {
       "path": "frontend/test/meeting-client-participants.test.mjs",
-      "sha256": "049ad87d0981484c019e5df699fa713c9fa71461103feed49cbd074afff116a0"
+      "sha256": "69e4afd7c45c6c81f6ece92982ea7f5f8bd0057c27f37bb1e1039f9ea6696130"
     },
     {
       "path": "frontend/test/meeting-client-processing.test.mjs",
       "sha256": "e193234ba2fef9f878006844cfc6ad44679e35b0a2e4e299b6a94a973dc522cd"
     },
     {
-      "path": "frontend/test/meeting-client-protocol.test.mjs",
-      "sha256": "9db8608707c5171421be01433ede537c1f39013a508a85db287244af7c76b0f3"
-    },
-    {
       "path": "frontend/test/meeting-client-recovery.test.mjs",
-      "sha256": "8e73056ef6923a9ca51fb0bd1d3a5012051e86241938d2c5269674d265d84f0f"
+      "sha256": "2cd292f563687f54591cb6fd326b9c7f8b5c3663c3a01667a0b988adf5ae06f7"
     },
     {
       "path": "frontend/test/meeting-client-room-state.test.mjs",
-      "sha256": "92b4a41ca2fbc838e0d83f30e84540206257592d3eacfcc9f3a8a46d6eee12ed"
+      "sha256": "7ba0fba72c181830a5383869216949186df183b4f45a81a3fd3f0d2de208e120"
     },
     {
       "path": "frontend/test/meeting-client-session.test.mjs",
@@ -2781,11 +2917,19 @@
     },
     {
       "path": "frontend/test/meeting-client-settings.test.mjs",
-      "sha256": "d10e8155d8094d9baefdfe391957af8b7c76ea142c916b85d6f7becafb9705a4"
+      "sha256": "fa401122ecfdf794ff00c08687cd61463dd5776d18ece44390745fd302b3211a"
     },
     {
       "path": "frontend/test/meeting-confirmations.test.mjs",
       "sha256": "0bbb81b31b160daad9c8636c81efc8051e16fe5aea4695c4f0ad29e49fbe296b"
+    },
+    {
+      "path": "frontend/test/meeting-connection-quality.test.mjs",
+      "sha256": "af8d19db6597ab4f002c8bc746ca29c92d08c8a0e0d74400d9cfd36000c209a3"
+    },
+    {
+      "path": "frontend/test/meeting-denoised-gain.test.mjs",
+      "sha256": "7a86f6cb351037f344cd9795ccc487df9a9bb494f708520bdd751612ad44d172"
     },
     {
       "path": "frontend/test/meeting-entry-lifecycle.test.mjs",
@@ -2801,7 +2945,7 @@
     },
     {
       "path": "frontend/test/meeting-ice-config.test.mjs",
-      "sha256": "96d162251f0d50fd3c06b75c14a014c035e3f20a43cb91ecbc3229d293a4b921"
+      "sha256": "06a6ae1c22875848da773040610e0c173618062d3286aca36867427a2dec2201"
     },
     {
       "path": "frontend/test/meeting-input-meter.test.mjs",
@@ -2810,10 +2954,6 @@
     {
       "path": "frontend/test/meeting-media-registry-render.test.mjs",
       "sha256": "065e9da8c7e97129d700230078e4f6effbe480558b775c87dfc96497f8f3dcde"
-    },
-    {
-      "path": "frontend/test/meeting-media-registry-view.test.mjs",
-      "sha256": "4d92d26189a96fd422c2d2d829bc44a241254b0771e7f2f0a182f8b738eaa119"
     },
     {
       "path": "frontend/test/meeting-media-registry.test.mjs",
@@ -2825,15 +2965,19 @@
     },
     {
       "path": "frontend/test/meeting-mic-settings.test.mjs",
-      "sha256": "0744834c8ef9e25a20d1b826d930529d38ccd3c672bd1889b08fa5b05e6acfe9"
+      "sha256": "8f99774618d1d1695ad4e9b36fc280e1189a0e9dd2315f2373f9c7ec36445aaf"
     },
     {
       "path": "frontend/test/meeting-microphone-comparison.test.mjs",
-      "sha256": "2cd4508eae6b2bccf6b42e3e9fbd8c6c523be00a71186346bce22da5b79cdb1b"
+      "sha256": "7b110958699a2d6cec99ac342bb9c0a2b7c09be40378fb78f6223da8717ce7d2"
     },
     {
-      "path": "frontend/test/meeting-motion.test.mjs",
-      "sha256": "11a27850490dc2b67b17baeb0a7b1b836f20ac02cce03077f5230e01509fb89b"
+      "path": "frontend/test/meeting-mobile-capabilities.test.mjs",
+      "sha256": "26f3a36f60c102020e632aec2aa3eb1a32e9f3887b511618900ce4f1da39e97c"
+    },
+    {
+      "path": "frontend/test/meeting-noise-processing.test.mjs",
+      "sha256": "bacb1e44b18ab6a40b88f124664b956bdc30309689be4cadf8f520067e6194df"
     },
     {
       "path": "frontend/test/meeting-notifications.test.mjs",
@@ -2841,11 +2985,19 @@
     },
     {
       "path": "frontend/test/meeting-participants-dock.test.mjs",
-      "sha256": "63db320abf6421850b838e8d2586a53300ba8a0ffc1e77c0f80a8d01226b113c"
+      "sha256": "e238458081e178adf638dbcda1cf08bde9c2e76ebc02e412deeffd51e50f9684"
     },
     {
       "path": "frontend/test/meeting-participants.test.mjs",
-      "sha256": "906ae48fa4024bae8abda49a0a6e794ebb519c67dc1c4a51f7614fd76b126ae3"
+      "sha256": "ef6809e339fe8021aab27dbc284291f35f8c85801b3e3d70abe0e2c0514dd3b9"
+    },
+    {
+      "path": "frontend/test/meeting-profiles.test.mjs",
+      "sha256": "598f400eb6c8657dd9da8e64461528c8864a81ca3330a3041cca72731b397b97"
+    },
+    {
+      "path": "frontend/test/meeting-push-to-talk.test.mjs",
+      "sha256": "86d4fb998d85fa29b4db3403a074e18dfcd972f7b6671bcfa99581078e664c58"
     },
     {
       "path": "frontend/test/meeting-retry-choice.test.mjs",
@@ -2860,16 +3012,20 @@
       "sha256": "ab64016fe66386f55bc464221d62f227dd62c4478e6f1d17587f831c1ee9e58e"
     },
     {
+      "path": "frontend/test/meeting-room-history.test.mjs",
+      "sha256": "e048e9add70be4a7ceabda010cdf0acf54bc94bd7d6ae0678958f49054c97fab"
+    },
+    {
       "path": "frontend/test/meeting-room-layout.test.mjs",
       "sha256": "cd34bd8793ec875dcfb6b50283a1f69c11e460338ed2456c02a33d43fed7af85"
     },
     {
       "path": "frontend/test/meeting-route.test.mjs",
-      "sha256": "ce9320495cc163a6cf349a6dc111a0ecf1774bf5425d4ef6029a3fc28c5abe25"
+      "sha256": "a16dd44a0bec8a931774dd3e79199c50bcef0d4cc21141df2ecfe596ce3c04e7"
     },
     {
       "path": "frontend/test/meeting-session-store.test.mjs",
-      "sha256": "abec9765c1dff057f0d8609f2f9b1e61618a10fbd4139f2ddb7e416ab1f17e84"
+      "sha256": "f5f9bb991a7c02a2cd335aabe094c73b152d5a6ff896518e70b3e368068d41e8"
     },
     {
       "path": "frontend/test/meeting-settings-dialog-cross-document.test.mjs",
@@ -2881,15 +3037,15 @@
     },
     {
       "path": "frontend/test/meeting-settings-shell.test.mjs",
-      "sha256": "8417088c8e7e1a018d262f5bf5be87e1c4eda1308222c047f88b676793e34f51"
+      "sha256": "0c97efd96e6485514d1449ba54a090bbdb85ebea5548bc35644bc0cf1a5c3e7d"
     },
     {
       "path": "frontend/test/meeting-settings-workspace.test.mjs",
-      "sha256": "bca1122dc50c311874e00b6642e3f9ee51c97d6d65580f644dde87505a40ec53"
+      "sha256": "54e09cdaef8110fd5d86e9593a5bdb3cca20b0dd2b0079522a89ef8057632f24"
     },
     {
       "path": "frontend/test/meeting-speaker-test.test.mjs",
-      "sha256": "31d7a077283c58c71765b6b0c05dfbb781df56cfa2d3669977f2d6015977bd6f"
+      "sha256": "136b635d2bbbb0336f1110ea53fd831b5929a82d8559ed30ad8819587854148e"
     },
     {
       "path": "frontend/test/meeting-speaking-monitor.test.mjs",
@@ -2901,7 +3057,7 @@
     },
     {
       "path": "frontend/test/meeting-theme.test.mjs",
-      "sha256": "ecd9fb81ee33b5dec3bffd3e4cb5a8f0b197cd556b5ad27a15f5a48b98ed52ae"
+      "sha256": "891ca906ec94f98a835091e4d1abe8a6afea708bca4cd7cc75ce009e9c1650f3"
     },
     {
       "path": "frontend/test/meeting-video-visibility.test.mjs",
@@ -2909,7 +3065,7 @@
     },
     {
       "path": "frontend/test/meeting-volume-controls.test.mjs",
-      "sha256": "0f0874ba00b66799f41b903724d40e2eb15572ba9c244184b6d4c65ee16ece2c"
+      "sha256": "126540be3a1d3ed911344b272cee661befc7ce81b58fad1ea7c471a3c53354fa"
     },
     {
       "path": "frontend/test/meeting-volume-memory.test.mjs",
@@ -2917,23 +3073,27 @@
     },
     {
       "path": "frontend/test/privacy-policy.test.mjs",
-      "sha256": "a9fb960cc010a90baffd2857f368a4ea4d793dc47470be11df9e68cc8d7c6410"
+      "sha256": "100fcbade32d7834628b0653ee779ccf92eeb37859524bce90d1c86657fa28f9"
     },
     {
       "path": "frontend/test/public-state.test.mjs",
-      "sha256": "3dd189ca7fbfae14aa29b47ae490e1cfc546028b71a5e56bb37e50d48a45645c"
+      "sha256": "a1274a894d027205fb0737932e9dc6cef86b9112fdb301554ce2ffab69514a40"
     },
     {
       "path": "frontend/test/shared-ui.test.mjs",
-      "sha256": "1238797f4fa1c37c9c5df521ca73deb84a87cdabbf718794a1674345ad763b9b"
+      "sha256": "88b5b74ea1838924533e8235e3017c6da3e284fb3648a47e62507c70983cb5a9"
     },
     {
       "path": "frontend/test/status-navigation.test.mjs",
-      "sha256": "842db2541be1eca72a5d7b8810090e74d850b9f76fd247e9aa6931eb83bce173"
+      "sha256": "06d184d7f394f19cb7af039da3e9750257cfbd3f494ab6d13104447b6afbf81e"
     },
     {
       "path": "frontend/test/studio-as-user.test.mjs",
       "sha256": "d769ee9ce46f4909a93fc88d801e55fc9dccff1416c120987104255892649ae4"
+    },
+    {
+      "path": "frontend/test/studio-copy-text.test.mjs",
+      "sha256": "ec82a9892bcfff90e3178d1dddc7aca18156285f70ec135d4010225721706552"
     },
     {
       "path": "frontend/test/studio-dnd.test.mjs",
@@ -2960,12 +3120,12 @@
       "sha256": "a85f24375caab9584db8d00e0566d925b742c580b6482d7aee9592970d35b40f"
     },
     {
-      "path": "frontend/test/theme-controls.test.mjs",
-      "sha256": "97d7b5e24fa4d433b7c8f14aa52ecb7908a2531991fdd4a2231e139247defc42"
+      "path": "frontend/test/theme-color.test.mjs",
+      "sha256": "c3dbfbbacd823f0a86767a9673aafcf657c47ac30da5d4639bda5ecccf31c392"
     },
     {
       "path": "frontend/test/theme-preference.test.mjs",
-      "sha256": "86485ea67370e4a99ee4a8e9994a12c27ded4f785bbbc5ff3ec53a3f3e27aa1d"
+      "sha256": "b54c6bc5be86532827a2793bdc13ae4b0f343bd9e28d8e8fa91e9503d7a3180d"
     },
     {
       "path": "frontend/test/tooltip-layer.test.mjs",
@@ -2977,11 +3137,27 @@
     },
     {
       "path": "infra/dev/nginx.conf",
-      "sha256": "93cdeed069dfa74f06088426d651cc3ec2039760a0a1f576d426fca36de2e6be"
+      "sha256": "d6db94475892f8a340a1ad18c9d0b94510e9f02defb3d13e96ed2b911f6e17e0"
+    },
+    {
+      "path": "infra/logging/DOZZLE-LICENSE",
+      "sha256": "8250403dd393dc8b0360723b303c107320691042ef8a286ddc34592087fca7cc"
+    },
+    {
+      "path": "infra/logging/Dockerfile",
+      "sha256": "9badc7eae9477b91b3ba17d5d8fdd674b8b80e49553cf125faedff30126baa6e"
+    },
+    {
+      "path": "infra/logging/notifications-disabled.yml",
+      "sha256": "bc7b895e915b027fc654f07c6b24f28e1f37be056d14cc650f20cd3969fae69c"
+    },
+    {
+      "path": "infra/logging/notifications.yml",
+      "sha256": "072830e3f3a8b7f9e7a2561e5a23413092135bd5366fc0850a49f55afbc1644b"
     },
     {
       "path": "README.md",
-      "sha256": "537104e95bb6dca870e85d931aef173f07e42f2d34745330d3505d05e653de65"
+      "sha256": "afa0bcd709dc0f7a6be3b068ac3311458a1affef140ce4c856beaf73a7984730"
     },
     {
       "path": "LICENSE",
@@ -2993,7 +3169,7 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "fc5a292aa2100e961ce612807db401794aa49e965605faee1f8919cbdfc23ecf"
+      "sha256": "c75e9499a85b3db2b237dae484f671106fe00e7aed698b86ba80952a911fa204"
     }
   ]
 }

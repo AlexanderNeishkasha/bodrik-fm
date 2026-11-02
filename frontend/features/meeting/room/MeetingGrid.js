@@ -5,15 +5,16 @@ import { flushSync } from "react-dom";
 
 import ParticipantCard from "../media/ParticipantCard";
 import { createSpeakingMonitor } from "../media/speakingMonitor.mjs";
-import CardActions, { CARD_COPY } from "./CardActions";
+import CardActions from "./CardActions";
 import { buildCards, fitTiles, focusedCard, newScreenKeys } from "./gridLayout.mjs";
 import { flushAndSettle, RELAYOUT_EVENT, transitionName, withViewTransition } from "./cardMotion.mjs";
 import { useAnimatedCards } from "./useAnimatedCards";
 import styles from "./MeetingGrid.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** Meeting card grid driven by the media registry and the viewer's local layout. */
-export default function MeetingGrid({ registry, layout, participants, selfId, presenter = false, language = "ru", hideCameraOff = false, loaded = true }) {
-  const text = { ...CARD_COPY[language === "en" ? "en" : "ru"], region: language === "en" ? "Meeting participants" : "Участники встречи" };
+export default function MeetingGrid({ registry, layout, participants, selfId, presenter = false, hideCameraOff = false, loaded = true }) {
+  const text = t("meeting.cardActions");
   const snapshot = useSyncExternalStore(registry.subscribe, registry.getSnapshot, registry.getSnapshot);
   const membershipKey = snapshot.participants.map((peer) => peer.id).sort().join(",");
   const view = useSyncExternalStore(layout.subscribe, layout.getSnapshot, layout.getSnapshot);

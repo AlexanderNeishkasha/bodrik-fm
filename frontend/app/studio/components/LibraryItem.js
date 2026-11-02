@@ -1,6 +1,6 @@
 ﻿import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import Icon from "../../components/Icon";
 import HighlightedSongName from "./HighlightedSongName";
 
@@ -100,8 +100,8 @@ export default function LibraryItem({
                     onConfirmRename(track);
                   }}
                   className="btn-accent inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)]"
-                  aria-label={ui.studio.save}
-                  title={ui.studio.save}
+                  aria-label={t("studio.save")}
+                  title={t("studio.save")}
                 >
                   <Icon name="check" className="h-4 w-4" />
                 </button>
@@ -112,8 +112,8 @@ export default function LibraryItem({
                     onCancelRename();
                   }}
                   className="btn-ghost inline-flex h-8 w-8 items-center justify-center rounded-full transition"
-                  aria-label={ui.studio.cancel}
-                  title={ui.studio.cancel}
+                  aria-label={t("studio.cancel")}
+                  title={t("studio.cancel")}
                 >
                   <Icon name="close" className="h-4 w-4" />
                 </button>
@@ -126,8 +126,8 @@ export default function LibraryItem({
                   onStartRename(track);
                 }}
                 className="btn-accent inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)]"
-                aria-label={ui.studio.rename}
-                title={ui.studio.rename}
+                aria-label={t("studio.rename")}
+                title={t("studio.rename")}
               >
                 <Icon name="edit" className="h-4 w-4" />
               </button>
@@ -139,8 +139,8 @@ export default function LibraryItem({
                 onRequestDelete(track);
               }}
               className="btn-ghost inline-flex h-8 w-8 items-center justify-center rounded-full transition"
-              aria-label={ui.studio.delete}
-              title={ui.studio.delete}
+              aria-label={t("studio.delete")}
+              title={t("studio.delete")}
             >
               <Icon name="trash" className="h-4 w-4" />
             </button>
@@ -154,8 +154,8 @@ export default function LibraryItem({
                 onPlay(track.id);
               }}
               className="btn-accent inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)]"
-              aria-label={ui.studio.play}
-              title={ui.studio.play}
+              aria-label={t("studio.play")}
+              title={t("studio.play")}
             >
               <Icon name="play" className="h-4 w-4" />
             </button>
@@ -166,8 +166,8 @@ export default function LibraryItem({
                 onQueue(track.id);
               }}
               className="btn-ghost inline-flex h-8 w-8 items-center justify-center rounded-full transition"
-              aria-label={ui.studio.queueAction}
-              title={ui.studio.queueAction}
+              aria-label={t("studio.queueAction")}
+              title={t("studio.queueAction")}
             >
               <Icon name="queue-add" className="h-4 w-4" />
             </button>

@@ -19,12 +19,13 @@ const EARLY_LIMIT = 64;
 /** Initial client state before admission. */
 export const initialRoomState = Object.freeze({
   status: "idle",
-  language: "ru",
   selfId: "",
   presenter: false,
   count: 0,
   speakerId: "",
   musicVolume: 1,
+  // Logical bot presence survives replaceable RTP producer restarts.
+  musicConnected: false,
   // True once the first media inventory after admission is in (all initial cards known).
   loaded: false,
   participants: Object.freeze({}),
@@ -44,7 +45,7 @@ function participant(stamp, name, avatar, presenter, previous) {
   });
 }
 
-/** The music participant shown while the room music producer exists. */
+/** Server-owned room music participant, present while conference output is connected. */
 const musicParticipant = Object.freeze({
   id: MUSIC_ID,
   stamp: null,
@@ -85,13 +86,12 @@ function retainProducers(producers, participants) {
   return Object.freeze(next);
 }
 
-/** Add one producer, adding the music participant for the system source. */
+/** Add one producer; only human sources can introduce participant membership. */
 function addProducer(state, source) {
   const value = producer(source, state.early);
   if (!value) return state;
   let { participants } = state;
-  if (value.system) participants = withEntry(participants, MUSIC_ID, musicParticipant);
-  else if (!participants[value.participantId]) {
+  if (!value.system && !participants[value.participantId]) {
     participants = withEntry(participants, value.participantId, participant(source.participant, source.name, source.avatar));
   }
   return {
@@ -100,6 +100,7 @@ function addProducer(state, source) {
     producers: withEntry(state.producers, value.id, value),
     early: without(state.early, value.id),
     musicVolume: value.system && Number.isFinite(source.volume) ? source.volume : state.musicVolume,
+    musicConnected: value.system || state.musicConnected,
   };
 }
 
@@ -117,12 +118,9 @@ function producerState(state, value) {
   return { ...state, producers: withEntry(state.producers, current.id, Object.freeze({ ...current, paused: value.paused })) };
 }
 
-/** Remove one closed producer, and the music participant with the music source. */
+/** Remove one closed source without changing participant membership. */
 function closeProducer(state, producerId) {
-  const current = state.producers[producerId];
-  if (!current) return { ...state, early: without(state.early, producerId) };
-  const participants = current.system ? without(state.participants, MUSIC_ID) : state.participants;
-  return { ...state, participants, producers: without(state.producers, producerId) };
+  return { ...state, producers: without(state.producers, producerId), early: without(state.early, producerId) };
 }
 
 /** Apply one Rust event. Unknown kinds are ignored. */
@@ -161,6 +159,8 @@ function applyEvent(state, kind, value) {
       return addProducer(state, value || {});
     case "producerClosed":
       return closeProducer(state, value?.resourceId);
+    case "musicDisconnected":
+      return state.musicConnected ? { ...state, musicConnected: false } : state;
     case "producerState":
       return producerState(state, value);
     case "dominantSpeaker":
@@ -172,13 +172,12 @@ function applyEvent(state, kind, value) {
   }
 }
 
-/** Replace participants from an authoritative snapshot, keeping the music participant. */
+/** Replace human participants from an authoritative snapshot; the bot is derived separately. */
 function applySnapshot(state, snapshot) {
   if (!Array.isArray(snapshot?.peers)) return state;
   const entries = snapshot.peers
     .filter((peer) => typeof peer?.stamp?.sessionId === "string")
     .map((peer) => [peer.stamp.sessionId, participant(peer.stamp, peer.name, peer.avatar, peer.presenter === true)]);
-  if (state.participants[MUSIC_ID]) entries.push([MUSIC_ID, musicParticipant]);
   const participants = Object.freeze(Object.fromEntries(entries));
   const self = participants[state.selfId];
   return {
@@ -195,7 +194,6 @@ function applyInventory(state, sources) {
   if (!Array.isArray(sources)) return state;
   const local = Object.entries(state.producers).filter(([, value]) => value.participantId === state.selfId);
   let next = { ...state, producers: Object.freeze(Object.fromEntries(local)) };
-  if (!sources.some((source) => source?.system === "music")) next.participants = without(next.participants, MUSIC_ID);
   for (const source of sources) next = addProducer(next, source || {});
   return next;
 }
@@ -216,8 +214,6 @@ export function reduceRoomState(state, action) {
   switch (action?.type) {
     case "status":
       return { ...state, status: action.status };
-    case "language":
-      return action.language === "en" || action.language === "ru" ? { ...state, language: action.language } : state;
     case "welcome": {
       const welcome = action.welcome;
       return {
@@ -240,16 +236,19 @@ export function reduceRoomState(state, action) {
     case "localProducerClosed":
       return state.producers[action.id] ? { ...state, producers: without(state.producers, action.id) } : state;
     case "reset":
-      return { ...initialRoomState, language: state.language };
+      return initialRoomState;
     default:
       return state;
   }
 }
 
-/** Project state into media-registry participants and sources (self first, music last). */
+/** Project human membership and logical music-bot presence independently of source replacement. */
 export function registryView(state) {
-  const sourcesFor = (id) => Object.values(state.producers).filter((value) => value.participantId === id || (id === MUSIC_ID && value.system));
-  const ordered = Object.values(state.participants).sort((a, b) => rank(a, state) - rank(b, state));
+  const producers = Object.values(state.producers);
+  const sourcesFor = (id) => producers.filter((value) => value.participantId === id || (id === MUSIC_ID && value.system));
+  const members = Object.values(state.participants);
+  if (["admitted", "reconnecting"].includes(state.status) && state.musicConnected && !state.participants[MUSIC_ID]) members.push(musicParticipant);
+  const ordered = members.sort((a, b) => rank(a, state) - rank(b, state));
   const participants = ordered.map((value) => {
     const own = sourcesFor(value.id);
     const active = (kind) => own.some((source) => source.kind === kind && !source.paused);
@@ -266,7 +265,7 @@ export function registryView(state) {
     };
   });
   const present = new Set(participants.map((value) => value.id));
-  const sources = Object.values(state.producers).filter((value) => value.system || present.has(value.participantId)).map((value) => ({
+  const sources = Object.values(state.producers).filter((value) => present.has(value.system ? MUSIC_ID : value.participantId)).map((value) => ({
     id: value.id,
     participantId: value.system ? MUSIC_ID : value.participantId,
     kind: value.kind,

@@ -3,13 +3,22 @@
 /** Headless-client meeting: actions go through the React control bar. */
 export function nextDriver(page) {
   const bar = page.getByRole("navigation", { name: "Управление встречей" });
+  /** Type a new prejoin name, first opening the "+" form when saved profiles hide it. */
+  async function fillName(name) {
+    const box = page.getByRole("textbox", { name: "Введите имя" });
+    const add = page.getByRole("button", { name: "Новый", exact: true });
+    await box.or(add).first().waitFor();
+    if (!(await box.isVisible())) await add.click();
+    await box.fill(name);
+  }
   return {
+    fillName,
     /** Path that opens this UI for a room (the public invitation URL). */
     path: (room) => `/room/${encodeURIComponent(room)}`,
     /** Fill the prejoin name and join, explicitly enabling video only when requested. */
     async join(name, { video = false } = {}) {
       if (video) await page.getByRole("button", { name: "Камера выключена", exact: true }).click();
-      await page.getByRole("textbox", { name: "Введите имя" }).fill(name);
+      await fillName(name);
       await page.getByRole("button", { name: "Присоединиться к встрече" }).click();
       await page.locator("main[data-meeting-status=admitted]").waitFor();
     },

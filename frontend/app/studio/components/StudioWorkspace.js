@@ -3,7 +3,7 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
-import AccountModal from "./AccountModal";
+import SettingsModal from "./SettingsModal";
 import DeleteModal from "./DeleteModal";
 import StudioScreen from "./StudioScreen";
 import Toast from "./Toast";
@@ -55,7 +55,7 @@ export default function StudioWorkspace({
           onConfirm={onConfirmDelete}
           isBusy={isDeleteBusy}
         />
-        <AccountModal account={auth.account} login={auth.login} />
+        <SettingsModal auth={auth} />
         <Toast notice={notice} />
         <DragOverlay adjustScale={false} dropAnimation={null}>
           {activeDrag?.data?.current ? (

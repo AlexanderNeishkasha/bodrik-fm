@@ -3,12 +3,12 @@ export const CHAT_IMAGE_TYPES = Object.freeze(["image/png", "image/jpeg", "image
 /** Maximum document transfer size; the server enforces the same bound. */
 export const CHAT_FILE_BYTES = 100 * 1024 * 1024;
 
-/** Format attachment sizes using localized numbers and familiar units. */
-export function attachmentSize(size, language = "ru") {
+/** Format attachment sizes using Russian numbers and familiar units. */
+export function attachmentSize(size) {
   if (!Number.isSafeInteger(size) || size < 0) return "";
   const index = size >= 1024 * 1024 ? 2 : size >= 1024 ? 1 : 0;
-  const value = new Intl.NumberFormat(language === "en" ? "en-US" : "ru-RU", { maximumFractionDigits: index ? 1 : 0 }).format(size / (1024 ** index));
-  return `${value} ${[language === "en" ? "B" : "Б", language === "en" ? "KB" : "КБ", language === "en" ? "MB" : "МБ"][index]}`;
+  const value = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: index ? 1 : 0 }).format(size / (1024 ** index));
+  return `${value} ${["Б", "КБ", "МБ"][index]}`;
 }
 
 /** Validate filenames and sizes before creating a preview or starting a transfer. */

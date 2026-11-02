@@ -4,16 +4,12 @@ import { useState } from "react";
 import Icon from "../../../components/ui/Icon";
 import { attachmentSize } from "./chatAttachment.mjs";
 import styles from "./ChatFileAttachment.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** Localized transfer state; completion never implies that a person opened the file. */
-const COPY = {
-  ru: { preparing: "Подготовка…", transferring: "Передача…", completed: "", failed: "Не удалось передать файл", cancelled: "Передача отменена", unavailable: "Файл больше недоступен", download: "Скачать", cancel: "Отменить передачу", error: "Не удалось выполнить действие" },
-  en: { preparing: "Preparing…", transferring: "Transferring…", completed: "", failed: "File transfer failed", cancelled: "Transfer cancelled", unavailable: "File no longer available", download: "Download", cancel: "Cancel transfer", error: "Could not complete the action" },
-};
-
 /** Document bubble backed by verified bytes; no file HTML or remote document embeds are rendered. */
-export default function ChatFileAttachment({ attachment, source, language = "ru" }) {
-  const text = COPY[language === "en" ? "en" : "ru"];
+export default function ChatFileAttachment({ attachment, source }) {
+  const text = t("meeting.chatFileAttachment");
   const [error, setError] = useState(false);
   const active = ["preparing", "transferring"].includes(attachment.phase);
   const downloadable = attachment.phase === "completed" && attachment.downloadable;
@@ -28,7 +24,7 @@ export default function ChatFileAttachment({ attachment, source, language = "ru"
     <button type="button" className={styles.document} disabled={!downloadable}
       aria-label={`${text.download}: ${attachment.name}`} onClick={() => act(() => source.download(attachment.id))}>
       <span className={styles.icon}><Icon name="document" size={24} className="" /></span>
-      <span className={styles.details}><strong>{attachment.name}</strong><span>{attachmentSize(attachment.size, language)}</span></span>
+      <span className={styles.details}><strong>{attachment.name}</strong><span>{attachmentSize(attachment.size)}</span></span>
     </button>
     {active && <><progress className={styles.progress} aria-label={text.transferring} value={attachment.transferred} max={attachment.size} />
       <button type="button" className={styles.cancel} aria-label={text.cancel} title={text.cancel} onClick={() => act(() => source.cancelTransfer(attachment.id))}><Icon name="close" size={18} /></button></>}

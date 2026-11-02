@@ -51,7 +51,7 @@ test("toasts show localized text, expire, and meeting sounds remain enabled", ()
   emit("participantJoined", { participant: stamp("bob") });
   assert.equal(notes.getSnapshot(), null, "join toast waits for the profile name");
   timers.at(-1)();
-  assert.equal(notes.getSnapshot().text, "Bob присоединился к встрече");
+  assert.equal(notes.getSnapshot().text, "Bob присоединяется к встрече");
   timers.at(-1)();
   assert.equal(notes.getSnapshot(), null);
 
@@ -59,11 +59,11 @@ test("toasts show localized text, expire, and meeting sounds remain enabled", ()
   current = { ...state, participants: { me: people.me } };
   stateListeners.forEach((listener) => listener());
   emit("participantLeft", { participant: stamp("bob") });
-  assert.equal(notes.getSnapshot().text, "Bob покинул встречу");
+  assert.equal(notes.getSnapshot().text, "Bob покидает встречу");
 
   assert.throws(() => preferences.set("sounds", false), /Invalid preference/);
   current = { ...current, language: "en" };
   emit("roomAction", { action: "unlock" });
-  assert.equal(notes.getSnapshot().text, "The room password was removed");
+  assert.equal(notes.getSnapshot().text, "Пароль комнаты снят");
   assert.deepEqual(sounds, ["joined", "left", "notify"]);
 });

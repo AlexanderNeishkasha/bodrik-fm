@@ -1,52 +1,53 @@
-import { useId } from "react";
-import { ui } from "../../lang/ru";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { t } from "../../lang/index.js";
 import Icon from "../../components/Icon";
-import SwitchControl from "../../../components/ui/SwitchControl";
-import { useMeetingOutputPresence } from "../hooks/useMeetingPresence";
 import styles from "./ConferenceControls.module.css";
 
-/** Render optional meeting controls in their own card at every viewport size. */
+/** Render live meeting output and invitation controls above the queue. */
 export default function ConferenceControls({ conference, musicOutput }) {
-  const musicId = useId();
-  const destinationId = useId();
-  const actions = useMeetingOutputPresence(Boolean(conference?.enabled));
-  if (!conference?.allowed) return null;
+  const [linkCopied, setLinkCopied] = useState(false);
+  const copiedTimerRef = useRef(null);
+
+  useEffect(() => () => window.clearTimeout(copiedTimerRef.current), []);
+
+  const handleCopyGuestLink = useCallback(async () => {
+    if (!await conference?.copyGuestLink?.()) return;
+    setLinkCopied(true);
+    window.clearTimeout(copiedTimerRef.current);
+    copiedTimerRef.current = window.setTimeout(() => setLinkCopied(false), 1000);
+  }, [conference]);
+
+  if (!conference?.allowed || !conference.enabled) return null;
   return (
-    <aside className={styles.card} aria-label={ui.studio.meeting}>
-      <div className={styles.header}>
-        <h2 className="text-lg font-semibold font-display tracking-[0.08em]">{ui.studio.meeting}</h2>
-        <SwitchControl label={ui.studio.meetingEnabled} checked={Boolean(conference.enabled)} disabled={conference.busy}
-          onChange={event => conference.setEnabled(event.target.checked)} />
-      </div>
-      <div className={`${styles.actionsRegion} ${actions.expanded ? styles.actionsExpanded : ""}`} aria-hidden={!actions.visible}>
-        <div className={styles.actionsInner}>
-          {actions.mounted ? <div className={`${styles.actions} ${actions.visible ? styles.actionsVisible : ""}`} inert={!actions.visible}>
-            <div className={`${styles.setting} ${styles.musicSetting}`}>
-              <div className={styles.musicDescription}>
-                <label htmlFor={musicId}>{ui.studio.meetingMusicOutput}</label>
-                <p id={destinationId} className={styles.destination}>{musicOutput === "conference" ? ui.studio.meetingDestination : ui.studio.studioDestination}</p>
-              </div>
-              <SwitchControl id={musicId} label={ui.studio.meetingMusicOutput} aria-describedby={destinationId}
-                checked={musicOutput === "conference"} disabled={conference.busy || !actions.visible}
-                onChange={event => conference.setMusicOutput(event.target.checked ? "conference" : "studio")} />
-            </div>
-            <div className={styles.links}>
-              <button type="button" disabled={conference.busy || !actions.visible} onClick={conference.join}
-                className={`${styles.openButton} btn-ghost`}>
-                {ui.studio.meetingOpen}<Icon name="external-link" />
-              </button>
-              <div className={styles.guestInvitation}>
-                <span className={styles.destination}>{ui.studio.meetingGuestLink}</span>
-                <button type="button" disabled={conference.busy || !actions.visible || !conference.inviteUrl} onClick={conference.copyGuestLink}
-                  aria-label={ui.studio.meetingCopyLink} title={ui.studio.meetingCopyLink}
-                  className={`${styles.guestLink} btn-ghost`}>
-                  <span className={styles.guestUrl}>{conference.inviteUrl || ui.studio.meetingGuestLink}</span>
-                  <Icon name="copy" />
-                </button>
-              </div>
-            </div>
-          </div> : null}
+    <aside className={styles.card} aria-label={t("studio.meeting")}>
+      <h2 className="text-lg font-semibold font-display tracking-[0.08em]">{t("studio.meeting")}</h2>
+      <fieldset className={styles.output} disabled={conference.busy}>
+        <legend>{t("studio.musicDestination")}</legend>
+        <div className={styles.outputOptions}>
+          <button type="button" aria-pressed={musicOutput === "studio"}
+            onClick={() => conference.setMusicOutput("studio")}
+            className={`${styles.outputOption} ${musicOutput === "studio" ? styles.outputOptionActive : ""}`}>
+            {t("studio.outputStudio")}
+          </button>
+          <button type="button" aria-pressed={musicOutput === "conference"}
+            onClick={() => conference.setMusicOutput("conference")}
+            className={`${styles.outputOption} ${musicOutput === "conference" ? styles.outputOptionActive : ""}`}>
+            {t("studio.outputMeeting")}
+          </button>
         </div>
+      </fieldset>
+      <div className={styles.actions}>
+        {conference.inviteUrl && (
+          <a href={conference.inviteUrl} target="_blank" rel="noopener noreferrer"
+            className={`${styles.actionButton} btn-ghost`}>
+            <span>{t("studio.meetingOpen")}</span><Icon name="external-link" />
+          </a>
+        )}
+        <button type="button" disabled={conference.busy || !conference.inviteUrl} onClick={handleCopyGuestLink}
+          aria-label={t("studio.meetingCopyLink")} title={t("studio.meetingCopyLink")}
+          className={`${styles.actionButton} btn-ghost`}>
+          <span>{t("studio.meetingCopyGuestLink")}</span><Icon name={linkCopied ? "check" : "copy"} />
+        </button>
       </div>
     </aside>
   );

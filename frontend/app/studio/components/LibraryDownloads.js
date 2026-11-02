@@ -1,6 +1,8 @@
 import Icon from "../../components/Icon";
+import { t } from "../../lang/index.js";
 import { youtubeStageLabel } from "../lib/youtube";
 
+/** Render active YouTube jobs and dismissible failures. */
 export default function LibraryDownloads({ downloads, displayName, onDismiss }) {
   if (!downloads?.length) {
     return null;
@@ -37,8 +39,8 @@ export default function LibraryDownloads({ downloads, displayName, onDismiss }) 
                   type="button"
                   onClick={() => onDismiss?.(download.id)}
                   className="btn-ghost inline-flex h-7 w-7 items-center justify-center rounded-full text-[var(--theme-muted)] hover:text-[var(--theme-text)]"
-                  aria-label="Убрать ошибку загрузки"
-                  title="Убрать"
+                  aria-label={t("studio.dismissDownloadError")}
+                  title={t("studio.dismiss")}
                 >
                   <Icon name="close" className="h-4 w-4" />
                 </button>

@@ -49,6 +49,8 @@ test("stored preferences merge over defaults and drop invalid values", () => {
     ["valid override", JSON.stringify({ quality: "fhd", echoCancellation: false }), { ...DEFAULT_PREFERENCES, quality: "fhd", echoCancellation: false }],
     ["saved basic suppression", JSON.stringify({ noiseMode: "browser" }), { ...DEFAULT_PREFERENCES, noiseMode: "browser" }],
     ["saved enhanced suppression", JSON.stringify({ noiseMode: "rnnoise" }), { ...DEFAULT_PREFERENCES, noiseMode: "rnnoise" }],
+    ["removed GTCRN defaults to basic", JSON.stringify({ noiseMode: "gtcrn" }), DEFAULT_PREFERENCES],
+    ["saved DeepFilterNet3", JSON.stringify({ noiseMode: "deepfilternet" }), { ...DEFAULT_PREFERENCES, noiseMode: "deepfilternet" }],
     ["saved suppression off", JSON.stringify({ noiseMode: "off" }), { ...DEFAULT_PREFERENCES, noiseMode: "off" }],
     ["invalid values ignored", JSON.stringify({ quality: "16k", noiseMode: "deep", unknown: 1 }), DEFAULT_PREFERENCES],
   ];
@@ -113,6 +115,39 @@ test("device lists skip entries without ids and label unnamed devices", async ()
   assert.deepEqual(snapshot.inputDevices, [{ value: "mic-1", label: "Mic" }]);
   assert.deepEqual(snapshot.cameras, [{ value: "cam-1", label: "videoinput 1" }]);
   assert.deepEqual(snapshot.outputDevices, [{ value: "spk-1", label: "Speaker" }]);
+});
+
+test("a saved device that disappeared falls back to the default and is forgotten", async () => {
+  const cases = [
+    ["missing microphone", "audio", "inputDevice", "OverconstrainedError", true],
+    ["missing camera", "camera", "camera", "NotFoundError", true],
+    ["denied pinned microphone is not retried", "audio", "inputDevice", "NotAllowedError", false],
+  ];
+  for (const [name, kind, key, failure, recovers] of cases) {
+    const storage = memoryStorage(JSON.stringify({ [key]: "gone" }));
+    const media = devices();
+    const open = media.getUserMedia;
+    media.getUserMedia = (constraints) => (constraints.audio?.deviceId || constraints.video?.deviceId
+      ? Promise.reject(Object.assign(new Error("missing"), { name: failure }))
+      : open(constraints));
+    const capture = createCapture({ mediaDevices: media, storage });
+    if (!recovers) {
+      await assert.rejects(capture.acquire(kind), { name: failure }, name);
+      assert.equal(capture.preferences[key], "gone", `${name}: choice kept`);
+      continue;
+    }
+    assert.ok(await capture.acquire(kind), name);
+    assert.equal(capture.preferences[key], "", `${name}: stale choice cleared`);
+    assert.equal(JSON.parse(storage.data.get("meeting.capture.v1"))[key], "", `${name}: persisted`);
+  }
+});
+
+test("device lists refresh after microphone attempts whether or not capture succeeds", async () => {
+  for (const [name, fail] of [["granted", false], ["failed", true]]) {
+    const capture = createCapture({ mediaDevices: devices({ fail }), storage: null });
+    await (fail ? assert.rejects(capture.acquire("audio")) : capture.acquire("audio"));
+    assert.deepEqual(capture.getSnapshot().inputDevices, [{ value: "mic-1", label: "Mic" }], name);
+  }
 });
 
 test("storage failures never break capture", async () => {

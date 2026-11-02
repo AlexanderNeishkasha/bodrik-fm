@@ -5,6 +5,7 @@ RUN apk add --no-cache build-base python3 py3-pip linux-headers \
 WORKDIR /app
 COPY backend/Cargo.toml backend/Cargo.lock backend/
 COPY backend/src backend/src
+COPY backend/crates/log-alerts backend/crates/log-alerts
 COPY backend/crates/meeting/Cargo.toml backend/crates/meeting/Cargo.toml
 COPY backend/crates/meeting/src backend/crates/meeting/src
 WORKDIR /app/backend
@@ -14,17 +15,21 @@ RUN --mount=type=cache,id=bodrik-cargo-registry,target=/usr/local/cargo/registry
 
 FROM alpine:3.23
 RUN apk add --no-cache ffmpeg ca-certificates curl python3 quickjs libgcc libstdc++ \
-    && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
-       -o /usr/local/bin/yt-dlp \
-    && chmod a+rx /usr/local/bin/yt-dlp
+    && mkdir -p /usr/local/share/yt-dlp \
+    && curl --fail --location --show-error \
+       https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+       -o /usr/local/share/yt-dlp/yt-dlp \
+    && chmod 0755 /usr/local/share/yt-dlp/yt-dlp
 WORKDIR /app
 RUN adduser -D app \
-    && mkdir -p /app/data /data/avatars /data/chat /data/diagnostics \
+    && mkdir -p /app/data /data/avatars /data/chat /data/diagnostics /data/yt-dlp \
     && chown -R app:app /app /data
 COPY --from=builder /tmp/backend /app/backend
 COPY backend/migrations /app/migrations
 COPY backend/crates/meeting/LICENSE /usr/share/licenses/meeting-backend/LICENSE
+COPY --chmod=0755 backend/entrypoint.sh /usr/local/bin/backend-entrypoint
 ENV BIND_ADDR=0.0.0.0:3001
 EXPOSE 3001
 USER app
+ENTRYPOINT ["/usr/local/bin/backend-entrypoint"]
 CMD ["/app/backend"]

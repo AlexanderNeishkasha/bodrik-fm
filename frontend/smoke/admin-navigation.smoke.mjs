@@ -11,7 +11,7 @@ for (const { name, path, auth, target, label } of [
   { name: "ordinary Studio", path: "/studio", auth: { showAdminBack: false }, target: "/", label: "К списку комнат" },
   { name: "login screen", path: "/studio", auth: { isAuthed: false, isChecked: true }, target: "/", label: "К списку комнат" },
 ]) {
-  test(`back arrow navigates correctly: ${name}`, async ({ page }) => {
+  test(`back arrow navigates correctly: ${name}`, { tag: "@push" }, async ({ page }) => {
     await page.route("http://admin-navigation.test/**", route => route.fulfill({
       contentType: "text/html; charset=utf-8",
       body: route.request().url() === `http://admin-navigation.test${path}`

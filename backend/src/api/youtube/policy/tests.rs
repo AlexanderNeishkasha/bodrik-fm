@@ -113,6 +113,43 @@ fn admission_cases() {
     }
 }
 
+/// Cancellation and expected outcomes cannot trigger operational download notifications.
+#[test]
+fn alert_failure_cases() {
+    for (name, error, expected) in [
+        (
+            "cancelled",
+            OpError::Internal("download job ownership ended".into()),
+            "cancelled",
+        ),
+        ("missing", OpError::Missing, "expected"),
+        ("conflict", OpError::Conflict("name exists"), "expected"),
+        ("rejected", OpError::Rejected("invalid"), "expected"),
+        (
+            "native exit",
+            OpError::Internal("download process exited unsuccessfully".into()),
+            "pipeline_failure",
+        ),
+        (
+            "native spawn",
+            OpError::Internal("download process could not start".into()),
+            "pipeline_failure",
+        ),
+        (
+            "native timeout",
+            OpError::Internal("download timed out".into()),
+            "pipeline_failure",
+        ),
+        (
+            "storage",
+            OpError::Internal("disk full".into()),
+            "pipeline_failure",
+        ),
+    ] {
+        assert_eq!(alert_failure_kind(&error), expected, "{name}");
+    }
+}
+
 /// All state pairs are checked against an independent allowlist of forward transitions.
 #[test]
 fn transition_cases() {

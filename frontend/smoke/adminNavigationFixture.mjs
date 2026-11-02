@@ -19,7 +19,7 @@ export async function adminNavigationFixture() {
     `, resolveDir: fileURLToPath(new URL("../", import.meta.url)) },
     bundle: true, platform: "node", format: "cjs", write: false, jsx: "automatic",
     outdir: "unused-admin-navigation-output",
-    loader: { ".js": "jsx", ".png": "dataurl" },
+    loader: { ".js": "jsx", ".png": "dataurl", ".svg": "dataurl" },
     external: ["react", "react/*", "react-dom/*", "next/link", "next/image"],
     plugins: [{
       name: "read-only-admin-hook",

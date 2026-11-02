@@ -102,7 +102,7 @@ pub(super) fn music_started(service: &Service, room_id: &str, producer_id: &str,
     );
 }
 
-/// Remove the server-owned music source from every connected room participant.
+/// Remove one replaceable server-owned audio source without changing bot presence.
 pub(super) fn music_stopped(service: &Service, room_id: &str, producer_id: &str) {
     system_event(
         service,
@@ -110,6 +110,11 @@ pub(super) fn music_stopped(service: &Service, room_id: &str, producer_id: &str)
         "producerClosed",
         json!({"resourceId":producer_id}),
     );
+}
+
+/// Remove the music bot only when conference output itself disconnects.
+pub(super) fn music_disconnected(service: &Service, room_id: &str) {
+    system_event(service, room_id, "musicDisconnected", json!({}));
 }
 
 /// Publish a validated meeting-wide music gain without restarting RTP.

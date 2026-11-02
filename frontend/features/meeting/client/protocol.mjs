@@ -38,26 +38,12 @@ export function profileAvatarPath(value, location) {
   }
 }
 
-/** Shape of a Studio host pass: 64 lowercase hex characters. */
-const HOST_GRANT = /^[0-9a-f]{64}$/;
-
-/**
- * Take the Studio host pass from the `#host=` fragment of the meeting link and remove
- * it from the address bar, so it is neither bookmarked nor shared. Returns "" if absent.
- */
-export function takeHostGrant(location = globalThis.location, history = globalThis.history) {
-  const match = /(?:^#|&)host=([^&]*)/.exec(location?.hash || "");
-  if (!match) return "";
-  history?.replaceState?.(history.state, "", `${location.pathname}${location.search}`);
-  return HOST_GRANT.test(match[1]) ? match[1] : "";
-}
-
-/** Request a single-use guest ticket; a host pass (once) makes this browser a room host. */
-export async function requestGuestTicket(slug, { fetchImpl = fetch, signal, hostGrant = "" } = {}) {
+/** Request a single-use guest ticket; the room owner's session cookie makes it a host ticket. */
+export async function requestGuestTicket(slug, { fetchImpl = fetch, signal } = {}) {
   const response = await fetchImpl(`/api/rooms/${encodeURIComponent(slug)}/conference/ticket`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: hostGrant ? JSON.stringify({ hostGrant }) : "{}",
+    body: "{}",
     cache: "no-store",
     signal: signal || AbortSignal.timeout(20_000),
   });

@@ -82,6 +82,36 @@ test("restart releases the old session, ignores duplicate clicks and joins fresh
   assert.ok(notified > 0);
 });
 
+test("manual restart without choices publishes a fresh idle client and does not join", async () => {
+  const created = [];
+  const capturePreferences = { inputDevice: "bluetooth", noiseMode: "off" };
+  const personal = { shortcuts: false, masterVolume: 70 };
+  const store = createSessionStore("room", "https://x.test", {
+    target: new EventTarget(),
+    create() {
+      const calls = [];
+      const session = { left: 0, calls, leave() { this.left++; }, client: {
+        getState: () => ({ status: "idle" }),
+        capture: { preferences: capturePreferences, setPreference: (key, value) => calls.push(["capture", key, value]) },
+        preferences: { getSnapshot: () => personal, set: (key, value) => calls.push(["personal", key, value]) },
+        join() { throw new Error("Manual retry must wait for the prejoin submit"); },
+      } };
+      created.push(session);
+      return session;
+    },
+  });
+  const observed = [];
+  store.subscribe(() => observed.push(store.getSnapshot()));
+  await store.restart();
+  assert.equal(created.length, 2);
+  assert.equal(created[0].left, 1);
+  assert.equal(store.getSnapshot(), created[1]);
+  assert.equal(created[1].client.getState().status, "idle");
+  assert.ok(observed.includes(created[1]));
+  assert.deepEqual(created[1].calls, [["capture", "inputDevice", "bluetooth"], ["capture", "noiseMode", "off"],
+    ["personal", "shortcuts", false], ["personal", "masterVolume", 70]]);
+});
+
 test("pagehide cancels a restart while the previous session is closing", async () => {
   let finish;
   let created = 0;

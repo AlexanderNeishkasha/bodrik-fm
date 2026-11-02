@@ -6,11 +6,12 @@ import styles from "./ChatMessageContent.module.css";
 import Icon from "../../../components/ui/Icon";
 import { attachmentSize, CHAT_IMAGE_TYPES, validAttachment } from "./chatAttachment.mjs";
 import Button from "../../../components/ui/Button";
+import { t } from "../../../app/lang/index.js";
 
 /** Compose text for an injected command; submitted labels local dispatch, never server delivery.
  * Blob previews bypass optimization and use CSS auto sizing for their unknown dimensions.
  */
-export default function ChatComposer({ submit, language = "ru", disabled = false, ref }) {
+export default function ChatComposer({ submit, disabled = false, ref }) {
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState("");
@@ -20,7 +21,7 @@ export default function ChatComposer({ submit, language = "ru", disabled = false
   const upload = useRef(null);
   const fileInput = useRef(null);
   const lifecycle = useRef({ live: false, busy: false, epoch: 0 });
-  const english = language === "en";
+  const text = t("meeting.chatComposer");
   useEffect(() => {
     const state = lifecycle.current;
     state.live = true;
@@ -97,16 +98,16 @@ export default function ChatComposer({ submit, language = "ru", disabled = false
 
   return <form className={styles.composer} onSubmit={send}>
     {staged && <figure className={styles.preview}>
-      {staged.url ? <Image unoptimized width={0} height={0} style={{ width: "auto", height: "auto" }} className={styles.previewImage} src={staged.url} alt={english ? "Image draft" : "Черновик изображения"} title={staged.name} /> : <span className={styles.documentIcon}><Icon name="document" size={25} className="" /></span>}
-      <figcaption className={staged.url ? styles.srOnly : styles.documentDetails}><strong>{staged.name}</strong><span>{attachmentSize(staged.size, language)}</span></figcaption>
-      <button className={styles.previewRemove} type="button" aria-label={english ? "Remove attachment" : "Убрать вложение"}
-        title={english ? "Remove attachment" : "Убрать вложение"} disabled={pending} onClick={() => attach(null)}><Icon name="close" size={22} /></button>
+      {staged.url ? <Image unoptimized width={0} height={0} style={{ width: "auto", height: "auto" }} className={styles.previewImage} src={staged.url} alt={text.imageDraft} title={staged.name} /> : <span className={styles.documentIcon}><Icon name="document" size={25} className="" /></span>}
+      <figcaption className={staged.url ? styles.srOnly : styles.documentDetails}><strong>{staged.name}</strong><span>{attachmentSize(staged.size)}</span></figcaption>
+      <button className={styles.previewRemove} type="button" aria-label={text.removeAttachment}
+        title={text.removeAttachment} disabled={pending} onClick={() => attach(null)}><Icon name="close" size={22} /></button>
     </figure>}
     <div className={styles.inputRow}>
-      <button className={styles.attachmentButton} type="button" aria-label={english ? "Attach file" : "Прикрепить файл"}
-        title={english ? "Attach file" : "Прикрепить файл"} disabled={disabled || pending} onClick={() => fileInput.current?.click()}><Icon name="attachment" size={22} className="" /></button>
-      <textarea className={styles.textarea} aria-label={english ? "Message" : "Сообщение"}
-      placeholder={staged ? (english ? "Add a caption…" : "Добавить подпись…") : (english ? "Type a message…" : "Введите сообщение…")} rows={Math.min(5, draft.split("\n").length)}
+      <button className={styles.attachmentButton} type="button" aria-label={text.attachFile}
+        title={text.attachFile} disabled={disabled || pending} onClick={() => fileInput.current?.click()}><Icon name="attachment" size={22} className="" /></button>
+      <textarea className={styles.textarea} aria-label={text.message}
+      placeholder={staged ? (text.captionPlaceholder) : (text.messagePlaceholder)} rows={Math.min(5, draft.split("\n").length)}
       value={draft} maxLength={4000} disabled={disabled || pending}
       onPaste={(event) => {
         const item = [...(event.clipboardData?.items || [])].find((entry) => entry.kind === "file");
@@ -117,22 +118,22 @@ export default function ChatComposer({ submit, language = "ru", disabled = false
       onKeyDown={(event) => {
         if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) send(event);
       }} />
-      <Button className={styles.send} type="submit" aria-label={english ? "Send" : "Отправить"} title={english ? "Send" : "Отправить"} disabled={disabled || pending || (!draft.trim() && !staged)}>
-        <Icon name="send" size={21} /><span className={styles.srOnly}>{pending ? (english ? "Submitting…" : "Отправка…") : ""}</span>
+      <Button className={styles.send} type="submit" aria-label={text.send} title={text.send} disabled={disabled || pending || (!draft.trim() && !staged)}>
+        <Icon name="send" size={21} /><span className={styles.srOnly}>{pending ? (text.submitting) : ""}</span>
       </Button>
     </div>
-    <div className={styles.hints}><span>{english ? "Enter sends. Shift+Enter adds a line break." : "Enter отправляет. Shift+Enter добавляет перенос строки."}</span><span>{draft.length} / 4000</span></div>
-    <input ref={fileInput} className={styles.fileInput} data-chat-attachment-picker="" type="file" aria-label={english ? "Attach file" : "Прикрепить файл"}
+    <div className={styles.hints}><span>{text.hint}</span><span>{draft.length} / 4000</span></div>
+    <input ref={fileInput} className={styles.fileInput} data-chat-attachment-picker="" type="file" aria-label={text.attachFile}
       disabled={disabled || pending} onChange={(event) => { if (event.target.files?.[0]) attach(event.target.files[0]); event.target.value = ""; }} />
-    <p className={styles.status} role="status">{status === "unknown" ? (english ? "Submission could not be confirmed. Check before sending again." : "Отправка не подтверждена. Проверьте перед повторной отправкой.") :
-      status === "one_file" ? (english ? "Attach one file at a time." : "Добавляйте по одному файлу.") :
-      status === "invalid_file" ? (english ? "Choose an image up to 5 MB or a file up to 100 MB." : "Выберите изображение до 5 МБ или файл до 100 МБ.") :
-      status === "caption" ? (english ? "File sent. The caption was not sent; try again." : "Файл отправлен. Подпись не отправилась — попробуйте ещё раз.") :
-      status === "no_participants" ? (english ? "No other participants are available." : "Нет других участников для отправки.") :
-      status === "length" ? (english ? "The message or caption is too long." : "Сообщение или подпись слишком длинные.") :
-      status === "rate_limit" ? (english ? "Please wait before sending again." : "Подождите перед следующей отправкой.") :
-      status === "policy" ? (english ? "Chat is restricted by the moderator." : "Чат ограничен модератором.") :
-      status === "recipient" ? (english ? "The selected participant is no longer available." : "Выбранный участник больше недоступен.") :
-      status ? (english ? "Message was not submitted. Check the connection, recipient and room restrictions." : "Сообщение не отправлено. Проверьте соединение, адресата и ограничения комнаты.") : ""}</p>
+    <p className={styles.status} role="status">{status === "unknown" ? (text.status.unknown) :
+      status === "one_file" ? (text.status.one_file) :
+      status === "invalid_file" ? (text.status.invalid_file) :
+      status === "caption" ? (text.status.caption) :
+      status === "no_participants" ? (text.status.no_participants) :
+      status === "length" ? (text.status.length) :
+      status === "rate_limit" ? (text.status.rate_limit) :
+      status === "policy" ? (text.status.policy) :
+      status === "recipient" ? (text.status.recipient) :
+      status ? (text.status.rejected) : ""}</p>
   </form>;
 }

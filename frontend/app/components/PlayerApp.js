@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState } from "react";
-import { ui } from "../lang/ru";
+import { t } from "../lang/index.js";
 import useAudioPulse from "../lib/useAudioPulse";
 import useHydrated from "../lib/useHydrated";
 import useMainHotkeys from "../lib/useMainHotkeys";
@@ -15,7 +15,7 @@ import HotkeysPanel from "./HotkeysPanel";
 import MainPlayerPanel from "./MainPlayerPanel";
 import playerStyles from "./MainPlayerPanel.module.css";
 import BodrickFlyby from "./BodrickFlyby";
-import NotFoundPanel from "./NotFoundPanel";
+import NotFound from "../not-found";
 import RoomsScreen from "./RoomsScreen";
 import PageTransition from "./PageTransition";
 
@@ -163,7 +163,7 @@ export default function PlayerApp() {
     onToggleMute: toggleMute,
     onAdjustVolume: adjustVolume,
     onToggleHotkeys: () => setShowHotkeys((prev) => !prev),
-    onToggleHat: roomSlug ? () => setIsHatHidden((prev) => !prev) : undefined,
+    onToggleHat: invalidPath ? undefined : () => setIsHatHidden((prev) => !prev),
     onEaster: bumpInteraction,
   });
 
@@ -172,7 +172,7 @@ export default function PlayerApp() {
   }
 
   if (invalidPath) {
-    return <NotFoundPanel />;
+    return <NotFound />;
   }
 
   if (!roomSlug) {
@@ -217,27 +217,27 @@ export default function PlayerApp() {
         </div>
         {isHydrated && hotkeysReady ? (
           <HotkeysPanel
-            title={ui.main.hotkeys.title}
-            hideLabel={ui.main.hotkeys.hide}
+            title={t("main.hotkeys.title")}
+            hideLabel={t("main.hotkeys.hide")}
             onHide={() => setShowHotkeys(false)}
             suppressHydrationWarning
             className="hotkeys-main"
             entries={[
               {
                 key: "Space",
-                label: isLocalPaused ? ui.main.hotkeys.play : ui.main.hotkeys.playPause,
+                label: isLocalPaused ? t("main.hotkeys.play") : t("main.hotkeys.playPause"),
               },
               {
                 key: "M",
-                label: isMuted || volume === 0 ? ui.main.hotkeys.muteOn : ui.main.hotkeys.muteOff,
+                label: isMuted || volume === 0 ? t("main.hotkeys.muteOn") : t("main.hotkeys.muteOff"),
               },
-              { key: "← →", label: ui.main.hotkeys.volume },
-              { key: "↑ ↓", label: ui.main.hotkeys.volume },
+              { key: "← →", label: t("main.hotkeys.volume") },
+              { key: "↑ ↓", label: t("main.hotkeys.volume") },
               {
                 key: "B",
-                label: isHatHidden ? ui.main.hotkeys.showHat : ui.main.hotkeys.hideHat,
+                label: isHatHidden ? t("main.hotkeys.showHat") : t("main.hotkeys.hideHat"),
               },
-              { key: "H", label: ui.main.hotkeys.hint, isHint: true },
+              { key: "H", label: t("main.hotkeys.hint"), isHint: true },
             ]}
           />
         ) : null}

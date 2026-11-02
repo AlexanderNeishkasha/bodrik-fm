@@ -9,7 +9,7 @@ function relay(expiresAt = 4600) {
 }
 
 /** Manual time and timer ownership for credential expiry and late-response checks. */
-function fixture(command = async () => relay()) {
+function fixture(command = async () => relay(), { forceRelay = false } = {}) {
   let time = 1000000;
   let requests = 0;
   let failures = 0;
@@ -17,6 +17,7 @@ function fixture(command = async () => relay()) {
   const applied = [];
   let id = 0;
   const ice = createIceConfiguration({
+    forceRelay,
     command: async (action) => { assert.deepEqual(action, { type: "iceConfig" }); requests++; return command(); },
     apply: async (options) => applied.push(options), onFailure: () => failures++, now: () => time, random: () => 0.5,
     setTimer: (callback, delay) => { timers.set(++id, { callback, delay }); return id; },
@@ -85,5 +86,28 @@ test("expired refreshed credentials are rejected without weakening relay policy"
   const context = fixture(async () => relay(900));
   await assert.rejects(context.ice.refresh(), /Expired/);
   assert.equal(context.applied.length, 0);
+  assert.equal(context.timers.size, 0);
+});
+
+test("client quality fallback keeps only TLS relays and preserves relay policy across refreshes", async () => {
+  const supplied = { ...relay(), iceTransportPolicy: "all" };
+  supplied.iceServers[0].urls.unshift("turn:turn.example.test:3478?transport=udp");
+  const context = fixture(async () => supplied, { forceRelay: true });
+  const options = await context.ice.refresh();
+  assert.equal(options.iceTransportPolicy, "relay");
+  assert.deepEqual(options.iceServers[0].urls, ["turns:turn.example.test:443?transport=tcp"]);
+  await context.fire();
+  assert.ok(context.applied.every((value) => value.iceTransportPolicy === "relay"));
+  assert.equal(supplied.iceTransportPolicy, "all", "server configuration is not mutated");
+  context.ice.close();
+});
+
+for (const [name, supplied] of [
+  ["disabled relay", { iceServers: [], iceTransportPolicy: "all", expiresAt: null }],
+  ["UDP-only relay", { ...relay(), iceServers: [{ ...relay().iceServers[0], urls: ["turn:turn.example.test:3478?transport=udp"] }] }],
+]) test(`quality fallback cannot silently use direct ICE with ${name}`, async () => {
+  const context = fixture(async () => supplied, { forceRelay: true });
+  await assert.rejects(context.ice.refresh(), /Encrypted TURN is unavailable/);
+  assert.deepEqual(context.applied, []);
   assert.equal(context.timers.size, 0);
 });

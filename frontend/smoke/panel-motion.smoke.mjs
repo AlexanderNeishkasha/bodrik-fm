@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("sidebar close buttons animate the outgoing panel and respect reduced motion", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -21,7 +22,7 @@ test("sidebar close buttons animate the outgoing panel and respect reduced motio
     };
   });
   const driver = nextDriver(page);
-  await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+  await page.goto(driver.path(smokeRoom()));
   await driver.join(`Motion${Date.now().toString(36).slice(-4)}`);
   const controls = page.getByRole("navigation", { name: "Управление встречей" });
   for (const [label, closeLabel, transitionName] of [

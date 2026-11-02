@@ -3,9 +3,10 @@ import { test } from "node:test";
 
 import { READMIT_DELAYS_MS, createMeetingClient } from "../features/meeting/client/meetingClient.mjs";
 import { RECONNECT_DELAYS_MS } from "../features/meeting/client/session.mjs";
+import { qualityReport } from "./helpers/meetingQuality.mjs";
 
 /** Fake meeting server: one WebSocket class whose instances answer admission and commands. */
-function fakeServer({ resumeFails = false } = {}) {
+function fakeServer({ resumeFails = false, iceConfig = { iceServers: [], iceTransportPolicy: "all", expiresAt: null }, presenter = false } = {}) {
   const server = { sockets: [], sessions: 0, commands: [], produced: [] };
   class Socket {
     static OPEN = 1;
@@ -37,7 +38,7 @@ function fakeServer({ resumeFails = false } = {}) {
       if (frame.type === "admit") {
         server.sessions += 1;
         this.stamp = { roomInstanceId: "r", sessionId: `s${server.sessions}`, admissionEpoch: 1 };
-        this.reply({ type: "welcome", version: 1, stamp: this.stamp, recoveryToken: "rt", revision: 0, phase: "admitted", presenter: false });
+        this.reply({ type: "welcome", version: 1, stamp: this.stamp, recoveryToken: "rt", revision: 0, phase: "admitted", presenter });
         return;
       }
       if (frame.type === "resume") {
@@ -50,14 +51,23 @@ function fakeServer({ resumeFails = false } = {}) {
       const operation = action.operation?.operation;
       server.commands.push(operation || action.type);
       let value = {};
-      if (action.type === "iceConfig") value = { iceServers: [], iceTransportPolicy: "all", expiresAt: null };
-      if (action.type === "snapshot") value = { revision: 0, count: 1, peers: [{ stamp: frame.stamp, name: "Me", presenter: false }] };
+      if (action.type === "iceConfig") value = iceConfig;
+      if (action.type === "snapshot") value = { revision: 0, count: 1, peers: [{ stamp: frame.stamp, name: "Me", presenter }] };
       if (action.type === "producers") value = [];
       if (operation === "capabilities") value = { codecs: [], headerExtensions: [] };
       if (operation === "createTransport") value = { id: `t${server.commands.length}` };
       if (operation === "produce") {
         value = { producerId: `p${server.produced.length + 1}` };
         server.produced.push(action.operation.payload.kind);
+      }
+      if (operation === "createTransport" && server.rejectNextCreate) {
+        server.rejectNextCreate = false;
+        this.reply({ type: "result", version: 1, id: frame.id, stamp: frame.stamp, ok: false, code: "unavailable" });
+        return;
+      }
+      if (operation === "closeTransport" && server.holdClose) {
+        server.releaseClose = () => this.reply({ type: "result", version: 1, id: frame.id, stamp: frame.stamp, ok: true, value });
+        return;
       }
       this.reply({ type: "result", version: 1, id: frame.id, stamp: frame.stamp, ok: true, value });
     }
@@ -66,11 +76,14 @@ function fakeServer({ resumeFails = false } = {}) {
 }
 
 /** Fake mediasoup device whose send transport drives the produce handshake. */
-function fakeDevice(transportsOut) {
-  const transport = (id) => {
+function fakeDevice(transportsOut, getStats) {
+  const transport = (options) => {
     const listeners = {};
     const value = {
-      id,
+      id: options.id,
+      options,
+      connectionState: "connected",
+      ...(getStats && { getStats }),
       closed: false,
       on: (name, listener) => (listeners[name] = listener),
       emit: (name, arg) => listeners[name]?.(arg),
@@ -87,7 +100,7 @@ function fakeDevice(transportsOut) {
     transportsOut.push(value);
     return value;
   };
-  return async () => ({ rtpCapabilities: {}, async load() {}, createSendTransport: (o) => transport(o.id), createRecvTransport: (o) => transport(o.id) });
+  return async () => ({ rtpCapabilities: {}, async load() {}, createSendTransport: transport, createRecvTransport: transport });
 }
 
 /** Fake capture devices producing live tracks. */
@@ -98,6 +111,9 @@ const mediaDevices = {
   },
   async enumerateDevices() {
     return [];
+  },
+  async getDisplayMedia() {
+    return this.getUserMedia({ video: true });
   },
 };
 
@@ -124,8 +140,9 @@ function manualTimers() {
   };
 }
 
+/** Drain fake socket/media microtasks; setImmediate avoids the ~15 ms Windows timer floor of setTimeout(0). */
 const flush = async () => {
-  for (let index = 0; index < 20; index++) await new Promise((resolve) => setTimeout(resolve, 0));
+  for (let index = 0; index < 20; index++) await new Promise((resolve) => setImmediate(resolve));
 };
 
 /** Build a joined client against the fake server. */
@@ -133,13 +150,15 @@ async function joined(options = {}) {
   const { server, Socket } = fakeServer(options);
   const timers = manualTimers();
   const transports = [];
+  let time = Date.now();
   const client = createMeetingClient({
     slug: "room",
     location: { protocol: "https:", host: "x.test" },
     crypto: { getRandomValues: (bytes) => bytes.fill(7) },
     fetchImpl: async () => ({ ok: true, json: async () => ({ version: 1, ticket: "t", roomSlug: "room" }) }),
     WebSocketImpl: Socket,
-    createDevice: fakeDevice(transports),
+    createDevice: fakeDevice(transports, options.getStats && (() => options.getStats(time))),
+    now: () => time,
     mediaDevices,
     storage: null,
     ...timers,
@@ -148,7 +167,7 @@ async function joined(options = {}) {
   const joining = client.join({ name: "Me", video: false });
   await flush();
   await joining;
-  return { client, server, timers, transports };
+  return { client, server, timers, transports, advance: (ms) => { time += ms; timers.fire(ms); } };
 }
 
 test("join admits, publishes the microphone and loads the room", async () => {
@@ -201,6 +220,34 @@ test("readmission is not repeated while one is in progress, and leave cancels it
   await flush();
   assert.equal(server.sessions, 1, "no new session after leave");
 });
+
+for (const notify of [true, false]) {
+  test(`leave with room music completes teardown and publishes left (notify=${notify})`, async () => {
+    const { client, server, timers, transports } = await joined();
+    const socket = server.sockets.at(-1);
+    socket.reply({ type: "event", version: 1, stamp: socket.stamp, revision: 1, kind: "producerCreated", value: {
+      producerId: "room-music", participant: { roomInstanceId: "system", sessionId: "bodrik-music", admissionEpoch: 1 },
+      name: "Бодрик FM", kind: "audio", mediaType: "audioType", system: "music",
+    } });
+    await flush();
+    assert.ok(client.registry.getSnapshot().sources.some((source) => source.id === "room-music"));
+    const statuses = [];
+    const unsubscribe = client.subscribe(() => statuses.push(client.getState().status));
+    const microphone = client.capture.track("audio");
+    await client.leave({ notify });
+    assert.ok(statuses.includes("left"), "the view receives the terminal state and can render the exit page");
+    assert.equal(client.getState().status, "left");
+    assert.equal(socket.readyState, 3);
+    assert.equal(microphone.readyState, "ended");
+    assert.ok(transports.every((transport) => transport.closed));
+    assert.equal(server.commands.filter((value) => value === "leave").length, Number(notify));
+    await client.leave({ notify });
+    for (const delay of [...RECONNECT_DELAYS_MS, ...READMIT_DELAYS_MS]) timers.fire(delay);
+    await flush();
+    assert.equal(server.sessions, 1, "no readmission after leaving");
+    unsubscribe();
+  });
+}
 
 test("explicit leave sends leave once and does not recover", async () => {
   const { client, server, timers } = await joined();
@@ -264,4 +311,124 @@ test("transport recovery applies jitter before fresh admission", async () => {
   await flush();
   assert.equal(server.sessions, 2, "fresh admission follows the sampled delay");
   await client.leave();
+});
+
+/** Server-authorized TURN/TLS credentials with automatic initial route selection. */
+function automaticIce() {
+  return { iceServers: [{ urls: ["turns:turn.example.test:443?transport=tcp"], username: "session", credential: "temporary" }],
+    iceTransportPolicy: "all", expiresAt: Math.floor(Date.now() / 1000) + 3600 };
+}
+
+/** Release the warmup and three bad two-second measurement windows. */
+async function degrade(context) {
+  for (let index = 0; index < 8; index++) {
+    context.advance(2000);
+    await flush();
+  }
+}
+
+test("poor quality switches both transports to TLS relay in the same session, retaining role, screen and muted microphone", async () => {
+  const context = await joined({ presenter: true, iceConfig: automaticIce(),
+    getStats: (time) => qualityReport({ time, received: time, lost: time / 5 }) });
+  const { client, server, transports } = context;
+  await client.setMicrophoneMuted(true);
+  await client.setScreenSharing(true);
+  const microphone = client.capture.track("audio");
+  const screen = client.capture.track("screen");
+  const sessionId = client.getState().selfId;
+  await degrade(context);
+  assert.equal(server.sessions, 1, "quality fallback does not re-admit the participant");
+  assert.equal(client.getState().selfId, sessionId);
+  assert.equal(client.getState().presenter, true);
+  assert.equal(client.getState().status, "admitted");
+  assert.deepEqual(transports.map((value) => value.options.iceTransportPolicy), ["all", "all", "relay", "relay"]);
+  assert.ok(transports.slice(0, 2).every((value) => value.closed));
+  assert.equal(server.commands.filter((value) => value === "closeTransport").length, 2, "native resources are released before replacement");
+  assert.equal(client.capture.track("audio"), microphone);
+  assert.equal(client.capture.track("screen"), screen);
+  assert.equal(screen.readyState, "live");
+  assert.equal(client.getRetryChoice().audio, false, "muted microphone stays muted");
+  assert.deepEqual(server.produced, ["audio", "video", "audio", "video"]);
+  await degrade(context);
+  assert.equal(transports.length, 4, "the call never oscillates between direct and relay routes");
+  await client.leave();
+});
+
+for (const [name, getStats, change] of [
+  ["healthy direct connection", (time) => qualityReport({ time, received: time }), (value) => value],
+  ["already selected relay", (time) => qualityReport({ time, received: time, lost: time / 5, candidateType: "relay" }), (value) => value],
+  ["server-required relay", (time) => qualityReport({ time, received: time, lost: time / 5 }), (value) => ({ ...value, iceTransportPolicy: "relay" })],
+  ["no TLS relay available", (time) => qualityReport({ time, received: time, lost: time / 5 }), (value) => ({ ...value,
+    iceServers: [{ ...value.iceServers[0], urls: ["turn:turn.example.test:3478?transport=udp"] }] })],
+]) test(`quality recovery leaves ${name} alone`, async () => {
+  const context = await joined({ iceConfig: change(automaticIce()), getStats });
+  await degrade(context);
+  assert.equal(context.transports.length, 2);
+  assert.equal(context.server.sessions, 1);
+  assert.equal(context.client.getState().status, "admitted");
+  await context.client.leave();
+});
+
+test("relay choice survives later full readmission", async () => {
+  const context = await joined({ iceConfig: automaticIce(), getStats: (time) => qualityReport({ time, received: time, lost: time / 5 }) });
+  await degrade(context);
+  context.transports.at(-1).emit("connectionstatechange", "failed");
+  await flush();
+  context.timers.fire(READMIT_DELAYS_MS[0]);
+  await flush();
+  assert.equal(context.server.sessions, 2);
+  assert.deepEqual(context.transports.slice(2).map((value) => value.options.iceTransportPolicy), ["relay", "relay", "relay", "relay"]);
+  await context.client.leave();
+});
+
+test("failed media-only switch uses bounded readmission and retains the original muted capture", async () => {
+  const context = await joined({ iceConfig: automaticIce(), getStats: (time) => qualityReport({ time, received: time, lost: time / 5 }) });
+  await context.client.setMicrophoneMuted(true);
+  const microphone = context.client.capture.track("audio");
+  context.server.rejectNextCreate = true;
+  await degrade(context);
+  assert.equal(context.client.getState().status, "reconnecting");
+  context.timers.fire(READMIT_DELAYS_MS[0]);
+  await flush();
+  assert.equal(context.server.sessions, 2);
+  assert.equal(context.client.getState().status, "admitted");
+  assert.equal(context.client.capture.track("audio"), microphone);
+  assert.equal(context.client.getRetryChoice().audio, false);
+  assert.ok(context.transports.slice(2).every((value) => value.options.iceTransportPolicy === "relay"));
+  await context.client.leave();
+});
+
+test("leaving while old transports are closing prevents new media and readmission", async () => {
+  const context = await joined({ iceConfig: automaticIce(), getStats: (time) => qualityReport({ time, received: time, lost: time / 5 }) });
+  context.server.holdClose = true;
+  await degrade(context);
+  assert.equal(context.client.getState().status, "reconnecting");
+  await context.client.leave();
+  context.timers.fire(READMIT_DELAYS_MS[0]);
+  await flush();
+  assert.equal(context.server.sessions, 1);
+  assert.equal(context.transports.length, 2);
+  assert.equal(context.client.getState().status, "left");
+});
+
+test("moderator mute and stop requests during the switch are honored when capture is restored", async () => {
+  const context = await joined({ iceConfig: automaticIce(), getStats: (time) => qualityReport({ time, received: time, lost: time / 5 }) });
+  await context.client.setScreenSharing(true);
+  const screen = context.client.capture.track("screen");
+  context.server.holdClose = true;
+  await degrade(context);
+  const socket = context.server.sockets.at(-1);
+  for (const [revision, action] of [[1, "mute"], [2, "stop"]]) {
+    socket.reply({ type: "event", version: 1, stamp: socket.stamp, revision, kind: "peerAction", value: { action } });
+    await flush();
+  }
+  assert.equal(screen.readyState, "ended");
+  context.server.holdClose = false;
+  context.server.releaseClose();
+  await flush();
+  assert.equal(context.client.getState().status, "admitted");
+  assert.equal(context.client.getRetryChoice().audio, false);
+  assert.equal(context.client.capture.track("screen"), null);
+  assert.deepEqual(context.server.produced, ["audio", "video", "audio"], "stopped screen is not republished");
+  await context.client.leave();
 });

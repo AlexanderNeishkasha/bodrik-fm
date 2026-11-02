@@ -1,17 +1,17 @@
-﻿import { ui } from "../../lang/ru";
+﻿import { t } from "../../lang/index.js";
 import Icon from "../../components/Icon";
 import RangeControl from "../../../components/ui/RangeControl";
 
 /** Reuse one slider/mute pair for local listening or the room's meeting output. */
 export default function NowPlayingVolume({
-  label = ui.studio.volume,
+  label = t("studio.volume"),
   disabled = false,
   localVolume,
   localMuted,
   onToggleMute,
   onVolumeChange,
 }) {
-  const muteLabel = localMuted ? ui.main.unmute : ui.main.mute;
+  const muteLabel = localMuted ? t("main.unmute") : t("main.mute");
 
   return (
     <div className="space-y-2">

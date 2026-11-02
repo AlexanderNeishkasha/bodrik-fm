@@ -1,0 +1,3 @@
+# Local viewer mode has no alert subscriptions or outbound destinations.
+dispatchers: []
+subscriptions: []

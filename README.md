@@ -20,49 +20,70 @@ The release commit date identifies the date of this modified source snapshot.
 
 ## Local build and run
 
-Requirements: Docker with Compose Watch support, OpenSSL for local certificates,
-and Bun 1.4.2 if running frontend checks outside Docker. The backend image supplies
-Rust 1.92, native mediasoup build tools, ffmpeg/ffprobe and yt-dlp.
+Requirements: Docker Engine on Linux with Compose Watch support, a host HTTPS
+reverse proxy such as Caddy, and Bun 1.4.2 for frontend checks outside Docker.
+The backend image supplies Rust 1.92, native mediasoup build tools, ffmpeg/ffprobe,
+yt-dlp and a pinned local mbx cache. Image builds use host networking for DNS.
 
-Create `.env` in the repository root using independently generated random secrets
-(at least 32 random characters for each signing key):
+Create `.env` in the repository root using independently generated secrets
+(`openssl rand -hex 32` for each signing key). This example uses local hostnames;
+configure DNS or hosts entries for both names to point at the development machine:
 
 ```dotenv
 BODRIK_FM_JWT_SECRET=replace-with-your-own-random-secret
 LOCAL_MEETING_TICKET_KEY=replace-with-a-different-random-secret
 ADMIN_LOGIN=local-admin
 ADMIN_PASSWORD=replace-with-your-own-password
-MEETING_PUBLIC_URL=https://localhost:3443
-CONFERENCE_UNAVAILABLE_URL=http://localhost:3000/bye
+LOCAL_DEV_HOST=bodrik.localhost
+LOCAL_PROXY_PORT=8380
 LOCAL_SFU_ANNOUNCED_IP=127.0.0.1
-NEXT_PUBLIC_API_BASE=http://localhost:3001
+NEXT_PUBLIC_API_BASE=https://bodrik.localhost
 NEXT_PUBLIC_SUPPORT_EMAIL=admin@example.invalid
+CORS_ALLOW_ORIGIN=https://bodrik.localhost,https://meet.bodrik.localhost
+AUTH_COOKIE_DOMAIN=bodrik.localhost
+TRUST_PROXY_HEADERS=true
+MEETING_PUBLIC_URL=https://meet.bodrik.localhost
+CONFERENCE_UNAVAILABLE_URL=https://bodrik.localhost/meeting-unavailable
+REPLACEMENT_BROWSER_ORIGINS=https://bodrik.localhost,https://meet.bodrik.localhost
+REPLACEMENT_INVITE_BASE_URL=https://meet.bodrik.localhost
+REPLACEMENT_BYE_URL=https://bodrik.localhost/bye
 ```
 
-For example, use `openssl rand -hex 32` separately for each signing key.
-Never commit the resulting environment file or runtime data.
-Create a **local-only** certificate (OpenSSL must support `-addext`):
+Never commit the resulting environment file or runtime data. The private development
+launcher is not part of this source snapshot, so direct Compose users must set the
+origins and URLs above explicitly. `LOCAL_DEV_HOST` configures frontend development
+origins; it does not derive the backend's environment settings by itself.
+
+Configure Caddy on the same host with this local-only site block, and trust its local
+CA in the browser used for microphone/camera access:
+
+```caddyfile
+bodrik.localhost, meet.bodrik.localhost {
+    tls internal
+    reverse_proxy 127.0.0.1:8380
+}
+```
+
+Caddy must preserve Host, send `X-Forwarded-Proto: https`, and forward WebSockets.
+The included nginx proxy listens only on `127.0.0.1:8380`; frontend port 3000 is
+container-internal. Port 3001 is loopback-only for backend debugging.
 
 ```sh
-mkdir -p infra/dev/certs data uploads
-openssl req -x509 -newkey rsa:2048 -nodes -days 30 \
-  -keyout infra/dev/certs/pc.local.key \
-  -out infra/dev/certs/pc.local.crt \
-  -subj '/CN=localhost' \
-  -addext 'subjectAltName=DNS:localhost,DNS:pc.local,IP:127.0.0.1'
+mkdir -p data uploads
+docker compose -f compose.dev.yml config --quiet
 docker compose -f compose.dev.yml up --build --watch
 ```
 
-Open `http://localhost:3000` and `/studio`; the admin interface is `/puppet_master`.
-Meeting pages use `https://localhost:3443`. Trust the generated local certificate
-in your development browser before testing microphone/camera access.
+Open `https://bodrik.localhost` and `/studio`; admin is `/puppet_master`.
+Meeting pages use `https://meet.bodrik.localhost`.
 Grant conference access to a user in admin, then enable/join a meeting from Studio.
 Migrations run automatically. Stop with Ctrl+C; Compose volumes preserve data.
 Do not use `down -v` unless you intentionally want to delete persistent volumes.
 
-The included Compose/proxy configuration is for local development, not a production
-security configuration. For LAN use, configure matching frontend/backend origins,
-invitation URLs, certificate names and an SFU address reachable by participants.
+The included Compose/nginx configuration is for local development behind that trusted
+host proxy, not a production security configuration. The backend debugger remains on
+`127.0.0.1:3001`; the frontend is internal-only, and UDP/TCP `40000-40100` must be
+reachable directly by LAN participants.
 Internet meetings additionally need appropriate TLS, firewall rules and usually TURN;
 no production TURN credentials or server configuration are shipped here.
 

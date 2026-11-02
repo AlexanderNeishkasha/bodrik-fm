@@ -1,0 +1,43 @@
+# Copied into the persistent /data volume on first start only.
+# Names are plain operational identifiers: no URLs, secrets or user-provided text.
+dispatchers:
+  - id: 1
+    name: Telegram private receiver
+    type: webhook
+    url: http://logging:9090/alerts
+    headers:
+      Authorization: Bearer ${ALERT_WEBHOOK_TOKEN}
+    template: '{"rule":"{{if .Subscription.Name}}{{.Subscription.Name}}{{else}}Dozzle destination test{{end}}","container":"{{.Container.Name}}"}'
+subscriptions:
+  - id: 1
+    name: YouTube download failure
+    enabled: true
+    dispatcherId: 1
+    containerExpression: 'labels["com.docker.compose.service"] == "backend"'
+    logExpression: 'type == "complex" && message.fields.event == "youtube_download_failed" && message.fields.failure_kind == "pipeline_failure"'
+  - id: 2
+    name: YouTube metadata failure
+    enabled: true
+    dispatcherId: 1
+    containerExpression: 'labels["com.docker.compose.service"] == "backend"'
+    logExpression: 'type == "complex" && message.fields.event == "youtube_metadata_failed"'
+  - id: 3
+    name: Backend error
+    enabled: true
+    dispatcherId: 1
+    containerExpression: 'labels["com.docker.compose.service"] == "backend"'
+    logExpression: 'level == "error"'
+  - id: 4
+    name: Backend out of memory
+    enabled: true
+    dispatcherId: 1
+    containerExpression: 'labels["com.docker.compose.service"] == "backend"'
+    eventExpression: 'name == "oom"'
+    cooldown: 300
+  - id: 5
+    name: Backend unexpected exit
+    enabled: true
+    dispatcherId: 1
+    containerExpression: 'labels["com.docker.compose.service"] == "backend"'
+    eventExpression: 'name == "die" && !(attributes["exitCode"] in ["0", "130", "143", "137"])'
+    cooldown: 300

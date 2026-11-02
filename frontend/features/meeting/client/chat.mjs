@@ -58,7 +58,6 @@ export function createMeetingChat({ client, slug, uploadImage, files, randomId =
       canSend: Boolean(fence) && admitted,
       // The presenter may remove anyone's message; others only their own.
       canModerate: state.presenter === true,
-      language: state.language || "ru",
       sessionKey,
     });
     for (const listener of [...listeners]) listener();

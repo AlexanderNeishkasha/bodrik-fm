@@ -31,6 +31,15 @@ pub(crate) use cookies::append_clear_auth_cookies;
 use cookies::{append_auth_cookies, token_from_headers};
 pub use rate_limiter::LoginRateLimiter;
 
+/// Cookie domain for a response to this request: the configured one only when the
+/// request is addressed to that domain or a subdomain.
+pub(crate) fn session_cookie_domain<'a>(
+    state: &'a AppState,
+    request: &HeaderMap,
+) -> Option<&'a str> {
+    cookies::request_cookie_domain(state.auth_cookie_domain.as_deref(), request)
+}
+
 /// Active database identity resolved from a signed authentication cookie.
 #[derive(Debug, Clone)]
 pub struct AuthUser {
@@ -142,7 +151,7 @@ pub async fn register(
     };
 
     state.login_rate_limiter.reset(&client_key).await;
-    issue_auth_cookie(&state, &user)
+    issue_auth_cookie(&state, &user, &headers)
 }
 
 /// Look up and verify credentials on a blocking worker, then issue an auth cookie.
@@ -184,7 +193,7 @@ pub async fn login(
     };
 
     state.login_rate_limiter.reset(&client_key).await;
-    issue_auth_cookie(&state, &user)
+    issue_auth_cookie(&state, &user, &headers)
 }
 
 /// Return current identity, including an admin's optional effective Studio account.
@@ -212,7 +221,16 @@ fn me_response(state: AppState, headers: HeaderMap) -> axum::response::Response 
         room_slug: user.room_slug,
         room_listed: user.room_listed,
     };
-    (axum::http::StatusCode::OK, Json(payload)).into_response()
+    let mut response = (axum::http::StatusCode::OK, Json(payload)).into_response();
+    // Move sessions issued before the cookie domain was configured onto it, so the
+    // meeting subdomain sees them without a fresh login.
+    if let Some(domain) = session_cookie_domain(&state, &headers)
+        && let Some(token) = token_from_headers(&headers)
+        && let Err(err) = append_auth_cookies(response.headers_mut(), &token, Some(domain))
+    {
+        tracing::warn!(error = %err, "auth.me.cookie_domain");
+    }
+    response
 }
 
 /// Resolve admin impersonation while leaving non-admin identities unchanged.
@@ -275,9 +293,9 @@ fn requested_as_user_id_from_headers(
 }
 
 /// Clear all supported authentication cookies in the browser response.
-pub async fn logout() -> impl IntoResponse {
+pub async fn logout(State(state): State<AppState>, request: HeaderMap) -> impl IntoResponse {
     let mut headers = HeaderMap::new();
-    append_clear_auth_cookies(&mut headers);
+    append_clear_auth_cookies(&mut headers, session_cookie_domain(&state, &request));
     (
         headers,
         Json(crate::api::ApiMessage {
@@ -335,7 +353,11 @@ pub(crate) fn verify_password(hash: &str, password: &str) -> bool {
 }
 
 /// Sign the session and append cookies, returning a generic 500 if signing fails.
-fn issue_auth_cookie(state: &AppState, user: &db::UserRecord) -> axum::response::Response {
+fn issue_auth_cookie(
+    state: &AppState,
+    user: &db::UserRecord,
+    request: &HeaderMap,
+) -> axum::response::Response {
     let token = match create_token(&state.jwt_secret, user) {
         Ok(value) => value,
         Err(err) => {
@@ -343,7 +365,9 @@ fn issue_auth_cookie(state: &AppState, user: &db::UserRecord) -> axum::response:
         }
     };
     let mut headers = HeaderMap::new();
-    if let Err(err) = append_auth_cookies(&mut headers, &token) {
+    if let Err(err) =
+        append_auth_cookies(&mut headers, &token, session_cookie_domain(state, request))
+    {
         return internal_error_response("auth.issue_auth_cookie.header", err);
     }
     (headers, Json(me_payload_from_record(user))).into_response()

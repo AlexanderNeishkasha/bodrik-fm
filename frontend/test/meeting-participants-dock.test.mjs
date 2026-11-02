@@ -27,7 +27,7 @@ for (const language of ["ru", "en"]) for (const visible of [false, true]) {
       getLanguage: () => language, getCapabilities: () => ({ visible }), execute: async () => ({}) });
     const html = render({ source });
     assert.equal(/<aside[^>]* hidden=""/.test(html), !visible);
-    assert.match(html, new RegExp(`aria-label="${language === "en" ? "Participants" : "Участники"}"`));
+    assert.match(html, new RegExp(`aria-label="${"Участники"}"`));
     assert.equal((html.match(/<h2/g) || []).length <= 1, true, "no duplicate dock heading");
     assert.doesNotMatch(html, /<slot|shadowroot|participantsList|plist/);
     source.dispose();

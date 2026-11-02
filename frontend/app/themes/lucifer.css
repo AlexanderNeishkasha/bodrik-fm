@@ -28,6 +28,7 @@
   --theme-queue-temp: #f5ebe2;
   --theme-danger: #8d0309;
   --theme-danger-hover: #d7374e;
+  --theme-danger-foreground: #fbf9f4;
   --theme-focus: #8d0309;
   --theme-font-display: var(--font-montserrat-alt);
   --theme-font-body: var(--font-body);

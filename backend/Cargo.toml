@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/meeting"]
+members = ["crates/meeting", "crates/log-alerts"]
 default-members = ["."]
 resolver = "3"
 
@@ -26,7 +26,7 @@ tokio = { version = "1", features = ["fs", "io-util", "macros", "net", "process"
 tower = { version = "0.5", features = ["util"] }
 tower-http = { version = "0.6.8", features = ["cors", "trace", "fs"] }
 tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter", "json"] }
 # Enables OsRng used through argon2::password_hash::rand_core for password salts.
 rand_core = { version = "0.6.4", features = ["getrandom"] }
 url = "2.5.7"

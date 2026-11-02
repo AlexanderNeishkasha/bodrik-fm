@@ -1,10 +1,10 @@
 import { themePreference } from "./themePreference.mjs";
 
-const DEFAULT_THEME = "mono";
+const DEFAULT_THEME = "pirate";
 /** Supported frontend themes shared with startup and backend contract checks. */
 export const THEME_NAMES = Object.freeze([
   "crimson",
-  "mono",
+  "noir",
   "midnight",
   "ivory",
   "lucifer",

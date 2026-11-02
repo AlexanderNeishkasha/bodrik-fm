@@ -3,49 +3,10 @@ const TOAST_MS = 4000;
 /** A joiner's profile name arrives just after participantJoined; wait for it. */
 const JOIN_NAME_MS = 1200;
 
-/** RU/EN notification text. `{name}`/`{from}` are replaced with display names. */
-const TEXT = {
-  ru: {
-    joined: "{name} присоединился к встрече",
-    left: "{name} покинул встречу",
-    presenterGranted: "{from} назначил вас ведущим",
-    presenterRevoked: "{from} снял с вас роль ведущего",
-    mute: "{from} выключил ваш микрофон",
-    hide: "{from} выключил вашу камеру",
-    stop: "{from} остановил вашу демонстрацию экрана",
-    unmute: "{from} просит включить микрофон",
-    unhide: "{from} просит включить камеру",
-    start: "{from} просит начать демонстрацию экрана",
-    lobby: "{name} ожидает в зале ожидания",
-    file: "{name} отправляет файл",
-    lock: "Комната защищена паролем",
-    unlock: "Пароль комнаты снят",
-    lobbyOn: "Зал ожидания включён",
-    lobbyOff: "Зал ожидания выключен",
-    joinLockOn: "Вход в комнату закрыт",
-    joinLockOff: "Вход в комнату открыт",
-  },
-  en: {
-    joined: "{name} joined the meeting",
-    left: "{name} left the meeting",
-    presenterGranted: "{from} made you a presenter",
-    presenterRevoked: "{from} removed your presenter role",
-    mute: "{from} muted your microphone",
-    hide: "{from} turned off your camera",
-    stop: "{from} stopped your screen share",
-    unmute: "{from} asks you to unmute",
-    unhide: "{from} asks you to turn on your camera",
-    start: "{from} asks you to share your screen",
-    lobby: "{name} is waiting in the lobby",
-    file: "{name} is sending a file",
-    lock: "The room is password protected",
-    unlock: "The room password was removed",
-    lobbyOn: "The lobby is on",
-    lobbyOff: "The lobby is off",
-    joinLockOn: "The room is locked",
-    joinLockOff: "The room is unlocked",
-  },
-};
+import { t } from "../../../app/lang/index.js";
+
+/** Russian notification text from the shared UI dictionary. */
+const TEXT = t("meeting.notifications");
 
 /**
  * Map one Rust event to `{ key, sound, severity, name?, from? }`, or null. `state` is
@@ -74,7 +35,7 @@ export function notificationFor(kind, value, state, before) {
     case "chatMessage":
       return { key: "", sound: "message" };
     case "roomAction":
-      return Object.hasOwn(TEXT.ru, value?.action) ? { key: value.action, sound: value.action === "lock" ? "locked" : "notify" } : null;
+      return Object.hasOwn(TEXT, value?.action) ? { key: value.action, sound: value.action === "lock" ? "locked" : "notify" } : null;
     default:
       return null;
   }
@@ -127,12 +88,12 @@ export function createMeetingNotifications({ client, playSound, schedule = setTi
         const current = client.getState();
         // Before a profile arrives the server may report the session id as the name.
         const raw = current.participants[id]?.name;
-        const name = raw && raw !== id ? raw : current.language === "en" ? "A participant" : "Участник";
-        if (current.participants[id]) show(format(TEXT[current.language === "en" ? "en" : "ru"].joined, { name }));
+        const name = raw && raw !== id ? raw : "Участник";
+        if (current.participants[id]) show(format(TEXT.joined, { name }));
       }, JOIN_NAME_MS);
       return;
     }
-    show(format(TEXT[state.language === "en" ? "en" : "ru"][note.key], note), note.severity);
+    show(format(TEXT[note.key], note), note.severity);
   });
 
   return {

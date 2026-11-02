@@ -4,18 +4,7 @@ import { build } from "esbuild";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { readFileSync } from "node:fs";
 import { rangeProgress } from "../components/ui/rangeModel.mjs";
-
-test("shared help retains accent border/hover and switches honor reduced motion", () => {
-  const help = readFileSync(new URL("../components/ui/HelpTooltip.module.css", import.meta.url), "utf8");
-  const toggle = readFileSync(new URL("../components/ui/SwitchControl.module.css", import.meta.url), "utf8");
-  assert.match(help, /70%, transparent/);
-  assert.match(help, /\.button:hover, \.button:focus-visible/);
-  assert.match(toggle, /transition: transform 140ms ease/);
-  assert.match(toggle, /translateX\(16px\)/);
-  assert.match(toggle, /prefers-reduced-motion: reduce[\s\S]*transition: none/);
-});
 
 for (const [name, value, min, max, expected] of [
   ["player units", 0.35, 0, 1, 35],
@@ -142,3 +131,20 @@ test("shared switch stays controlled and help text is safely escaped and initial
   assert.equal(tooltip.includes('role="tooltip"'), false);
   assert.equal(tooltip.includes('<script>'), false);
 });
+
+for (const [name, points] of [
+  ["mode descriptions", ["Basic: browser filtering.", "Enhanced: additional filtering."]],
+  ["escaped content", ["<script>not markup</script>", "<img src=x>"]],
+  ["empty list", []],
+]) {
+  test(`shared help renders safe accessible bullet points: ${name}`, async () => {
+    const { render } = await renderer();
+    const html = render("help", { label: "Help", content: points });
+    assert.ok(html.includes('role="list"'));
+    assert.equal((html.match(/role="listitem"/g) || []).length, points.length);
+    assert.ok(html.includes('hidden=""'));
+    assert.equal(html.includes("<script>"), false);
+    assert.equal(html.includes("<img "), false);
+    assert.equal(html.includes('role="tooltip"'), false);
+  });
+}

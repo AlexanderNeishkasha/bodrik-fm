@@ -1,4 +1,4 @@
-﻿import { ui } from "../../lang/ru";
+﻿import { t } from "../../lang/index.js";
 import Icon from "../../components/Icon";
 import CollapsibleLibraryBlock from "./CollapsibleLibraryBlock";
 
@@ -25,7 +25,7 @@ export default function YoutubeDownloadForm({
             type="url"
             value={url}
             onChange={(event) => onUrlChange(event.target.value)}
-            placeholder={ui.studio.youtubeUrlPlaceholder}
+            placeholder={t("studio.youtubeUrlPlaceholder")}
             className="min-w-0 flex-1 rounded-full border border-[var(--theme-border)] bg-[var(--theme-input-bg)] px-3 py-1 text-sm text-[var(--theme-text)]"
             disabled={isBusy}
           />
@@ -33,7 +33,7 @@ export default function YoutubeDownloadForm({
             type="submit"
             className="btn-accent inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)] disabled:opacity-60"
             disabled={isBusy}
-            aria-label={ui.studio.download}
+            aria-label={t("studio.download")}
           >
             <Icon name="download" className="h-4 w-4" />
           </button>

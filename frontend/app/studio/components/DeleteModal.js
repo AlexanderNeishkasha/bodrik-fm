@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 
 /** Render a keyboard-safe confirmation dialog and restore prior focus on close. */
 export default function DeleteModal({
@@ -49,10 +49,10 @@ export default function DeleteModal({
         className="panel-shadow-modal w-full max-w-md space-y-4 rounded-3xl border border-[var(--theme-border)] bg-[var(--theme-card)] p-6"
       >
         <h3 id="delete-modal-title" className="text-lg font-semibold font-display tracking-[0.08em]">
-          {ui.studio.deleteTitle}
+          {t("studio.deleteTitle")}
         </h3>
         <p className="text-sm text-[var(--theme-muted)]">
-          {ui.studio.deleteHintPrefix}
+          {t("studio.deleteHintPrefix")}
           <span className="font-semibold text-[var(--theme-text)]">
             {deleteTarget.filename}
           </span>
@@ -66,7 +66,7 @@ export default function DeleteModal({
             disabled={isBusy}
             className="btn-ghost rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition disabled:opacity-60"
           >
-            {ui.studio.cancel}
+            {t("studio.cancel")}
           </button>
           <button
             type="button"
@@ -74,7 +74,7 @@ export default function DeleteModal({
             disabled={isBusy}
             className="btn-accent rounded-full border border-[var(--theme-accent)] bg-[var(--theme-accent)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)] disabled:opacity-60"
           >
-            {ui.studio.delete}
+            {t("studio.delete")}
           </button>
         </div>
       </div>

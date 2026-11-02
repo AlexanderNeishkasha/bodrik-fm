@@ -5,14 +5,14 @@ import { createMicrophoneComparison } from "../features/meeting/client/microphon
 /** Deferred promises model permission prompts that outlive a menu or device. */
 function deferred() { let resolve; let reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
 /** Independent capture and graph resources, with no access to the call's live track. */
-function setup({ failContext = false } = {}) {
+function setup({ failContext = false, coupledAudioRouting = false } = {}) {
   let devices = [{ value: "one" }, { value: "two" }];
   const observers = new Set();
   const requests = [];
   const contexts = [];
   const timers = new Set();
   const streams = [];
-  const capture = { getSnapshot: () => ({ inputDevices: devices }), subscribe: (fn) => (observers.add(fn), () => observers.delete(fn)) };
+  const capture = { getSnapshot: () => ({ inputDevices: devices, coupledAudioRouting }), subscribe: (fn) => (observers.add(fn), () => observers.delete(fn)) };
   /** Fake graph samples a different waveform per independent probe. */
   class Context {
     constructor() { if (failContext) throw new Error("Unavailable"); contexts.push(this); }
@@ -31,11 +31,39 @@ function setup({ failContext = false } = {}) {
       streams.push(stream); requests[index].resolve(stream); return stream;
     },
     update(values) { devices = values.map((value) => ({ value })); observers.forEach((fn) => fn()); },
+    setCoupled(value) { coupledAudioRouting = value; observers.forEach((fn) => fn()); },
     tick() { timers.forEach((fn) => fn()); },
   };
 }
 /** Let resolved capture promises connect their graphs. */
 async function settle() { await Promise.resolve(); await Promise.resolve(); }
+
+test("coupled audio routes are never opened for comparison", () => {
+  const h = setup({ coupledAudioRouting: true });
+  const off = h.source.subscribe(() => {});
+  h.update(["default", "speakerphone", "bluetooth"]);
+  assert.equal(h.requests.length, 0);
+  assert.equal(h.contexts.length, 0);
+  assert.equal(h.timers.size, 0);
+  assert.deepEqual(h.source.getSnapshot(), {});
+  off();
+  assert.equal(h.observers.size, 0);
+});
+
+test("changing to coupled routing releases probes and rejects late capture results", async () => {
+  const h = setup();
+  const off = h.source.subscribe(() => {});
+  h.resolve(0);
+  await settle();
+  h.setCoupled(true);
+  h.resolve(1);
+  await settle();
+  h.update(["speakerphone", "bluetooth"]);
+  assert.equal(h.requests.length, 2, "no new captures after entering route mode");
+  assert.ok(h.streams.every((stream) => stream.track.stopped === 1));
+  assert.deepEqual(h.source.getSnapshot(), {});
+  off();
+});
 
 for (const scenario of ["independent levels", "late permission after close", "reopen before permission", "device removal", "permission denied", "context unavailable"]) {
   test(`microphone comparison lifecycle: ${scenario}`, async () => {

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import { normalizeConferenceVolume } from "../lib/requestPolicy.mjs";
 import { reconcileConferenceRoomSnapshot } from "../lib/conferenceSnapshot.mjs";
 import { isAbortError } from "../../lib/abortError.mjs";
+import { copyText } from "../lib/copyText.mjs";
 
 /** Manage the optional conference capability without exposing its provider. */
 export default function useConference({ apiBase, asUserId, isAuthed, roomState, showNotice }) {
@@ -110,7 +111,7 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
     const payload = await runAction(
       "/api/studio/conference",
       { body: { enabled: nextEnabled } },
-      ui.studio.meetingSettingsFailed,
+      t("studio.meetingSettingsFailed"),
     );
     if (!payload) return;
     setSnapshot({
@@ -126,7 +127,7 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
     await runAction(
       "/api/studio/conference/music-output",
       { body: { output }, json: false },
-      ui.studio.meetingOutputFailed,
+      t("studio.meetingOutputFailed"),
     );
   }, [runAction]);
 
@@ -155,7 +156,7 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
       } catch (error) {
         if (!isAbortError(error) && musicVolumeRequestRef.current === controller) {
           setVolumeState({ scope, value: null });
-          showNotice(ui.studio.meetingVolumeFailed);
+          showNotice(t("studio.meetingVolumeFailed"));
         }
       } finally {
         if (musicVolumeRequestRef.current === controller) musicVolumeRequestRef.current = null;
@@ -166,30 +167,14 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
 
   /** Copy the current public invitation without exposing provider identifiers. */
   const copyGuestLink = useCallback(async () => {
-    if (!current.inviteUrl || typeof window === "undefined") return;
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(current.inviteUrl);
-        showNotice(ui.studio.meetingLinkCopied);
-      } else {
-        window.prompt(ui.studio.meetingCopyPrompt, current.inviteUrl);
-      }
-    } catch {
-      showNotice(ui.studio.meetingCopyFailed);
+    if (!current.inviteUrl || typeof window === "undefined") return false;
+    if (!await copyText(current.inviteUrl)) {
+      window.prompt(t("studio.meetingCopyPrompt"), current.inviteUrl);
+      return false;
     }
+    showNotice(t("studio.meetingLinkCopied"));
+    return true;
   }, [current.inviteUrl, showNotice]);
-
-  /** Request a fresh presenter URL and open only the returned backend authority. */
-  const join = useCallback(async () => {
-    const payload = await runAction(
-      "/api/studio/conference/join",
-      { json: true },
-      ui.studio.meetingOpenFailed,
-    );
-    if (typeof payload?.join_url === "string") {
-      window.open(payload.join_url, "_blank", "noopener,noreferrer");
-    }
-  }, [runAction]);
 
   return {
     allowed: current.allowed,
@@ -201,6 +186,5 @@ export default function useConference({ apiBase, asUserId, isAuthed, roomState, 
     setMusicOutput,
     setMusicVolume,
     copyGuestLink,
-    join,
   };
 }

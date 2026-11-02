@@ -39,7 +39,6 @@ export function createMeetingFiles({ client, save }) {
       save(new Blob([file.bytes], { type: file.mediaType }), file.name);
     },
     getSession: () => state().selfId || null,
-    getLanguage: () => state().language || "ru",
   });
 
   let status = state().status;

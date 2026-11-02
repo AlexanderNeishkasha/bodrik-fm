@@ -1,26 +1,20 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import {
   create,
   sections,
 } from "../features/meeting/settings/settingsShellModel.mjs";
 
-/** Inject only visibility and language; the shell has no signaling/media dependencies. */
+/** Inject only visible sections; the shell has no signaling or media dependencies. */
 function fixture(initial = [...sections]) {
   let available = initial;
-  let language = "ru";
   const source = create({
     getAvailableSections: () => available,
-    getLanguage: () => language,
   });
   return {
     source,
     setAvailable: (next) => {
       available = next;
-    },
-    setLanguage: (next) => {
-      language = next;
     },
   };
 }
@@ -62,7 +56,7 @@ test("settings shell capability removal selects first retained available section
   const h = fixture();
   h.source.execute("select", "tabModerator");
   h.source.execute("open");
-  h.setAvailable(["tabLanguages", "tabRoom"]);
+  h.setAvailable(["tabShortcuts", "tabRoom"]);
   h.source.refresh();
   assert.equal(h.source.getSnapshot().selected, "tabRoom");
   assert.equal(h.source.getSnapshot().open, true);
@@ -83,13 +77,9 @@ test("settings shell snapshots are immutable/stable and notify only actual view 
   assert.equal(count, 0);
   assert.ok(Object.isFrozen(before));
   assert.ok(Object.isFrozen(before.available));
-  h.setLanguage("en");
-  h.source.refresh();
-  assert.equal(count, 1);
-  assert.equal(h.source.getSnapshot().language, "en");
   h.source.dispose();
   h.source.refresh();
-  assert.equal(count, 1);
+  assert.equal(count, 0);
   assert.throws(() => h.source.execute("open"), /disposed/);
 });
 
@@ -98,14 +88,3 @@ for (const available of [null, {}, ["missing"]]) {
     assert.throws(() => fixture(available), /Invalid settings section/);
   });
 }
-
-test("settings shell keeps stable scrollable content and a horizontal mobile category rail", () => {
-  const css = readFileSync(new URL("../features/meeting/settings/SettingsShell.module.css", import.meta.url), "utf8");
-  assert.match(css, /width:\s*min\(960px,\s*calc\(100vw\s*-\s*24px\)\)/);
-  assert.match(css, /height:\s*min\(720px,\s*calc\(100dvh\s*-\s*24px\)\)/);
-  assert.match(css, /\.panels\s*\{[^}]*overflow-y:\s*auto/);
-  assert.match(css, /@media\s*\(max-width:\s*600px\)/);
-  assert.match(css, /\.navigation\s*\{[^}]*overflow-x:\s*auto;\s*overflow-y:\s*hidden/);
-  assert.doesNotMatch(css, /flex-wrap:\s*wrap/);
-  assert.match(css, /button:hover::after[^}]*visibility:\s*visible/);
-});

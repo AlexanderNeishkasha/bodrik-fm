@@ -6,34 +6,22 @@ import Icon from "../../../components/ui/Icon";
 import styles from "./SettingsShell.module.css";
 import { bindSettingsDialog } from "./settingsDialogLifecycle.mjs";
 import { useBackClose } from "../room/useBackClose";
+import { t } from "../../../app/lang/index.js";
 
 /** Retained section labels and visual grouping; availability remains source-owned. */
-const copy = {
-  ru: { title: "Настройки встречи", close: "Закрыть настройки", devices: "Устройства", meeting: "Встреча", personal: "Личное",
-    tabAudioDevices: "Звук", tabVideoDevices: "Видео", tabProfile: "Профиль",
-    tabRoom: "Комната", tabModerator: "Модератор", tabShortcuts: "Горячие клавиши",
-    tabLanguages: "Язык" },
-  en: { title: "Meeting settings", close: "Close settings", devices: "Devices", meeting: "Meeting", personal: "Personal",
-    tabAudioDevices: "Audio", tabVideoDevices: "Video", tabProfile: "Profile",
-    tabRoom: "Room", tabModerator: "Moderator", tabShortcuts: "Shortcuts",
-    tabLanguages: "Language" },
-};
-
 const groups = [
   { key: "devices", sections: ["tabAudioDevices", "tabVideoDevices"] },
-  { key: "meeting", sections: ["tabProfile", "tabRoom", "tabModerator"] },
-  { key: "personal", sections: ["tabShortcuts", "tabLanguages"] },
+  { key: "meeting", sections: ["tabProfile", "tabRoom", "tabModerator", "tabShortcuts"] },
 ];
 const icons = { tabAudioDevices: "mic", tabVideoDevices: "video", tabProfile: "profile",
-  tabRoom: "room", tabModerator: "moderator", tabShortcuts: "shortcuts",
-  tabLanguages: "language" };
+  tabRoom: "room", tabModerator: "moderator", tabShortcuts: "shortcuts", };
 
 /** Render navigation around caller-owned panels; mounting/closing never owns the call or a feature source. */
 export default function SettingsShell({ source, renderSection, onReady, overlayDocument }) {
   const snapshot = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot);
   const dialogRef = useRef(null);
   const id = useId();
-  const text = copy[snapshot.language === "en" ? "en" : "ru"];
+  const text = t("meeting.settingsShell");
 
   useBackClose(snapshot.open, () => source.execute("close"));
   useEffect(() => { onReady?.(); }, [onReady]);
@@ -61,7 +49,7 @@ export default function SettingsShell({ source, renderSection, onReady, overlayD
     event.currentTarget.querySelectorAll('[role="tab"]')[index]?.focus();
   }
 
-  return <dialog ref={dialogRef} className={styles.dialog} lang={snapshot.language} aria-labelledby={`${id}-title`}
+  return <dialog ref={dialogRef} className={styles.dialog} aria-labelledby={`${id}-title`}
     onKeyDown={(event) => event.stopPropagation()}>
     <header className={styles.header}><h2 id={`${id}-title`}>{text.title}</h2>
       <button type="button" className={styles.close} aria-label={text.close} title={text.close} onClick={close}><X size={18} /></button></header>

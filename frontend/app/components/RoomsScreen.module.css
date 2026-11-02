@@ -1,3 +1,24 @@
+.panel {
+    position: relative;
+}
+
+.panel::before {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    box-sizing: border-box;
+    border: 1px solid var(--theme-border);
+    border-radius: inherit;
+    background: var(--theme-card);
+    content: "";
+    pointer-events: none;
+}
+
+.content {
+    position: relative;
+    z-index: 2;
+}
+
 .panelEnter {
     animation: panelFadeIn 160ms ease-out both;
 }
@@ -47,6 +68,10 @@
             max(2rem, env(safe-area-inset-bottom))
             max(1.5rem, env(safe-area-inset-left));
         box-shadow: none;
+    }
+
+    .panel::before {
+        content: none;
     }
 
     .studioLink.studioLink {

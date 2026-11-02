@@ -1,3 +1,5 @@
+export { processNoise } from "./noiseProcessing.mjs";
+
 /** Self-hosted processing assets (scripts/prepare-meeting-assets.mjs). */
 const ASSETS = "/meeting-assets";
 
@@ -7,7 +9,7 @@ export const BLUR_PX = Object.freeze({ low: 10, high: 20 });
 /** Camera effects: none, light background blur, strong background blur. */
 export const BACKGROUND_MODES = Object.freeze(["off", "low", "high"]);
 
-/** Whether the browser can run RNNoise in an AudioWorklet. */
+/** Whether the browser has the primitives required for neural AudioWorklet suppression. */
 export function noiseSuppressionSupported(scope = globalThis) {
   return typeof scope.AudioWorkletNode === "function" && typeof scope.WebAssembly === "object";
 }
@@ -15,37 +17,6 @@ export function noiseSuppressionSupported(scope = globalThis) {
 /** Whether the browser can run the background pipeline. */
 export function backgroundSupported(scope = globalThis) {
   return typeof scope.HTMLCanvasElement?.prototype?.captureStream === "function" && typeof scope.WebAssembly === "object";
-}
-
-/**
- * Run a microphone track through RNNoise. Resolves with `{ track, dispose }`; the
- * output track belongs to the returned handle, the input stays with its owner.
- */
-export async function processNoise(track) {
-  const { RnnoiseWorkletNode, loadRnnoise } = await import("@sapphi-red/web-noise-suppressor");
-  const context = new AudioContext({ sampleRate: 48000 });
-  try {
-    const wasmBinary = await loadRnnoise({ url: `${ASSETS}/rnnoise/rnnoise.wasm`, simdUrl: `${ASSETS}/rnnoise/rnnoise_simd.wasm` });
-    await context.audioWorklet.addModule(`${ASSETS}/rnnoise/workletProcessor.js`);
-    const node = new RnnoiseWorkletNode(context, { maxChannels: 1, wasmBinary });
-    const source = context.createMediaStreamSource(new MediaStream([track]));
-    const destination = context.createMediaStreamDestination();
-    source.connect(node).connect(destination);
-    const output = destination.stream.getAudioTracks()[0];
-    return {
-      track: output,
-      dispose() {
-        source.disconnect();
-        node.disconnect();
-        node.destroy?.();
-        output.stop();
-        context.close().catch(() => {});
-      },
-    };
-  } catch (error) {
-    context.close().catch(() => {});
-    throw error;
-  }
 }
 
 let segmenterScript = null;

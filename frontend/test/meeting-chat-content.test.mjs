@@ -79,7 +79,7 @@ for (const language of ["ru", "en"]) {
     assert.ok(html.includes('loading="lazy"'));
     assert.ok(html.includes('referrerPolicy="no-referrer"') || html.includes('referrerpolicy="no-referrer"'));
     assert.ok(html.includes("&lt;img"));
-    assert.ok(html.includes(language === "en" ? "Shared meeting image" : "Изображение в чате"));
+    assert.ok(html.includes("Изображение в чате"));
     assert.equal(html.includes("<script"), false);
     assert.equal(html.includes('rel="preload"'), false);
   });

@@ -7,7 +7,7 @@ use crate::api::{
 };
 use axum::{
     Json,
-    extract::{ConnectInfo, State},
+    extract::State,
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
@@ -157,56 +157,6 @@ pub async fn set_music_volume(
         }
         Err(error) => internal_error_response("conference.volume", error),
     }
-}
-
-/// Issue an owner/admin presenter URL with atomic request throttling and post-provider revalidation.
-pub async fn studio_join(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-    ConnectInfo(remote): ConnectInfo<SocketAddr>,
-) -> Response {
-    let user = match studio::studio_user_from_http_async(&state, &headers).await {
-        Ok(user) => user,
-        Err(response) => return *response,
-    };
-    if !admit(&state, &headers, remote).await {
-        return json_message(StatusCode::TOO_MANY_REQUESTS, "too many attempts").into_response();
-    }
-    if state.conference_provider.is_none() {
-        return json_message(StatusCode::SERVICE_UNAVAILABLE, "conference unavailable")
-            .into_response();
-    }
-    let conference = match room_state(&state, user.room_id).await {
-        Ok(Some(conference)) => conference,
-        Ok(None) => {
-            return json_message(StatusCode::NOT_FOUND, "conference disabled").into_response();
-        }
-        Err(error) => return internal_error_response("conference.join.load", error),
-    };
-    let Some(join_url) = state.conference_provider.as_deref().and_then(|provider| {
-        super::policy::joinable(&conference, provider.key())
-            .then(|| provider.invitation_url(&conference.room_slug))
-    }) else {
-        return json_message(StatusCode::NOT_FOUND, "conference disabled").into_response();
-    };
-    // The owner's link carries a single-use host pass in the fragment (never sent to
-    // servers or logs); the meeting page redeems it so this browser becomes host.
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |elapsed| elapsed.as_secs());
-    let app = state.clone();
-    let room_id = conference.room_id;
-    let token =
-        match tokio::task::spawn_blocking(move || super::hosts::mint_grant(&app, room_id, now))
-            .await
-        {
-            Ok(Ok(token)) => token,
-            Ok(Err(error)) => return internal_error_response("conference.join.host", error),
-            Err(error) => return internal_error_response("conference.join.host", error),
-        };
-    super::response::no_store_json(JoinResponse {
-        join_url: format!("{join_url}#host={token}"),
-    })
 }
 
 /// Build public-invitation settings without exposing provider mapping or credentials.

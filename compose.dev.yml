@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: backend/dev.dockerfile
+      # The Pi is its LAN DNS server; build steps must reach that resolver via the host.
+      network: host
     environment:
       BIND_ADDR: 0.0.0.0:3001
       BODRIK_FM_JWT_SECRET: ${BODRIK_FM_JWT_SECRET:-}
@@ -12,12 +14,16 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       MEDIA_DIR: ${MEDIA_DIR:-/app/backend/uploads}
       UPLOAD_TMP_DIR: ${UPLOAD_TMP_DIR:-/app/backend/uploads/tmp}
-      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-http://localhost:3000,http://127.0.0.1:3000,http://pc.local:3000,https://pc.local:3443,https://localhost:3443}
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-}
+      # The launcher shares Studio sessions with the derived meeting subdomain.
+      AUTH_COOKIE_DOMAIN: ${AUTH_COOKIE_DOMAIN:-}
       TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-false}
       MEETING_PUBLIC_URL: ${MEETING_PUBLIC_URL:-}
       CONFERENCE_UNAVAILABLE_URL: ${CONFERENCE_UNAVAILABLE_URL:-}
       MEETING_TICKET_KEY: ${LOCAL_MEETING_TICKET_KEY:-}
       MEETING_ENABLED: "true"
+      # Parallel smoke workers join from one host; keep production's default of 30.
+      CONFERENCE_JOINS_PER_MINUTE: ${CONFERENCE_JOINS_PER_MINUTE:-600}
       TURN_ENABLED: ${LOCAL_TURN_ENABLED:-false}
       TURN_URLS: ${LOCAL_TURN_URLS:-}
       TURN_SHARED_SECRET: ${LOCAL_TURN_SHARED_SECRET:-}
@@ -29,9 +35,9 @@ services:
       MEETING_RTP_MAX: ${LOCAL_SFU_RTP_MAX:-40100}
       MEETING_FFMPEG_PATH: /usr/bin/ffmpeg
       MEETING_MUSIC_RTP_HOST: 127.0.0.1
-      REPLACEMENT_BROWSER_ORIGINS: https://pc.local:3443,https://localhost:3443
-      REPLACEMENT_INVITE_BASE_URL: https://pc.local:3443/api/conferences
-      REPLACEMENT_BYE_URL: http://pc.local:3000/bye
+      REPLACEMENT_BROWSER_ORIGINS: ${REPLACEMENT_BROWSER_ORIGINS:-}
+      REPLACEMENT_INVITE_BASE_URL: ${REPLACEMENT_INVITE_BASE_URL:-}
+      REPLACEMENT_BYE_URL: ${REPLACEMENT_BYE_URL:-}
       REPLACEMENT_UI_BUTTONS_JSON: "false"
       REPLACEMENT_BRAND_JSON: "false"
       REPLACEMENT_AVATAR_DIR: /uploads/avatars
@@ -58,17 +64,52 @@ services:
       - dev_mirotalk_client_diagnostics:/logs/diagnostics
     init: true
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
       - "${LOCAL_SFU_RTP_MIN:-40000}-${LOCAL_SFU_RTP_MAX:-40100}:${LOCAL_SFU_RTP_MIN:-40000}-${LOCAL_SFU_RTP_MAX:-40100}/udp"
       - "${LOCAL_SFU_RTP_MIN:-40000}-${LOCAL_SFU_RTP_MAX:-40100}:${LOCAL_SFU_RTP_MIN:-40000}-${LOCAL_SFU_RTP_MAX:-40100}/tcp"
+
+  # Viewer only: no Telegram credentials are passed into this service.
+  logging:
+    profiles: [logging]
+    build:
+      context: .
+      dockerfile: infra/logging/Dockerfile
+    init: true
+    restart: unless-stopped
+    environment:
+      TELEGRAM_ALERTS_ENABLED: "false"
+    ports:
+      - "127.0.0.1:8088:8080"
+    networks: [logging]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - dev_logging_data:/data
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=16m
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+    healthcheck:
+      test: [CMD, env, -i, DOZZLE_NO_ANALYTICS=true, /dozzle, healthcheck]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   frontend:
     build:
       context: ./frontend
       dockerfile: dev.dockerfile
+      network: host
     command: sh -c "bun install --frozen-lockfile && bun run dev"
     environment:
       CI: "true"
+      LOCAL_DEV_HOST: ${LOCAL_DEV_HOST:-localhost}
       NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-http://localhost:3001}
       NEXT_PUBLIC_SUPPORT_EMAIL: ${NEXT_PUBLIC_SUPPORT_EMAIL:-support@bodrik.fm}
     # Compose Watch writes Linux-local source so Turbopack receives native events.
@@ -96,23 +137,22 @@ services:
           path: ./frontend/package.json
         - action: rebuild
           path: ./frontend/bun.lock
-    ports:
-      - "3000:3000"
-
-
   meet:
     image: nginx:1.27-alpine
     ports:
-      - "3443:443"
+      - "127.0.0.1:${LOCAL_PROXY_PORT:-8380}:80"
     volumes:
       - ./infra/dev/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./infra/dev/certs:/etc/nginx/certs:ro
       - ./data/chat-attachments:/data/chat-attachments:ro
     depends_on:
       - frontend
       - backend
 
+networks:
+  logging:
+
 volumes:
+  dev_logging_data:
   backend_target:
   backend_mbx_cache:
   meeting_target:

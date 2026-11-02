@@ -6,13 +6,10 @@ import { AudioLines, Check, Mic, Play, Settings, Square, Volume2 } from "lucide-
 import SelectControl from "../../../components/ui/SelectControl";
 import SwitchControl from "../../../components/ui/SwitchControl";
 import styles from "./MicQuickMenu.module.css";
+import { t } from "../../../app/lang/index.js";
+import { noiseModeOptions } from "../client/noiseModes.mjs";
 
 /** RU/EN copy. */
-const COPY = {
-  ru: { microphones: "Микрофоны", processing: "Настройки микрофона", noise: "Шумоподавление", off: "Выключено", browser: "Базовое", enhanced: "Усиленное", echo: "Эхоподавление", gain: "Выравнивание громкости", speakers: "Динамики", volume: "Громкость динамика", test: "Проверить динамики", stopTest: "Остановить", open: "Открыть настройки звука", unavailable: "Недоступен", level: "Уровень микрофона" },
-  en: { microphones: "Microphones", processing: "Microphone settings", noise: "Noise suppression", off: "Off", browser: "Basic", enhanced: "Enhanced", echo: "Echo cancellation", gain: "Auto gain control", speakers: "Speakers", volume: "Speaker volume", test: "Test speakers", stopTest: "Stop", open: "Open audio settings", unavailable: "Unavailable", level: "Microphone level" },
-};
-
 /** Raw per-device meter; inaccessible inputs are distinct from silence. */
 function Level({ reading, label, unavailable }) {
   const level = reading?.level || 0;
@@ -31,12 +28,12 @@ function Toggle({ label, checked, disabled, onChange }) {
   </label>;
 }
 
-/** Quick microphone and speaker menu shown above the mic button. */
-export default function MicQuickMenu({ audio, onOpenSettings, onError, language = "ru" }) {
+/** Quick microphone and output-device menu shown above the mic button. */
+export default function MicQuickMenu({ audio, onOpenSettings, onError }) {
   const snapshot = useSyncExternalStore(audio.subscribe, audio.getSnapshot, audio.getSnapshot);
   const [comparison] = useState(() => audio.createInputComparison());
   const levels = useSyncExternalStore(comparison.subscribe, comparison.getSnapshot, comparison.getSnapshot);
-  const text = COPY[language === "en" ? "en" : "ru"];
+  const text = t("meeting.micQuickMenu");
   const busy = Boolean(snapshot.pending);
 
   /** Run one audio setting change. */
@@ -44,26 +41,28 @@ export default function MicQuickMenu({ audio, onOpenSettings, onError, language 
     audio.execute(key, value).catch((error) => onError?.(error));
   }
 
-  const modes = [["off", text.off], ["browser", text.browser], ...(snapshot.enhancedAvailable ? [["rnnoise", text.enhanced]] : [])];
-  return <div style={{ viewTransitionName: "meeting-control-menu" }} className={styles.menu} role="menu" aria-label={text.microphones}>
-    <p className={styles.title}><Mic size={14} aria-hidden="true" /> {text.microphones}</p>
+  const modes = noiseModeOptions(text, snapshot.enhancedAvailable);
+  return <div style={{ viewTransitionName: "meeting-control-menu" }} className={styles.menu} role="menu" aria-label={snapshot.coupledAudioRouting ? text.audioDevice : text.microphones}>
+    <p className={styles.title}><Mic size={14} aria-hidden="true" /> {snapshot.coupledAudioRouting ? text.audioDevice : text.microphones}</p>
+    {snapshot.coupledAudioRouting && <p>{text.routeHint}</p>}
     {snapshot.inputDevices.map((device) => {
       const selected = device.value === snapshot.inputDevice;
       return <button key={device.value} type="button" role="menuitemradio" aria-checked={selected} className={styles.device} disabled={busy}
         onClick={() => change("inputDevice", device.value)}>
         <span className={styles.check}>{selected && <Check size={14} />}</span>
         <span className={styles.label}>{device.label}</span>
-        <Level reading={levels[device.value]} label={`${text.level}: ${device.label}`} unavailable={text.unavailable} />
+        {!snapshot.coupledAudioRouting && <Level reading={levels[device.value]} label={`${text.level}: ${device.label}`} unavailable={text.unavailable} />}
       </button>;
     })}
     <p className={styles.title}><AudioLines size={14} aria-hidden="true" /> {text.processing}</p>
     <div className={styles.row}>
       <span>{text.noise}</span>
-      <SelectControl label={text.noise} className={styles.noiseSelector} options={modes.map(([value, label]) => ({ value, label }))}
+      <SelectControl label={text.noise} className={styles.noiseSelector} options={modes}
         value={snapshot.noiseMode} disabled={busy} onChange={(event) => change("noiseMode", event.target.value)} />
     </div>
     <Toggle label={text.echo} checked={snapshot.echoCancellation} disabled={busy} onChange={(value) => change("echoCancellation", value)} />
     <Toggle label={text.gain} checked={snapshot.autoGainControl} disabled={busy} onChange={(value) => change("autoGainControl", value)} />
+    {snapshot.pttAvailable && <Toggle label={text.ptt} checked={snapshot.pushToTalk} disabled={busy} onChange={(value) => change("pushToTalk", value)} />}
     {snapshot.outputSelectionAvailable && snapshot.outputDevices.length > 0 && <>
       <p className={styles.title}><Volume2 size={14} aria-hidden="true" /> {text.speakers}</p>
       {snapshot.outputDevices.map((device) => {

@@ -1,13 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("touch cards reveal controls on one tap and focus only on double tap", async ({ browser }) => {
   const context = await browser.newContext({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   const driver = nextDriver(page);
   try {
-    await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+    await page.goto(driver.path(smokeRoom()));
     await driver.join(`Touch${Date.now().toString(36).slice(-4)}`);
     const music = page.locator('article[data-card-key="bodrik-music"]');
     const controls = page.getByRole("navigation", { name: "Управление встречей" });
@@ -20,6 +21,11 @@ test("touch cards reveal controls on one tap and focus only on double tap", asyn
       expect(Math.max(...boxes.map((box) => box.center)) - Math.min(...boxes.map((box) => box.center))).toBeLessThan(1);
       expect(Math.min(...boxes.map((box) => box.x))).toBeGreaterThanOrEqual(0);
       expect(Math.max(...boxes.map((box) => box.right))).toBeLessThanOrEqual(width);
+      // Quick menus are hidden on the mobile layout (≤700px); settings stays reachable.
+      if (width <= 700) {
+        await expect(controls.getByRole("button", { name: "Дополнительно", exact: true })).toHaveCount(0);
+        continue;
+      }
       await controls.getByRole("button", { name: "Дополнительно", exact: true }).tap();
       const more = page.getByRole("menu", { name: "Дополнительно", exact: true });
       await expect(more).toBeVisible();

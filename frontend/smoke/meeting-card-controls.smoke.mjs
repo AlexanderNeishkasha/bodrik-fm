@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("card fullscreen follows video and double click does not select text", async ({ page }) => {
   const driver = nextDriver(page);
   const name = `Card${Date.now().toString(36)}`;
-  await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+  await page.goto(driver.path(smokeRoom()));
   await driver.join(name);
   try {
     const card = page.locator("article[data-participant-id]").filter({ has: page.locator("footer strong", { hasText: name }) });
@@ -27,7 +28,7 @@ test("mobile focus keeps avatar snapshots square while cards change shape", asyn
   await page.setViewportSize({ width: 390, height: 844 });
   const driver = nextDriver(page);
   const name = `Motion${Date.now().toString(36)}`;
-  await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+  await page.goto(driver.path(smokeRoom()));
   await driver.join(name);
   try {
     const card = page.locator("article[data-participant-id]").filter({ has: page.locator("footer strong", { hasText: name }) });
@@ -44,13 +45,16 @@ test("mobile focus keeps avatar snapshots square while cards change shape", asyn
         return transition;
       };
     }, avatarName);
+    // Other room activity (a previous participant leaving) may add transitions, so count at least one per focus change.
+    const samples = () => page.evaluate(() => window.avatarSamples.length);
     await card.locator("footer strong").dblclick();
     await expect(card).toHaveAttribute("data-focused", "true");
-    await expect.poll(() => page.evaluate(() => window.avatarSamples.length)).toBe(1);
+    await expect.poll(samples).toBeGreaterThanOrEqual(1);
     await page.waitForTimeout(350);
+    const focused = await samples();
     await card.locator("footer strong").dblclick();
     await expect(card).not.toHaveAttribute("data-focused", "true");
-    await expect.poll(() => page.evaluate(() => window.avatarSamples.length)).toBe(2);
+    await expect.poll(samples).toBeGreaterThan(focused);
     for (const sample of await page.evaluate(() => window.avatarSamples)) {
       expect(sample.width).toBeGreaterThan(0);
       expect(Math.abs(sample.width - sample.height)).toBeLessThan(1);

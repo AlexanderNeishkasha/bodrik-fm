@@ -178,6 +178,195 @@
   opacity: 0.6;
 }
 
+/* Saved profiles: round avatar tiles; the chosen one wears an accent ring, the rest recede. */
+.profilePicker {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.profilesLabel {
+  margin: 0;
+  color: var(--meeting-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 10px;
+}
+
+.profile {
+  position: relative;
+  width: 88px;
+}
+
+.profileButton {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 8px;
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  color: var(--meeting-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.profileButton:focus-visible {
+  outline: none;
+}
+
+.profileAvatar {
+  display: grid;
+  overflow: hidden;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--meeting-accent);
+  background-position: center;
+  background-size: cover;
+  color: var(--meeting-on-accent);
+  font-size: 1.2rem;
+  font-weight: 700;
+  opacity: 0.72;
+  transition: opacity var(--meeting-motion), transform var(--meeting-motion), box-shadow var(--meeting-motion);
+}
+
+.profileName {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--meeting-muted);
+  font-size: 0.85rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--meeting-motion);
+}
+
+.profileButton:hover .profileAvatar {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.profileButton:hover .profileName {
+  color: var(--meeting-text);
+}
+
+.profileButton:active .profileAvatar {
+  transform: scale(0.95);
+}
+
+.profileButton:focus-visible .profileAvatar {
+  box-shadow: 0 0 0 3px var(--meeting-card), 0 0 0 5px var(--meeting-focus);
+}
+
+.profileButton[aria-pressed="true"] .profileAvatar {
+  opacity: 1;
+  box-shadow: 0 0 0 3px var(--meeting-card), 0 0 0 5px var(--meeting-accent);
+}
+
+.profileButton[aria-pressed="true"] .profileName {
+  color: var(--meeting-text);
+  font-weight: 700;
+}
+
+.profileAdd {
+  border: 2px dashed var(--meeting-border);
+  background: transparent;
+  color: var(--meeting-muted);
+  opacity: 1;
+}
+
+.profileButton:hover .profileAdd,
+.profileButton[aria-pressed="true"] .profileAdd {
+  border-color: var(--meeting-accent);
+  color: var(--meeting-accent);
+}
+
+.profileButton[aria-pressed="true"] .profileAdd {
+  box-shadow: none;
+}
+
+.profileRemove {
+  position: absolute;
+  top: 0;
+  right: 8px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--meeting-border);
+  border-radius: 50%;
+  background: var(--meeting-raised);
+  color: var(--meeting-muted);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity var(--meeting-motion), transform var(--meeting-motion), background-color var(--meeting-motion), color var(--meeting-motion);
+}
+
+.profile:hover .profileRemove,
+.profileRemove:focus-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.profileRemove:hover {
+  border-color: var(--meeting-danger);
+  background: var(--meeting-danger-bg);
+  color: var(--meeting-danger-foreground);
+}
+
+.profileRemove:focus-visible {
+  outline: 2px solid var(--meeting-focus);
+  outline-offset: 2px;
+}
+
+/* Touch screens have no hover: keep removal reachable. */
+@media (hover: none) {
+  .profileRemove {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* New-profile form: slides open/closed like the camera preview (rows 260ms, fade 180ms). */
+.newProfile {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: none;
+  transition: grid-template-rows 260ms ease, margin-top 260ms ease, opacity 180ms ease 80ms, transform 260ms ease, visibility 0s;
+}
+
+.newProfile[data-open="false"] {
+  grid-template-rows: 0fr;
+  /* Cancel the card's row gap so the closed form takes no space. */
+  margin-top: -16px;
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  transition: grid-template-rows 260ms ease, margin-top 260ms ease, opacity 180ms ease, transform 260ms ease, visibility 0s 260ms;
+}
+
+.newProfileBody {
+  display: grid;
+  min-height: 0;
+  gap: 16px;
+  overflow: hidden;
+  /* Room for focus rings inside the clipped area. */
+  margin: -6px;
+  padding: 6px;
+}
+
 @media (max-width: 700px) {
   .page {
     padding: 0;
@@ -197,6 +386,15 @@
 
   .card h1 {
     font-size: 1.2rem;
+  }
+
+  .profile {
+    width: 76px;
+  }
+
+  .profileAvatar {
+    width: 56px;
+    height: 56px;
   }
 
   .body,
@@ -220,7 +418,14 @@
 @media (prefers-reduced-motion: reduce) {
   .body,
   .previewSlot,
-  .body[data-camera-on="true"] .previewSlot {
+  .body[data-camera-on="true"] .previewSlot,
+  .profileAvatar,
+  .profileRemove {
+    transition: none;
+  }
+
+  .newProfile,
+  .newProfile[data-open="false"] {
     transition: none;
   }
 }

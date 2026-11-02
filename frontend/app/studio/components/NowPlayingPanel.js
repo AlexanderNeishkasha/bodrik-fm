@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core";
 import AudioGlow from "../../components/AudioGlow";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import NowPlayingControls from "./NowPlayingControls";
 import NowPlayingHeader from "./NowPlayingHeader";
 import NowPlayingSeek from "./NowPlayingSeek";
@@ -64,7 +64,7 @@ export default function NowPlayingPanel({
           onSeekCommit={onSeekCommit}
         />
         <NowPlayingVolume
-          label={musicOutput === "conference" ? ui.studio.meetingVolume : undefined}
+          label={musicOutput === "conference" ? t("studio.meetingVolume") : undefined}
           localVolume={localVolume}
           localMuted={localMuted}
           onToggleMute={onToggleMute}

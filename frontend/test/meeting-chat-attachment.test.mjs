@@ -20,8 +20,8 @@ for (const [name, file, accepted] of [
 test("attachment sizes use localized numbers and units", () => {
   assert.equal(attachmentSize(100, "ru"), "100 Б");
   assert.equal(attachmentSize(1536, "ru"), "1,5 КБ");
-  assert.equal(attachmentSize(1536, "en"), "1.5 KB");
-  assert.equal(attachmentSize(1024 * 1024, "en"), "1 MB");
+  assert.equal(attachmentSize(1536), "1,5 КБ");
+  assert.equal(attachmentSize(1024 * 1024), "1 МБ");
   assert.equal(attachmentSize(undefined), "");
 });
 

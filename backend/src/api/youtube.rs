@@ -58,7 +58,7 @@ pub async fn submit_download(
     let metadata = match youtube_download_runner::fetch_metadata(&url).await {
         Ok(metadata) => metadata,
         Err(err) => {
-            tracing::warn!(%err, "youtube metadata probe failed");
+            tracing::warn!(event = "youtube_metadata_failed", failure_kind = %err, "youtube metadata probe failed");
             return json_message(StatusCode::BAD_GATEWAY, "youtube metadata failed")
                 .into_response();
         }

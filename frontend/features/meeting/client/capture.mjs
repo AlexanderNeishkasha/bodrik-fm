@@ -1,3 +1,6 @@
+import { NEURAL_NOISE_MODES, NOISE_MODES } from "./noiseModes.mjs";
+import { audioRoutingCapabilities, screenSharingAvailable } from "./capabilities.mjs";
+
 /** Capture resolutions offered by the legacy meeting, keyed by option value. */
 export const RESOLUTIONS = Object.freeze({
   qvga: [320, 240],
@@ -38,7 +41,7 @@ const VALID = Object.freeze({
   inputDevice: (value) => typeof value === "string" && value.length <= 256,
   outputDevice: (value) => typeof value === "string" && value.length <= 256,
   camera: (value) => typeof value === "string" && value.length <= 256,
-  noiseMode: (value) => value === "off" || value === "browser" || value === "rnnoise",
+  noiseMode: (value) => NOISE_MODES.includes(value),
   echoCancellation: (value) => typeof value === "boolean",
   autoGainControl: (value) => typeof value === "boolean",
   quality: (value) => Object.hasOwn(RESOLUTIONS, value),
@@ -61,6 +64,12 @@ const AFFECTS = Object.freeze({
   outputDevice: "output",
   backgroundMode: "background",
 });
+
+/** Preference that pins the device of each device-backed capture kind. */
+const DEVICE_PREFERENCE = Object.freeze({ audio: "inputDevice", camera: "camera" });
+
+/** Errors meaning a pinned device id no longer matches any device. */
+const MISSING_DEVICE_ERRORS = Object.freeze(["OverconstrainedError", "NotFoundError"]);
 
 /** Merge stored preferences over defaults, dropping invalid values. */
 export function parsePreferences(raw) {
@@ -88,7 +97,8 @@ export function captureConstraints(kind, preferences) {
       audio: {
         ...(preferences.inputDevice ? { deviceId: { exact: preferences.inputDevice } } : {}),
         echoCancellation: preferences.echoCancellation,
-        autoGainControl: preferences.autoGainControl,
+        // Neural modes level the denoised output; browser AGC would boost noise before filtering.
+        autoGainControl: preferences.autoGainControl && !NEURAL_NOISE_MODES.includes(preferences.noiseMode),
         noiseSuppression: preferences.noiseMode === "browser",
       },
     };
@@ -119,7 +129,7 @@ function deviceOptions(devices, kind) {
  * Own every local capture track and the capture preferences. Callers publish the
  * returned tracks; this module only acquires, restarts and stops them.
  */
-export function createCapture({ mediaDevices, storage }) {
+export function createCapture({ mediaDevices, storage, navigatorRef = globalThis.navigator }) {
   let preferences = parsePreferences(read(storage));
   let devices = Object.freeze({ inputDevices: [], outputDevices: [], cameras: [] });
   const tracks = new Map(); // kind -> MediaStreamTrack
@@ -135,12 +145,13 @@ export function createCapture({ mediaDevices, storage }) {
     snapshot = Object.freeze({
       ...preferences,
       ...devices,
+      ...audioRoutingCapabilities(devices.outputDevices, navigatorRef),
       activeInputDevice: active.audio,
       activeCamera: active.camera,
       microphone: tracks.has("audio"),
       cameraOn: tracks.has("camera"),
       screen: tracks.has("screen"),
-      screenAvailable: typeof mediaDevices?.getDisplayMedia === "function",
+      screenAvailable: screenSharingAvailable(mediaDevices, navigatorRef),
       pending,
       error,
     });
@@ -153,6 +164,26 @@ export function createCapture({ mediaDevices, storage }) {
       storage?.setItem(STORAGE_KEY, JSON.stringify(preferences));
     } catch {
       // Private mode or blocked storage: keep in memory only.
+    }
+  }
+
+  /**
+   * Open a stream for one kind. A saved device that disappeared (unplugged, or ids
+   * rotated after site data was cleared) is forgotten and the default device is used.
+   */
+  async function open(kind) {
+    if (kind === "screen") return mediaDevices.getDisplayMedia(captureConstraints(kind, preferences));
+    const key = DEVICE_PREFERENCE[kind];
+    const pinned = preferences[key];
+    try {
+      return await mediaDevices.getUserMedia(captureConstraints(kind, preferences));
+    } catch (error) {
+      if (!pinned || !MISSING_DEVICE_ERRORS.includes(error?.name)) throw error;
+      if (preferences[key] === pinned) {
+        preferences = Object.freeze({ ...preferences, [key]: "" });
+        save();
+      }
+      return mediaDevices.getUserMedia(captureConstraints(kind, preferences));
     }
   }
 
@@ -185,13 +216,22 @@ export function createCapture({ mediaDevices, storage }) {
     /**
      * Acquire (or re-acquire) one kind; the previous track of that kind is stopped.
      * When acquires of one kind overlap, only the newest is installed; an older one
-     * stops its own track and resolves with whatever is current.
+     * stops its own track and resolves with whatever is current. Device lists are
+     * re-read after every microphone/camera attempt, failed or not, because a
+     * permission prompt can expose ids even when capture itself fails.
      */
     async acquire(kind) {
+      if (kind === "screen" && !screenSharingAvailable(mediaDevices, navigatorRef)) {
+        throw new DOMException("Screen sharing is unavailable", "NotSupportedError");
+      }
       const generation = (generations.get(kind) || 0) + 1;
       generations.set(kind, generation);
-      const constraints = captureConstraints(kind, preferences);
-      const stream = kind === "screen" ? await mediaDevices.getDisplayMedia(constraints) : await mediaDevices.getUserMedia(constraints);
+      let stream;
+      try {
+        stream = await open(kind);
+      } finally {
+        if (kind !== "screen") await api.refreshDevices().catch(() => {});
+      }
       const track = kind === "audio" ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0];
       // Screen capture may include system audio; this client publishes screen video only.
       for (const extra of stream.getTracks()) if (extra !== track) extra.stop();

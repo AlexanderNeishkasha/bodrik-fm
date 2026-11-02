@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import { localizeApiMessage } from "../lib/localizeApiMessage";
 import { uploadId, uploadKey } from "../lib/uploadPolicy.mjs";
 
@@ -44,7 +44,7 @@ export default function useStudioUploads({
     if (!file) return Promise.resolve(false);
     const key = uploadKey(file);
     if (inFlightKeysRef.current.has(key)) {
-      showNotice(ui.messages.fileExists);
+      showNotice(t("messages.fileExists"));
       return Promise.resolve(false);
     }
     inFlightKeysRef.current.add(key);
@@ -106,14 +106,14 @@ export default function useStudioUploads({
         } catch {}
         if (rawMessage === "name exists") {
           setUploads((current) => current.filter((item) => item.id !== id));
-          showNotice(ui.messages.fileExists);
-          setStatus(ui.messages.fileExists);
+          showNotice(t("messages.fileExists"));
+          setStatus(t("messages.fileExists"));
           settle(false);
           return;
         }
-        fail(localizeApiMessage(rawMessage, ui.messages.uploadFailed));
+        fail(localizeApiMessage(rawMessage, t("messages.uploadFailed")));
       };
-      xhr.onerror = () => fail(ui.messages.uploadFailed);
+      xhr.onerror = () => fail(t("messages.uploadFailed"));
       xhr.onabort = () => {
         if (settled) return;
         setUploads((current) => current.filter((item) => item.id !== id));

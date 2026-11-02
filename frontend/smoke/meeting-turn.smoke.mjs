@@ -38,9 +38,10 @@ async function prepareRoom() {
     await post("/api/studio/upload", { multipart: { file: { name: "relay-tone.wav", mimeType: "audio/wav", buffer: tone() } } });
     const tracks = await (await api.get("/api/studio/tracks")).json();
     await post("/api/studio/play", { data: { id: tracks.at(-1).id } });
-    const join = await post("/api/studio/conference/join", { data: {} });
-    const host = new URL((await join.json()).join_url);
-    return { host: host.pathname + host.hash, guest: host.pathname };
+    // Relay checks need no presenter: both participants join by the plain room path.
+    const { room_slug: slug } = await (await api.get("/api/auth/me")).json();
+    const path = `/room/${encodeURIComponent(slug)}`;
+    return { host: path, guest: path };
   } finally { await api.dispose(); }
 }
 

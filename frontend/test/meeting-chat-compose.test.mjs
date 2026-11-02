@@ -31,7 +31,7 @@ async function harness(submit, { disabled = false } = {}) {
     URL: { createObjectURL: (file) => { const url = URL.createObjectURL(file); created.push(url); return url; }, revokeObjectURL: (url) => { revoked.push(url); URL.revokeObjectURL(url); } }, require: (name) => name === "react" ? { ...require("react"), ...hooks } : require(name),
   });
   /** Render without resetting hook state, just as a local rerender would do. */
-  function render() { cursor = 0; return evaluated.exports.default({ submit, language: "en", ref: composer, disabled }); }
+  function render() { cursor = 0; return evaluated.exports.default({ submit, ref: composer, disabled }); }
   /** Find a JSX node without executing another component's hooks. */
   function find(node, type) {
     if (!node || typeof node !== "object") return null;
@@ -55,11 +55,11 @@ for (const [name, result, clears] of [["local submission", { status: "submitted"
     assert.equal(h.find(h.render(), "textarea").props.value, clears ? "" : "hello");
     const status = h.find(h.render(), "p").props.children;
     if (name === "local submission") assert.equal(status, "");
-    if (name === "missing result") assert.ok(status.includes("could not be confirmed"));
+    if (name === "missing result") assert.ok(status.includes("Неизвестно, отправилось ли сообщение"));
     h.dispose();
   });
 }
-for (const [reason, expected] of [["no_participants", "No other participants"], ["length", "too long"], ["rate_limit", "wait"], ["policy", "moderator"], ["recipient", "no longer available"]]) {
+for (const [reason, expected] of [["no_participants", "Нет других участников"], ["length", "слишком длинные"], ["rate_limit", "Подождите"], ["policy", "ограничил"], ["recipient", "уже вышел"]]) {
   test(`composer explains local rejection ${reason} without exposing transport details`, async () => {
     const h = await harness(() => ({ status: "rejected", reason, clearDraft: false }));
     h.draft("hello");
@@ -160,7 +160,7 @@ test("a submitted file with rejected caption is unstaged while its caption remai
   await h.send();
   assert.equal(h.find(h.render(), "figure"), null);
   assert.equal(h.find(h.render(), "textarea").props.value, "caption");
-  assert.match(h.find(h.render(), "p").props.children, /File sent/);
+  assert.match(h.find(h.render(), "p").props.children, /Файл отправлен/);
   h.dispose();
 });
 
@@ -177,7 +177,7 @@ for (const [name, files, accepted] of [
   assert.equal(Boolean(h.find(h.render(), "figure")), accepted);
   await h.send();
   assert.equal(sent, accepted ? files[0] : undefined);
-  if (name === "multiple files") assert.match(h.find(h.render(), "p").props.children, /one file at a time/);
+  if (name === "multiple files") assert.match(h.find(h.render(), "p").props.children, /по одному файлу/);
   h.dispose();
 });
 

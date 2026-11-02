@@ -40,7 +40,6 @@ pub async fn run_download_job(state: AppState, id: String, room: i64, url: Strin
         error = watch(&state, &id, room) => Err(OpError::Internal(error)),
     };
     if let Err(error) = outcome {
-        tracing::warn!(job_id = %id, room_id = room, %error, "youtube job failed");
         persist_error(&state, &id, room, &error).await;
     }
     drop(permit);
@@ -48,6 +47,15 @@ pub async fn run_download_job(state: AppState, id: String, room: i64, url: Strin
 
 /// Record only sanitized public failure classifications, reporting write failures too.
 async fn persist_error(state: &AppState, id: &str, room: i64, error: &OpError) {
+    let failure_kind = policy::alert_failure_kind(error);
+    tracing::warn!(
+        event = "youtube_download_failed",
+        failure_kind,
+        %error,
+        job_id = id,
+        room_id = room,
+        "youtube job failed"
+    );
     let db_state = state.clone();
     let id = id.to_owned();
     let public = policy::public_error(error);

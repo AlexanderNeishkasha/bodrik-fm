@@ -1,4 +1,4 @@
-﻿import { ui } from "../../lang/ru";
+﻿import { t } from "../../lang/index.js";
 import Icon from "../../components/Icon";
 
 export default function NowPlayingControls({
@@ -11,8 +11,8 @@ export default function NowPlayingControls({
   onToggleRepeat,
 }) {
   const repeatLabel = isRepeatOn
-    ? ui.studio.repeatDisable
-    : ui.studio.repeatEnable;
+    ? t("studio.repeatDisable")
+    : t("studio.repeatEnable");
   const repeatClassName = isRepeatOn
     ? "btn-accent bg-[var(--theme-accent)] text-[var(--theme-text-dark)] hover:bg-[var(--theme-accent-bright)]"
     : "btn-ghost";
@@ -23,8 +23,8 @@ export default function NowPlayingControls({
         {isPlaying ? (
           <button
             onClick={onPause}
-            aria-label={ui.studio.pause}
-            title={ui.studio.pause}
+            aria-label={t("studio.pause")}
+            title={t("studio.pause")}
             data-hotkey-press="playback"
             className="btn-accent inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)] disabled:opacity-60"
           >
@@ -33,8 +33,8 @@ export default function NowPlayingControls({
         ) : (
           <button
             onClick={onResume}
-            aria-label={ui.studio.resume}
-            title={ui.studio.resume}
+            aria-label={t("studio.resume")}
+            title={t("studio.resume")}
             data-hotkey-press="playback"
             className="btn-accent inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)] disabled:opacity-60"
           >
@@ -52,8 +52,8 @@ export default function NowPlayingControls({
         </button>
         <button
           onClick={onSkip}
-          aria-label={ui.studio.nextTrack}
-          title={ui.studio.nextTrack}
+          aria-label={t("studio.nextTrack")}
+          title={t("studio.nextTrack")}
           className="btn-accent inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)] disabled:opacity-60"
         >
           <Icon name="next" className="h-4 w-4" />

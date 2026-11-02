@@ -7,25 +7,21 @@ import SelectControl from "../../../components/ui/SelectControl";
 import Button from "../../../components/ui/Button";
 import { effectLabels } from "../media/cameraEffects.mjs";
 import styles from "./AudioSettings.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** React-owned labels; device option names remain supplied by the native registry. */
-const copy = {
-  ru: { title: "Видео", intro: "Выберите камеру и настройте качество изображения.", camera: "Камера", quality: "Качество видео", fps: "FPS камеры", screenQuality: "Качество экрана", screenFps: "FPS экрана", screenHint: "Оптимизация экрана", empty: "Камеры не найдены", access: "Запросить доступ к камере", error: "Не удалось применить настройки видео. Проверьте доступ к камере или уменьшите качество." },
-  en: { title: "Video", intro: "Choose your camera and balance image quality with performance.", camera: "Camera", quality: "Video quality", fps: "Camera FPS", screenQuality: "Screen quality", screenFps: "Screen FPS", screenHint: "Screen optimization", empty: "No cameras found", access: "Request camera access", error: "Could not apply video settings. Check camera access or lower the quality." },
-};
-
 /** Render camera (device, background effect, quality) and screen controls without creating capture. */
 export default function VideoSettings({ source, onReady }) {
   useEffect(() => { onReady?.(); }, [onReady]);
   const snapshot = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot);
-  const text = copy[snapshot.language === "en" ? "en" : "ru"];
-  const effects = effectLabels(snapshot.language);
+  const text = t("meeting.videoSettings");
+  const effects = effectLabels();
   /** Runtime commands retain desired preferences and publish operation failures instead of optimistic view state. */
   async function change(key, value) {
     try { await source.execute(key, value); }
     catch { console.warn("Video settings command rejected; see video settings status"); }
   }
-  return <section className={styles.section} lang={snapshot.language} onKeyDown={(event) => { if (event.key !== "Escape") event.stopPropagation(); }}>
+  return <section className={styles.section} onKeyDown={(event) => { if (event.key !== "Escape") event.stopPropagation(); }}>
     <header className={styles.header}><h3>{text.title}</h3><p>{text.intro}</p></header>
     <SettingRow label={text.camera} icon={<Icon name="video" size={18} />} />
     <SelectControl label={text.camera} options={snapshot.cameras} placeholder={text.empty} value={snapshot.camera} disabled={!!snapshot.pending || !snapshot.cameraAllowed || !snapshot.cameras.length} onChange={(event) => change("camera", event.target.value)} />

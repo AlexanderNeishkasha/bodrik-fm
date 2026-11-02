@@ -46,6 +46,9 @@ impl State {
 }
 
 /// Poll every active replacement room and fail silent on authority/process errors.
+///
+/// # Errors
+/// Returns unconfirmed process-cleanup failures requiring the owning host to stop.
 pub(super) async fn supervise(
     service: Service,
     mut stop: watch::Receiver<bool>,
@@ -91,6 +94,9 @@ pub(super) async fn supervise(
 }
 
 /// Reconcile all exact rooms; removed rooms cannot retain a process.
+///
+/// # Errors
+/// Returns process wait, kill or reap failures that prevent safe source replacement.
 async fn reconcile(
     service: &Service,
     states: &mut HashMap<String, State>,
@@ -161,14 +167,16 @@ async fn reconcile(
                 tracing::warn!(room_id = id, category, "meeting music snapshot unavailable");
                 if let Some(mut state) = states.remove(&id) {
                     silence(&mut state).await?;
+                    close_native(service, &room).await;
+                    super::participant::music_disconnected(service, &id);
                 }
-                close_native(service, &room).await;
             }
             _ => {
                 if let Some(mut state) = states.remove(&id) {
                     silence(&mut state).await?;
+                    close_native(service, &room).await;
+                    super::participant::music_disconnected(service, &id);
                 }
-                close_native(service, &room).await;
             }
         }
     }
@@ -226,10 +234,27 @@ async fn apply(
     let track = snapshot.track.as_ref().ok_or("music unavailable")?;
     let key = format!("{}:{}", snapshot.revision, track.id);
     let local_position = state.source_position + state.source_started.elapsed().as_secs_f64();
-    let healthy = state
-        .process
-        .as_mut()
-        .is_some_and(|child| matches!(child.try_wait(), Ok(None)));
+    let exit = match state.process.as_mut() {
+        Some(child) => child.try_wait().map_err(|_| "music process wait failed")?,
+        None => None,
+    };
+    let healthy = state.process.is_some() && exit.is_none();
+    // EOF can precede the player's one-second advancement tick. Replaying the old
+    // snapshot replaces RTP twice on repeat, or churns forever beyond the file's end.
+    // A failed child also stays silent until a new authoritative playback revision.
+    if state.source_key.as_deref() == Some(&key) && !healthy {
+        if let Some(status) = exit {
+            state.process.take();
+            if !status.success() {
+                tracing::warn!(
+                    room_id = id,
+                    revision = snapshot.revision,
+                    "meeting music process exited; awaiting playback change"
+                );
+            }
+        }
+        return Ok(());
+    }
     if state.source_key.as_deref() == Some(&key)
         && healthy
         && (snapshot.position - local_position).abs() < DRIFT_LIMIT_SECONDS
@@ -311,6 +336,9 @@ async fn create_native(service: &Service, room: &Room, volume: f64) -> Result<St
 }
 
 /// Stop and reap one process with a bounded graceful deadline.
+///
+/// # Errors
+/// Returns failures to observe, kill or reap the owned child within its deadline.
 async fn silence(state: &mut State) -> Result<(), &'static str> {
     state.source_key = None;
     let Some(mut child) = state.process.take() else {

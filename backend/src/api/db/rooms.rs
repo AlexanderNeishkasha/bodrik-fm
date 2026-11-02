@@ -25,7 +25,7 @@ pub(super) fn ensure_room_for_user_tx(
     .map_err(|err| err.to_string())?;
     let room_id = tx.last_insert_rowid();
     tx.execute(
-        "INSERT INTO room_settings(room_id, theme, repeat_one) VALUES(?1, 'mono', 0)",
+        "INSERT INTO room_settings(room_id, theme, repeat_one) VALUES(?1, 'pirate', 0)",
         params![room_id],
     )
     .map_err(|err| err.to_string())?;

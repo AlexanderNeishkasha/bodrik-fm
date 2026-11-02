@@ -2,7 +2,7 @@
 import { useDndContext, useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import Icon from "../../components/Icon";
 import LibraryItem from "./LibraryItem";
 
@@ -109,8 +109,8 @@ export default function LibrarySection({
           onPointerDown={(event) => event.stopPropagation()}
           onClick={toggleCollapsed}
           className="btn-ghost inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition"
-          aria-label={isCollapsed ? ui.studio.expandSection : ui.studio.collapseSection}
-          title={isCollapsed ? ui.studio.expandSection : ui.studio.collapseSection}
+          aria-label={isCollapsed ? t("studio.expandSection") : t("studio.collapseSection")}
+          title={isCollapsed ? t("studio.expandSection") : t("studio.collapseSection")}
         >
           <Icon name="arrow-right" className={`h-4 w-4 transition ${isCollapsed ? "" : "rotate-90"}`} />
         </button>
@@ -139,8 +139,8 @@ export default function LibrarySection({
               onPointerDown={(event) => event.stopPropagation()}
               onClick={toggleCollapsed}
               className="block w-full truncate text-left text-sm font-semibold uppercase tracking-[0.14em] text-[var(--theme-muted)] transition hover:text-[var(--theme-text)]"
-              aria-label={isCollapsed ? ui.studio.expandSection : ui.studio.collapseSection}
-              title={isCollapsed ? ui.studio.expandSection : ui.studio.collapseSection}
+              aria-label={isCollapsed ? t("studio.expandSection") : t("studio.collapseSection")}
+              title={isCollapsed ? t("studio.expandSection") : t("studio.collapseSection")}
             >
               {section.name}
             </button>
@@ -158,8 +158,8 @@ export default function LibrarySection({
                     onConfirmRenameSection(section);
                   }}
                   className="btn-accent inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)]"
-                  aria-label={ui.studio.save}
-                  title={ui.studio.save}
+                  aria-label={t("studio.save")}
+                  title={t("studio.save")}
                 >
                   <Icon name="check" className="h-4 w-4" />
                 </button>
@@ -170,8 +170,8 @@ export default function LibrarySection({
                     onCancelRenameSection();
                   }}
                   className="btn-ghost inline-flex h-8 w-8 items-center justify-center rounded-full transition"
-                  aria-label={ui.studio.cancel}
-                  title={ui.studio.cancel}
+                  aria-label={t("studio.cancel")}
+                  title={t("studio.cancel")}
                 >
                   <Icon name="close" className="h-4 w-4" />
                 </button>
@@ -184,8 +184,8 @@ export default function LibrarySection({
                   onStartRenameSection(section);
                 }}
                 className="btn-accent inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--theme-accent)] text-[var(--theme-text-dark)] transition hover:bg-[var(--theme-accent-bright)]"
-                aria-label={ui.studio.renameSection}
-                title={ui.studio.renameSection}
+                aria-label={t("studio.renameSection")}
+                title={t("studio.renameSection")}
               >
                 <Icon name="edit" className="h-4 w-4" />
               </button>
@@ -197,8 +197,8 @@ export default function LibrarySection({
                 onDeleteSection(section);
               }}
               className="btn-ghost inline-flex h-8 w-8 items-center justify-center rounded-full transition"
-              aria-label={ui.studio.deleteSection}
-              title={ui.studio.deleteSection}
+              aria-label={t("studio.deleteSection")}
+              title={t("studio.deleteSection")}
             >
               <Icon name="trash" className="h-4 w-4" />
             </button>
@@ -223,7 +223,7 @@ export default function LibrarySection({
                     <div className="ml-5 h-12 rounded-2xl border border-dashed border-[var(--theme-accent-60)] bg-[var(--theme-queue-temp)]" />
                   ) : (
                     <div className="ml-5 rounded-2xl border border-dashed border-[var(--theme-border)] px-4 py-3 text-sm text-[var(--theme-muted)]">
-                      {ui.studio.sectionEmpty}
+                      {t("studio.sectionEmpty")}
                     </div>
                   )
                 ) : (

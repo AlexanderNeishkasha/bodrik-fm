@@ -1,5 +1,6 @@
 import { createVideoVisibility } from "./videoVisibility.mjs";
-import { createIceConfiguration } from "./iceConfig.mjs";
+import { createIceConfiguration, tlsRelayOptions } from "./iceConfig.mjs";
+import { createQualityMonitor } from "./connectionQuality.mjs";
 
 /** Header extension the legacy client strips before loading the device. */
 const VIDEO_ORIENTATION = "urn:3gpp:video-orientation";
@@ -26,12 +27,13 @@ async function loadDevice() {
  * remote consumers. `reconcile(state)` is idempotent: it consumes every remote producer
  * once and closes consumers whose producer disappeared. Tracks are exposed by producer id.
  */
-export function createMeetingMedia({ command, createDevice = loadDevice, onTracksChanged, onTransportFailed, setTimer = setTimeout,
-  clearTimer = clearTimeout, now = Date.now, random = Math.random }) {
+export function createMeetingMedia({ command, createDevice = loadDevice, onTracksChanged, onTransportFailed, onPoorQuality,
+  forceRelay = false, setTimer = setTimeout, clearTimer = clearTimeout, now = Date.now, random = Math.random }) {
   let device = null;
   let sendTransport = null;
   let recvTransport = null;
   let closed = false;
+  let quality = null;
   let lastState = null;
   const consumers = new Map(); // producerId -> consumer
   const consuming = new Set(); // producerIds with an in-flight consume
@@ -39,7 +41,7 @@ export function createMeetingMedia({ command, createDevice = loadDevice, onTrack
   const failures = new Map(); // producerId -> failed consume attempts
   let queue = Promise.resolve();
   const visibility = createVideoVisibility({ apply: updateVideoVisibility, schedule: setTimer });
-  const ice = createIceConfiguration({ command, setTimer, clearTimer, now, random, onFailure: onTransportFailed,
+  const ice = createIceConfiguration({ command, setTimer, clearTimer, now, random, forceRelay, onFailure: onTransportFailed,
     apply: async ({ iceServers }) => {
       if (closed) return;
       for (const transport of [sendTransport, recvTransport]) {
@@ -167,13 +169,17 @@ export function createMeetingMedia({ command, createDevice = loadDevice, onTrack
     /** Load the device and create both transports. Call once after admission. */
     async start() {
       const iceSettings = await ice.refresh();
+      if (closed) return;
       const capabilities = await media("capabilities", {});
+      if (closed) return;
       const routerRtpCapabilities = {
         ...capabilities,
         headerExtensions: (capabilities.headerExtensions || []).filter((ext) => ext.uri !== VIDEO_ORIENTATION),
       };
       device = await createDevice();
+      if (closed) return;
       await device.load({ routerRtpCapabilities });
+      if (closed) return;
       const sendOptions = await media("createTransport", {});
       if (closed) return;
       sendTransport = device.createSendTransport({ ...sendOptions, ...iceSettings });
@@ -186,6 +192,9 @@ export function createMeetingMedia({ command, createDevice = loadDevice, onTrack
       if (closed) return;
       recvTransport = device.createRecvTransport({ ...recvOptions, ...iceSettings });
       connectHandler(recvTransport);
+      if (onPoorQuality && iceSettings.iceTransportPolicy === "all" && tlsRelayOptions(iceSettings)) {
+        quality = createQualityMonitor({ transports: [sendTransport, recvTransport], onPoorQuality, setTimer, clearTimer, now });
+      }
       if (lastState) api.reconcile(lastState);
     },
 
@@ -253,9 +262,17 @@ export function createMeetingMedia({ command, createDevice = loadDevice, onTrack
       return producers.get(producerId)?.track || consumers.get(producerId)?.track || null;
     },
 
+    /** Close local and server transports before replacing the route in the same session. */
+    async closeTransports() {
+      const ids = [sendTransport, recvTransport].filter(Boolean).map((transport) => transport.id);
+      api.close();
+      for (const transportId of ids) await media("closeTransport", { transportId });
+    },
+
     /** Close all media resources. Capture tracks are owned by the caller. */
     close() {
       closed = true;
+      quality?.close();
       ice.close();
       visibility.close();
       for (const consumer of consumers.values()) consumer.close();

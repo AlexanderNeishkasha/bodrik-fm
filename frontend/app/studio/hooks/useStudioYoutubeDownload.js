@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import { localizeApiMessage } from "../lib/localizeApiMessage";
 import { validateYoutubeUrl } from "../lib/youtube";
 import { isAbortError } from "../../lib/abortError.mjs";
@@ -62,8 +62,8 @@ export default function useStudioYoutubeDownload({
       if (!response.ok) throw new Error("dismiss failed");
     } catch (error) {
       if (!isAbortError(error)) {
-        showNotice(ui.messages.actionFailed);
-        setStatus(ui.messages.actionFailed);
+        showNotice(t("messages.actionFailed"));
+        setStatus(t("messages.actionFailed"));
       }
     } finally {
       if (dismissControllersRef.current.get(id) === controller) {
@@ -76,7 +76,7 @@ export default function useStudioYoutubeDownload({
   const submitYoutube = useCallback(async () => {
     const nextUrl = youtubeUrl.trim();
     if (!validateYoutubeUrl(nextUrl)) {
-      setYoutubeError(ui.messages.invalidYoutubeUrl);
+      setYoutubeError(t("messages.invalidYoutubeUrl"));
       return;
     }
     if (submitControllerRef.current) return;
@@ -103,16 +103,16 @@ export default function useStudioYoutubeDownload({
         if (data?.message) rawMessage = data.message;
       } catch {}
       if (controller.signal.aborted) return;
-      const localized = localizeApiMessage(rawMessage, ui.messages.youtubeDownloadFailed);
-      const publicMessage = localized === rawMessage ? ui.messages.youtubeDownloadFailed : localized;
+      const localized = localizeApiMessage(rawMessage, t("messages.youtubeDownloadFailed"));
+      const publicMessage = localized === rawMessage ? t("messages.youtubeDownloadFailed") : localized;
       setYoutubeError(publicMessage);
       showNotice(publicMessage);
       setStatus(publicMessage);
     } catch (error) {
       if (!isAbortError(error)) {
-        setYoutubeError(ui.messages.youtubeDownloadFailed);
-        showNotice(ui.messages.youtubeDownloadFailed);
-        setStatus(ui.messages.youtubeDownloadFailed);
+        setYoutubeError(t("messages.youtubeDownloadFailed"));
+        showNotice(t("messages.youtubeDownloadFailed"));
+        setStatus(t("messages.youtubeDownloadFailed"));
       }
     } finally {
       if (submitControllerRef.current === controller) {

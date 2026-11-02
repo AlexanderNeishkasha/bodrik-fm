@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import { readApiMessage } from "../../lib/apiMessage";
 import { clearCachedAuthUser } from "../../lib/authSession";
 import { isAbortError } from "../../lib/abortError.mjs";
@@ -55,17 +55,17 @@ export default function useAccountManagement({ apiBase, showNotice, setStatus })
       });
       if (response.ok) {
         resetPasswordFields();
-        showNotice(ui.messages.passwordChanged);
+        showNotice(t("messages.passwordChanged"));
         setStatus("ready");
       } else {
-        const message = await readApiMessage(response, ui.messages.passwordChangeFailed);
+        const message = await readApiMessage(response, t("messages.passwordChangeFailed"));
         if (controller.signal.aborted) return;
         showNotice(message);
         setStatus("password change failed");
       }
     } catch (error) {
       if (!isAbortError(error)) {
-        showNotice(ui.messages.passwordChangeFailed);
+        showNotice(t("messages.passwordChangeFailed"));
         setStatus("password change failed");
       }
     } finally {
@@ -96,13 +96,13 @@ export default function useAccountManagement({ apiBase, showNotice, setStatus })
         router.replace("/");
         return;
       }
-      const message = await readApiMessage(response, ui.messages.accountDeleteFailed);
+      const message = await readApiMessage(response, t("messages.accountDeleteFailed"));
       if (controller.signal.aborted) return;
       showNotice(message);
       setStatus("account delete failed");
     } catch (error) {
       if (!isAbortError(error)) {
-        showNotice(ui.messages.accountDeleteFailed);
+        showNotice(t("messages.accountDeleteFailed"));
         setStatus("account delete failed");
       }
     } finally {

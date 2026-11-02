@@ -8,13 +8,10 @@ import Icon from "../../../components/ui/Icon";
 import SelectControl from "../../../components/ui/SelectControl";
 import Button from "../../../components/ui/Button";
 import styles from "./AudioSettings.module.css";
+import { t } from "../../../app/lang/index.js";
+import { noiseModeOptions } from "../client/noiseModes.mjs";
 
 /** Maintain RU/EN audio copy in React, never through the legacy DOM translator. */
-const copy = {
-  ru: { title: "Аудио", intro: "Выберите микрофон и динамики, затем настройте звук встречи.", mic: "Микрофон", speaker: "Динамик", noise: "Шумоподавление", off: "Выключено", browser: "Базовое", enhanced: "Усиленное", noiseHelp: "Базовое: снижает фоновый шум с небольшой нагрузкой. Усиленное: сильнее подавляет шум, но использует больше CPU и батареи. Выключено: без фильтрации шума.", help: "Справка", test: "Проверить", stopTest: "Остановить", ptt: "Push-to-talk", focus: "Фокус на говорящем", focusHelp: "Выделяет участника, который сейчас говорит.", empty: "Устройства не найдены", level: "Уровень микрофона" },
-  en: { title: "Audio", intro: "Select your microphone and speakers, then adjust meeting audio.", mic: "Microphone", speaker: "Speaker", noise: "Noise suppression", off: "Off", browser: "Basic", enhanced: "Enhanced", noiseHelp: "Basic: reduces background noise with low processing load. Enhanced: stronger filtering, using more CPU and battery. Off: no noise filtering.", help: "Help", test: "Test", stopTest: "Stop", ptt: "Push to talk", focus: "Speaker focus", focusHelp: "Highlights the participant who is currently speaking.", empty: "No devices found", level: "Microphone level" },
-};
-
 /** Consume the existing meter independently of control snapshots; no second capture/audio graph is created. */
 function InputMeter({ source, label }) {
   const level = useSyncExternalStore(source.subscribeLevel, source.getInputLevel, source.getInputLevel);
@@ -28,18 +25,18 @@ function InputMeter({ source, label }) {
 export default function AudioSettings({ source, onReady }) {
   useEffect(() => { onReady?.(); }, [onReady]);
   const snapshot = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot);
-  const text = copy[snapshot.language === "en" ? "en" : "ru"];
+  const text = t("meeting.audioSettings");
   /** Commands publish errors and rollback to the same source instead of an optimistic UI copy. */
   async function change(key, value) {
     try { await source.execute(key, value); }
     catch { console.warn("Audio settings command rejected; see settings status"); }
   }
-  const modes = [{ value: "off", label: text.off }, { value: "browser", label: text.browser }];
-  if (snapshot.enhancedAvailable) modes.push({ value: "rnnoise", label: text.enhanced });
-  return <section className={styles.section} lang={snapshot.language} onKeyDown={(event) => { if (event.key !== "Escape") event.stopPropagation(); }}>
+  const modes = noiseModeOptions(text, snapshot.enhancedAvailable);
+  return <section className={styles.section} onKeyDown={(event) => { if (event.key !== "Escape") event.stopPropagation(); }}>
     <header className={styles.header}><h3>{text.title}</h3><p>{text.intro}</p></header>
-    <SettingRow label={text.mic} icon={<Icon name="mic" size={18} />} />
-    <SelectControl label={text.mic} options={snapshot.inputDevices} placeholder={text.empty} value={snapshot.inputDevice} disabled={!!snapshot.pending || !snapshot.microphoneAvailable || !snapshot.inputDevices.length} onChange={(event) => change("inputDevice", event.target.value)} />
+    <SettingRow label={snapshot.coupledAudioRouting ? text.audioDevice : text.mic} icon={<Icon name="mic" size={18} />} />
+    {snapshot.coupledAudioRouting && <p>{text.routeHint}</p>}
+    <SelectControl label={snapshot.coupledAudioRouting ? text.audioDevice : text.mic} options={snapshot.inputDevices} placeholder={text.empty} value={snapshot.inputDevice} disabled={!!snapshot.pending || !snapshot.microphoneAvailable || !snapshot.inputDevices.length} onChange={(event) => change("inputDevice", event.target.value)} />
     <InputMeter source={source} label={text.level} />
     {snapshot.processingAvailable && <>
       <SettingRow className={styles.noiseRow} label={text.noise} icon={<Icon name="ear" size={18} />} description={text.noiseHelp} helpLabel={text.help}>
@@ -47,15 +44,18 @@ export default function AudioSettings({ source, onReady }) {
       </SettingRow>
       <MicProcessingSettings source={source} />
     </>}
+    {snapshot.pttAvailable && <SettingRow label={text.ptt} icon={<Icon name="hand" size={18} />}><SettingSwitch label={text.ptt} checked={snapshot.pushToTalk} disabled={!!snapshot.pending} onChange={(value) => change("pushToTalk", value)} /></SettingRow>}
     <div className={styles.divider} />
     {snapshot.outputSelectionAvailable && <>
       <SettingRow label={text.speaker} icon={<Icon name="headphones" size={18} />} />
       <div className={styles.speakerRow}><SelectControl label={text.speaker} options={snapshot.outputDevices} value={snapshot.outputDevice} disabled={!!snapshot.pending} onChange={(event) => change("outputDevice", event.target.value)} /><Button disabled={!!snapshot.pending} onClick={() => change("testSpeaker")}><Icon name={snapshot.speakerTestPlaying ? "stop" : "play"} size={16} />{snapshot.speakerTestPlaying ? text.stopTest : text.test}</Button></div>
     </>}
-    {!snapshot.outputSelectionAvailable && <Button disabled={!!snapshot.pending} onClick={() => change("testSpeaker")}><Icon name={snapshot.speakerTestPlaying ? "stop" : "play"} size={16} />{snapshot.speakerTestPlaying ? text.stopTest : text.test}</Button>}
+    {!snapshot.outputSelectionAvailable && <>
+      <SettingRow label={text.speaker} icon={<Icon name="headphones" size={18} />} description={snapshot.coupledAudioRouting ? undefined : text.systemOutput} />
+      <Button disabled={!!snapshot.pending} onClick={() => change("testSpeaker")}><Icon name={snapshot.speakerTestPlaying ? "stop" : "play"} size={16} />{snapshot.speakerTestPlaying ? text.stopTest : text.test}</Button>
+    </>}
     <SpeakerVolumeSettings source={source} />
-    {snapshot.pttAvailable && <SettingRow label={text.ptt} icon={<Icon name="hand" size={18} />} ><SettingSwitch label={text.ptt} checked={snapshot.pushToTalk} disabled={!!snapshot.pending} onChange={(value) => change("pushToTalk", value)} /></SettingRow>}
     {snapshot.focusAvailable && <SettingRow label={text.focus} icon={<Icon name="focus" size={18} />} description={text.focusHelp} helpLabel={text.help}><SettingSwitch label={text.focus} checked={snapshot.speakerFocus} disabled={!!snapshot.pending} onChange={(value) => change("speakerFocus", value)} /></SettingRow>}
-    {!snapshot.processingAvailable && snapshot.error && <p role="alert">{snapshot.language === "en" ? "Could not update audio settings. Please try again." : "Не удалось изменить настройки звука. Попробуйте ещё раз."}</p>}
+    {!snapshot.processingAvailable && snapshot.error && <p role="alert">{text.processingError}</p>}
   </section>;
 }

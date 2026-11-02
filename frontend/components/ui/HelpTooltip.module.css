@@ -4,4 +4,7 @@
 .button:focus-visible { outline: 2px solid var(--ui-accent, var(--theme-accent, #94d8c1)); outline-offset: 3px; }
 .tooltip { box-sizing: border-box; position: fixed; width: 280px; overflow: auto; overscroll-behavior: contain; pointer-events: auto; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--ui-accent, var(--theme-accent, #94d8c1)) 35%, transparent); border-radius: 16px; line-height: 1.45; background: var(--ui-surface, var(--theme-card, #171721)); color: inherit; box-shadow: var(--theme-shadow-panel, 0 8px 24px #0005); font-size: 13px; font-weight: 400; z-index: 10; }
 .tooltip[hidden] { display: none; }
+.tooltip .list { display: block; padding-left: 16px; }
+.tooltip .listItem { display: list-item; list-style-type: disc; }
+.tooltip .listItem + .listItem { margin-top: 6px; }
 @media (prefers-reduced-motion: reduce) { .button { transition: none; } }

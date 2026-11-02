@@ -16,7 +16,7 @@ use axum::{
 /// Theme identifiers offered by the static frontend's allowlist.
 const THEMES: &[&str] = &[
     "crimson",
-    "mono",
+    "noir",
     "midnight",
     "ivory",
     "lucifer",

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import BrandedStatusPage from "../../app/components/BrandedStatusPage";
-import { storedMeetingLanguage } from "./client/preferences.mjs";
 import MeetingSession from "./room/MeetingSession";
 import { meetingStatusPage } from "./room/meetingStatusCopy.mjs";
 import { INITIAL_MEETING_ENTRY, startMeetingEntry } from "./runtime/meetingEntryLifecycle.mjs";
@@ -26,20 +25,13 @@ function useMeetingAdmission(pathname) {
 /** Resolve the invitation, then run the meeting or show its branded status. */
 export default function MeetingApp() {
   const pathname = typeof window === "undefined" ? "/meeting" : window.location.pathname;
-  const language = useSyncExternalStore(subscribeLanguage, storedMeetingLanguage, () => "ru");
   const { admission, retry } = useMeetingAdmission(pathname);
   const retriable = ["network", "rate_limited"].includes(admission.code);
   const status = admission.phase === "loading" ? "connecting" : retriable ? "failed" : "unavailable";
-  const { text, page } = meetingStatusPage(status, language);
+  const { text, page } = meetingStatusPage(status);
   const actions = [...(retriable ? [{ label: text.retry, onClick: retry }] : []), { label: text.home, href: "/" }];
   return <div data-meeting-entry="next" data-meeting-phase={admission.phase}>
     {admission.phase === "prejoin" && admission.slug ? <MeetingSession slug={admission.slug} />
-      : <BrandedStatusPage title={page.title} description={page.description} language={language} actions={actions} />}
+      : <BrandedStatusPage title={page.title} description={page.description} actions={actions} />}
   </div>;
-}
-
-/** Refresh entry-page language if another tab changes the saved preference. */
-function subscribeLanguage(listener) {
-  window.addEventListener("storage", listener);
-  return () => window.removeEventListener("storage", listener);
 }

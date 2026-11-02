@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import useStudioCurrentLabel from "./useStudioCurrentLabel";
 import useStudioGuards from "./useStudioGuards";
 import useStudioLibrary from "./useStudioLibrary";
@@ -145,8 +145,8 @@ export default function useStudioLibraryState({
         previousStatus !== "error" &&
         !youtubeErrorNoticesRef.current.has(download.id)
       ) {
-        showNotice(ui.messages.youtubeDownloadFailed);
-        setStatus(ui.messages.youtubeDownloadFailed);
+        showNotice(t("messages.youtubeDownloadFailed"));
+        setStatus(t("messages.youtubeDownloadFailed"));
         youtubeErrorNoticesRef.current.add(download.id);
       }
     }

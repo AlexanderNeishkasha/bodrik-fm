@@ -6,16 +6,14 @@ export const sections = Object.freeze([
   "tabRoom",
   "tabModerator",
   "tabShortcuts",
-  "tabLanguages",
 ]);
 
 /** Own shell navigation only; capability refresh cannot create media or send policy commands. */
-export function create({ getAvailableSections, getLanguage }) {
+export function create({ getAvailableSections }) {
   const listeners = new Set();
   let open = false;
   let selected = null;
   let available = Object.freeze([]);
-  let language;
   let snapshot;
   let disposed = false;
 
@@ -33,16 +31,14 @@ export function create({ getAvailableSections, getLanguage }) {
       available = Object.freeze(next);
     if (!available.includes(selected)) selected = available[0] || null;
     if (!selected) open = false;
-    language = getLanguage() === "en" ? "en" : "ru";
     if (
       snapshot &&
       snapshot.open === open &&
       snapshot.selected === selected &&
-      snapshot.available === available &&
-      snapshot.language === language
+      snapshot.available === available
     )
       return;
-    snapshot = Object.freeze({ open, selected, available, language });
+    snapshot = Object.freeze({ open, selected, available });
     listeners.forEach((listener) => listener());
   }
   refresh();

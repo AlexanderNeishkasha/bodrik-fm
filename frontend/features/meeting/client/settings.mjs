@@ -3,6 +3,8 @@ import { createInputLevelMeter } from "./inputLevelMeter.mjs";
 import { create as createShellModel, sections as allSections } from "../settings/settingsShellModel.mjs";
 import { FRAME_RATES, RESOLUTIONS, SCREEN_HINTS } from "./capture.mjs";
 import { backgroundSupported, noiseSuppressionSupported } from "./processing.mjs";
+import { isMobileDevice } from "./capabilities.mjs";
+import { replaceProfile } from "./profiles.mjs";
 
 /** Capture preference keys the audio and video views may change. */
 const AUDIO_KEYS = Object.freeze(["inputDevice", "outputDevice", "noiseMode", "echoCancellation", "autoGainControl"]);
@@ -82,16 +84,16 @@ function source(stores, compute, run, extra = {}, tracksPending = () => true) {
 }
 
 /** Room header source: slug, invite and time since joining (the view ticks the timer). */
-function roomInfoSource(stores, room, language, onShare) {
+function roomInfoSource(stores, room, onShare) {
   let joinedAt = 0;
   let snapshot = null;
   const listeners = new Set();
-  /** Recompute when room status or language changes. */
+  /** Recompute when room status changes. */
   function refresh() {
     const state = room();
     if (state.status === "admitted" && !joinedAt) joinedAt = Date.now();
-    const next = { language: language(), available: state.status === "admitted", joinedAt };
-    if (snapshot && snapshot.language === next.language && snapshot.available === next.available && snapshot.joinedAt === next.joinedAt) return;
+    const next = { available: state.status === "admitted", joinedAt };
+    if (snapshot && snapshot.available === next.available && snapshot.joinedAt === next.joinedAt) return;
     snapshot = Object.freeze(next);
     for (const listener of [...listeners]) listener();
   }
@@ -109,11 +111,13 @@ function roomInfoSource(stores, room, language, onShare) {
   };
 }
 
-/** Avatar the prejoin restores on the next join (`MeetingPrejoin`); "" forgets it. */
-function rememberAvatar(url) {
+/**
+ * Persist a confirmed in-meeting profile change into the saved prejoin profile
+ * `previousName`; an empty avatar clears that profile's picture.
+ */
+function rememberProfile(previousName, profile) {
   try {
-    if (url) globalThis.localStorage?.setItem("meeting.avatar", url);
-    else globalThis.localStorage?.removeItem("meeting.avatar");
+    replaceProfile(globalThis.localStorage, globalThis.location, previousName, profile);
   } catch {
     // Storage may be unavailable (private mode); the change still applies to this meeting.
   }
@@ -150,7 +154,6 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
   const { capture, layout, preferences } = client;
   const stores = [client, capture, layout, preferences];
   const room = () => client.getState();
-  const language = () => preferences.getSnapshot().language;
   let policy = { config: { isLocked: false, isLobbyEnabled: false, isJoinLocked: false }, moderator: Object.fromEntries(MODERATOR_FIELDS.map((key) => [key, false])) };
   const policyListeners = new Set();
   const policyStore = { subscribe: (listener) => (policyListeners.add(listener), () => policyListeners.delete(listener)) };
@@ -193,20 +196,20 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
   const audio = source(speakerTest ? [...stores, speakerTest] : stores, () => {
     const value = capture.getSnapshot();
     return {
-      language: language(),
       microphoneAvailable: value.microphone,
       inputDevices: value.inputDevices,
       inputDevice: value.inputDevice || value.activeInputDevice,
       outputDevices: value.outputDevices,
       outputDevice: value.outputDevice,
-      outputSelectionAvailable: typeof globalThis.HTMLMediaElement?.prototype?.setSinkId === "function",
+      outputSelectionAvailable: Boolean(value.outputSelectionAvailable),
+      coupledAudioRouting: Boolean(value.coupledAudioRouting),
       noiseMode: value.noiseMode,
       enhancedAvailable: noiseSuppressionSupported(),
       processingAvailable: true,
       echoCancellation: value.echoCancellation,
       autoGainControl: value.autoGainControl,
-      pttAvailable: false,
-      pushToTalk: false,
+      pttAvailable: true,
+      pushToTalk: preferences.getSnapshot().pushToTalk,
       focusAvailable: false,
       speakerFocus: false,
       speakerVolume: preferences.getSnapshot().masterVolume,
@@ -218,6 +221,11 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
     if (key === "testSpeaker") {
       if (speakerTest?.getSnapshot()) return speakerTest.stop();
       return speakerTest ? speakerTest.play(capture.getSnapshot().outputDevice) : playTone?.(capture.getSnapshot().outputDevice);
+    }
+    if (key === "pushToTalk") {
+      if (typeof value !== "boolean") throw new Error("Invalid push-to-talk preference");
+      if (value) await client.setMicrophoneMuted(true);
+      return preferences.set("pushToTalk", value);
     }
     if (!AUDIO_KEYS.includes(key)) throw new Error("Unsupported audio setting");
     return client.setCapturePreference(key, value);
@@ -236,7 +244,6 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
   const video = source([...stores, policyStore], () => {
     const value = capture.getSnapshot();
     return {
-      language: language(),
       cameras: value.cameras,
       camera: value.camera || value.activeCamera,
       qualities: QUALITY_OPTIONS,
@@ -273,7 +280,6 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
   const profile = source(stores, () => {
     const self = room().participants[room().selfId];
     return {
-      language: language(),
       available: room().status === "admitted",
       name: self?.name || "",
       avatar: self?.avatar || avatar,
@@ -282,29 +288,32 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
       details,
     };
   }, async (key, value) => {
+    const self = room().participants[room().selfId];
+    const current = { name: self?.name || "", avatar: self?.avatar || avatar };
     if (key === "name") {
       const name = typeof value === "string" ? value.trim() : "";
       if (!name || name.length > 32) throw new Error("Invalid name");
-      return client.command({ type: "participantProfile", change: { type: "name", value: name } });
+      const result = await client.command({ type: "participantProfile", change: { type: "name", value: name } });
+      rememberProfile(current.name, { ...current, name });
+      return result;
     }
     if (key === "avatar") {
       const url = await client.uploadImage("avatar", value);
       avatar = new URL(url).pathname;
       const result = await client.command({ type: "participantProfile", change: { type: "avatar", value: avatar } });
-      rememberAvatar(avatar);
+      rememberProfile(current.name, { ...current, avatar });
       return result;
     }
     if (key === "resetAvatar") {
       avatar = "";
       const result = await client.command({ type: "participantProfile", change: { type: "avatar", value: "" } });
-      rememberAvatar("");
+      rememberProfile(current.name, { ...current, avatar: "" });
       return result;
     }
     throw new Error("Unsupported profile setting");
   });
 
   const policySource = source([...stores, policyStore], () => ({
-    language: language(),
     available: room().status === "admitted",
     capabilities: capabilities[room().presenter === true],
     state: policyState,
@@ -332,17 +341,17 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
   });
 
   const personal = source(stores, () => ({
-    language: language(),
     shortcuts: preferences.getSnapshot().shortcuts,
   }), async (key, value) => {
-    if (key === "language" || key === "shortcuts") return preferences.set(key, value);
+    if (key === "shortcuts") return preferences.set(key, value);
     throw new Error("Unsupported personal setting");
   });
 
+  const mobile = isMobileDevice(navigatorRef);
   const shell = createShellModel({
-    // Moderator settings are presenter-only; everything else is always listed.
-    getAvailableSections: () => allSections.filter((id) => id !== "tabModerator" || room().presenter),
-    getLanguage: language,
+    // Moderator settings are presenter-only; keyboard shortcuts are desktop-only.
+    getAvailableSections: () => allSections.filter((id) =>
+      (id !== "tabModerator" || room().presenter) && (id !== "tabShortcuts" || !mobile)),
   });
   const offShell = stores.map((store) => store.subscribe(() => shell.refresh()));
   // Settings panels stay mounted while hidden, so the ban list reloads here each time a
@@ -355,7 +364,7 @@ export function createMeetingSettings({ client, navigatorRef = globalThis.naviga
     moderatorShown = shown;
   }));
 
-  const sources = Object.freeze({ audio, video, profile, policy: policySource, personal, roomInfo: roomInfoSource(stores, room, language, onShare) });
+  const sources = Object.freeze({ audio, video, profile, policy: policySource, personal, roomInfo: roomInfoSource(stores, room, onShare) });
   return {
     shell,
     sources,

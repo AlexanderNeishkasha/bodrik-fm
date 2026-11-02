@@ -6,33 +6,9 @@ import { Mic, MicOff, Monitor, MonitorOff, MoreVertical, Search, ShieldCheck, Us
 import Button from "../../../components/ui/Button";
 import RangeControl from "../../../components/ui/RangeControl";
 import styles from "./ParticipantsPanel.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** Participant copy is UI-owned; observed server role/status never grants action permissions in this renderer. */
-const copy = {
-  ru: {
-    title: "Участники", refresh: "Обновить", empty: "Нет участников", waiting: "Зал ожидания",
-    presenter: "Ведущий", guest: "Участник", music: "Музыка от чародея", audio: "Микрофон включён",
-    muted: "Микрофон выключен", video: "Камера включена", screen: "Демонстрация экрана",
-    error: "Не удалось подтвердить список участников.", unavailable: "Нет активной сессии встречи.",
-    actionError: "Действие отклонено или не подтверждено.", search: "Поиск участников",
-    privateChat: "Личный чат", roleGrant: "Назначить ведущим", roleRevoke: "Снять роль ведущего", mute: "Выключить микрофон",
-    hide: "Выключить камеру", stop: "Остановить демонстрацию", ban: "Забанить на 24 часа", eject: "Выгнать",
-    pin: "В фокус", hideGrid: "Скрыть из сетки", showGrid: "Показать в сетке", accept: "Принять", reject: "Отклонить",
-    acceptAll: "Принять всех", rejectAll: "Отклонить всех", volume: "Громкость", actions: "Действия", invite: "Пригласить", roomActions: "Действия комнаты", muteAll: "Выключить микрофоны у всех", hideAll: "Выключить камеры у всех", stopAll: "Остановить все демонстрации", disconnectAll: "Отключить всех участников", you: "вы", videoOff: "Камера выключена", screenOff: "Нет демонстрации экрана",
-  },
-  en: {
-    title: "Participants", refresh: "Refresh", empty: "No participants", waiting: "Waiting room",
-    presenter: "Presenter", guest: "Participant", music: "Music from the sorcerer", audio: "Microphone on",
-    muted: "Microphone off", video: "Camera on", screen: "Sharing screen",
-    error: "The participant list could not be verified.", unavailable: "No active meeting session.",
-    actionError: "The action was rejected or could not be confirmed.", search: "Search participants",
-    privateChat: "Private chat", roleGrant: "Make presenter", roleRevoke: "Remove presenter role", mute: "Mute microphone",
-    hide: "Turn camera off", stop: "Stop screen sharing", ban: "Ban for 24 hours", eject: "Kick",
-    pin: "Focus", hideGrid: "Hide from grid", showGrid: "Show in grid", accept: "Admit", reject: "Reject",
-    acceptAll: "Admit all", rejectAll: "Reject all", volume: "Volume", actions: "Actions", invite: "Invite", roomActions: "Room actions", muteAll: "Mute everyone", hideAll: "Turn off every camera", stopAll: "Stop all screen sharing", disconnectAll: "Disconnect all participants", you: "you", videoOff: "Camera off", screenOff: "Not sharing screen",
-  },
-};
-
 /** Render initials when an allowlisted uploaded avatar is unavailable. */
 function Avatar({ participant }) {
   const initials = participant.name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
@@ -49,7 +25,7 @@ function Action({ children, disabled, onClick, danger = false }) {
 /** Render safe participant/lobby observations and delegate commands to the caller-owned runtime. */
 export default function ParticipantsPanel({ source, onReady, headerControl }) {
   const snapshot = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot);
-  const text = copy[snapshot.language === "en" ? "en" : "ru"];
+  const text = t("meeting.participantsPanel");
   const [query, setQuery] = useState("");
   const [openMenu, setOpenMenu] = useState("");
   const membershipKey = snapshot.peers.map((peer) => peer.id).sort().join(",");
@@ -60,9 +36,9 @@ export default function ParticipantsPanel({ source, onReady, headerControl }) {
   }
   useEffect(() => { onReady?.(); }, [onReady]);
   const peers = useMemo(() => {
-    const needle = query.trim().toLocaleLowerCase(snapshot.language);
-    return needle ? snapshot.peers.filter((peer) => peer.name.toLocaleLowerCase(snapshot.language).includes(needle)) : snapshot.peers;
-  }, [query, snapshot.language, snapshot.peers]);
+    const needle = query.trim().toLocaleLowerCase("ru-RU");
+    return needle ? snapshot.peers.filter((peer) => peer.name.toLocaleLowerCase("ru-RU").includes(needle)) : snapshot.peers;
+  }, [query, snapshot.peers]);
   const busy = snapshot.pending || Boolean(snapshot.pendingCommand);
 
   /** Run one command without leaking credentials or turning rejection into success. */
@@ -75,7 +51,7 @@ export default function ParticipantsPanel({ source, onReady, headerControl }) {
   /** Close the menu and run a moderation command (a ban is confirmed by the room dialog). */
   function ask(command) { setOpenMenu(""); act(command); }
 
-  return <section className={styles.panel} lang={snapshot.language} aria-busy={busy}>
+  return <section className={styles.panel} aria-busy={busy}>
     <header className={styles.header}>
       <h2 className={styles.srOnly}>{text.title}</h2>
       <button type="button" className={styles.invite} disabled={!snapshot.available || busy} onClick={() => act({ type: "invite" })}>

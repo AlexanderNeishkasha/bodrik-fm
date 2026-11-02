@@ -15,12 +15,10 @@ import MeetingGrid from "./MeetingGrid";
 import ConfirmDialog from "./ConfirmDialog";
 import ShareDialog from "./ShareDialog";
 import styles from "./MeetingRoom.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** Status lines shown over the grid when the meeting is not simply running. */
-const STATUS = {
-  ru: { reconnecting: "Переподключение…", failed: "Не удалось восстановить соединение.", left: "Вы покинули встречу.", kicked: "Ведущий выгнал вас из встречи.", banned: "Вас забанили в этой комнате.", lobby: "Ожидание в зале ожидания…" },
-  en: { reconnecting: "Reconnecting…", failed: "Could not restore the connection.", left: "You left the meeting.", kicked: "The presenter kicked you from the meeting.", banned: "You were banned from this room.", lobby: "Waiting in the lobby…" },
-};
+const STATUS = t("meeting.meetingRoom");
 
 /** Callback for views that report readiness; the room needs no handoff. */
 function ready() {}
@@ -72,8 +70,7 @@ export default function MeetingRoom({ session, origin }) {
   const chatOpen = useSyncExternalStore(chat.subscribe, () => chat.getSnapshot().visible, () => false);
   const dockOpen = useSyncExternalStore(participants.subscribe, () => participants.getSnapshot().visible, () => false);
   const panelOpen = chatOpen || dockOpen;
-  const language = state.language === "en" ? "en" : "ru";
-  const status = STATUS[language][state.status];
+  const status = STATUS[state.status];
 
   /** Close the topmost panel; returns whether one was open. */
   function closeTopPanel() {
@@ -129,7 +126,7 @@ export default function MeetingRoom({ session, origin }) {
   }, [chatOffset]);
 
   return <main className={styles.room} style={panelStyle} data-meeting-status={state.status}>
-    <MeetingGrid registry={client.registry} layout={client.layout} participants={participants} selfId={state.selfId} presenter={state.presenter} language={language}
+    <MeetingGrid registry={client.registry} layout={client.layout} participants={participants} selfId={state.selfId} presenter={state.presenter}
       hideCameraOff={!preferences.cameraOffParticipants} loaded={state.loaded} />
     <MeetingAudio registry={client.registry} outputDevice={capture.outputDevice} layout={client.layout} masterVolume={preferences.masterVolume} musicVolume={state.musicVolume} />
     {status && <p className={styles.status} role="status">{status}</p>}
@@ -138,12 +135,12 @@ export default function MeetingRoom({ session, origin }) {
     <ParticipantsDock source={participants} />
     <SettingsWorkspace source={settings.shell} sources={settings.sources} />
     <MeetingNotifications source={notifications} onReady={ready} />
-    {share && <ShareDialog url={`${origin}/room/${encodeURIComponent(session.slug)}`} language={language} onClose={() => setShare(false)} />}
+    {share && <ShareDialog url={`${origin}/room/${encodeURIComponent(session.slug)}`} onClose={() => setShare(false)} />}
     {about && <AboutDialog snapshot={about} onClose={() => setAbout(null)} />}
-    <ConfirmDialog confirmations={session.confirmations} language={language} />
-    <MeetingControlBar client={client} chat={chat} participants={participants} settings={settings} language={language} shortcuts={preferences.shortcuts}
+    <ConfirmDialog confirmations={session.confirmations} />
+    <MeetingControlBar client={client} chat={chat} participants={participants} settings={settings} shortcuts={preferences.shortcuts}
       autoHide={!preferences.keepControls}
       onOpenSettings={() => settings.open()}
-      onInvite={() => setShare(true)} onAbout={() => setAbout({ language })} onError={(failure) => setError(failure?.message || String(failure))} />
+      onInvite={() => setShare(true)} onAbout={() => setAbout({})} onError={(failure) => setError(failure?.message || String(failure))} />
   </main>;
 }

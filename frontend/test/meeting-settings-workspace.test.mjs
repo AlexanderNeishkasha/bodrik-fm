@@ -23,7 +23,6 @@ for (const [section, keys, kinds] of [
   ["tabRoom", ["roomInfo", "policy"], [undefined, "room"]],
   ["tabModerator", ["policy"], ["moderator"]],
   ["tabShortcuts", ["personal"], ["shortcuts"]],
-  ["tabLanguages", ["personal"], ["language"]],
 ]) {
   test(`workspace composes existing feature owners: ${section}`, () => {
     const bindings = resolveSettingsSection(section, sources);
@@ -76,7 +75,7 @@ for (const language of ["ru", "en"]) {
     assert.match(html, /role="tablist"/);
     assert.equal(html.split('role="tabpanel"').length - 1, 2);
     assert.match(html, /Fixture/);
-    assert.match(html, new RegExp(language === "ru" ? "Настройки встречи" : "Meeting settings"));
+    assert.match(html, new RegExp("Настройки встречи"));
     assert.doesNotMatch(html, /<slot|shadowroot|iframe|mySettings|tabProfileBtn/);
   });
 }

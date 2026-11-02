@@ -5,13 +5,9 @@ import Button from "../../../components/ui/Button";
 import { SettingRow, SettingSwitch } from "./SettingControls";
 import styles from "./AudioSettings.module.css";
 import form from "./ProfileSettings.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** Policy copy is UI-owned; success and current booleans always originate from the authorized server. */
-const copy = {
-  ru: { room: "Доступ к комнате", moderator: "Разрешения участников", lobby: "Зал ожидания", joinLock: "Закрыть вход новым участникам", password: "Пароль комнаты", lock: "Установить пароль", unlock: "Удалить пароль", passwordPlaceholder: "Новый пароль", locked: "Пароль установлен", presenter: "Изменять эти настройки может только ведущий.", error: "Сервер не подтвердил изменение настройки.", unknown: "Результат неизвестен. Проверьте состояние комнаты перед повторной попыткой.", storage: "Настройка применена сервером, но локальное сохранение не удалось.", audio_start_muted: "Микрофоны выключены при входе", video_start_hidden: "Камеры выключены при входе", audio_cant_unmute: "Запретить включать микрофон", video_cant_unhide: "Запретить включать камеру", screen_cant_share: "Запретить демонстрацию экрана", chat_cant_privately: "Запретить личные сообщения", chat_cant_publicly: "Запретить сообщения в общем чате", bans: "Забаненные участники", bansEmpty: "Никто не забанен.", unban: "Разбанить", hoursLeft: "ещё {n} ч", minutesLeft: "ещё {n} мин", bansNote: "Бан действует 24 часа и сбрасывается при перезапуске сервера." },
-  en: { room: "Room access", moderator: "Participant permissions", lobby: "Waiting room", joinLock: "Lock room for new participants", password: "Room password", lock: "Set password", unlock: "Remove password", passwordPlaceholder: "New password", locked: "Password is set", presenter: "Only the presenter can change these settings.", error: "The server did not confirm the policy change.", unknown: "The outcome is unknown. Check room state before trying again.", storage: "The server applied the policy, but local persistence failed.", audio_start_muted: "Participants start muted", video_start_hidden: "Participants start with camera off", audio_cant_unmute: "Prevent microphone activation", video_cant_unhide: "Prevent camera activation", screen_cant_share: "Prevent screen sharing", chat_cant_privately: "Prevent private messages", chat_cant_publicly: "Prevent public messages", bans: "Banned participants", bansEmpty: "Nobody is banned.", unban: "Unban", hoursLeft: "{n} h left", minutesLeft: "{n} min left", bansNote: "Bans last 24 hours and reset when the server restarts." },
-};
-
 /** Password is a temporary masked UI draft, never stored in a policy snapshot or local preferences. */
 function PasswordForm({ disabled, text, submit }) {
   const [password, setPassword] = useState("");
@@ -49,7 +45,7 @@ function BanList({ bans, disabled, text, change }) {
 /** Render one policy section; no optimistic flag copying and no media side effects during render. */
 export default function PolicySettings({ source, kind, onReady }) {
   const snapshot = useSyncExternalStore(source.subscribe, source.getSnapshot, source.getSnapshot);
-  const text = copy[snapshot.language === "en" ? "en" : "ru"];
+  const text = t("meeting.policySettings");
   const config = snapshot.state.config;
   const caps = snapshot.capabilities;
   useEffect(() => { onReady?.(); }, [onReady]);
@@ -67,7 +63,7 @@ export default function PolicySettings({ source, kind, onReady }) {
   }
   // Room access and moderation are presenter-only: hidden for others.
   if (!caps.presenter) return null;
-  return <section className={styles.section} lang={snapshot.language} onKeyDown={(event) => { if (event.key !== "Escape") event.stopPropagation(); }}>
+  return <section className={styles.section} onKeyDown={(event) => { if (event.key !== "Escape") event.stopPropagation(); }}>
     <header className={styles.header}><h3>{text[kind]}</h3></header>
     {kind === "room" && <>
       {caps.joinLock && toggle("joinLock", config.isJoinLocked)}

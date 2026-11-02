@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import { readApiMessage } from "../../lib/apiMessage";
 import { deferEffect } from "../../lib/deferEffect";
 import { clearCachedAuthUser, hasCachedAuthUser, setCachedAuthUser } from "../../lib/authSession";
@@ -154,14 +154,14 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
       });
       if (response.ok) await applySuccessfulAuth(response, controller.signal);
       else if (!controller.signal.aborted) {
-        const message = await readApiMessage(response, ui.messages.loginFailed);
+        const message = await readApiMessage(response, t("messages.loginFailed"));
         if (controller.signal.aborted) return;
         showNotice(message);
         setStatus("login failed");
       }
     } catch (error) {
       if (!isAbortError(error)) {
-        showNotice(ui.messages.loginFailed);
+        showNotice(t("messages.loginFailed"));
         setStatus("login failed");
       }
     } finally {
@@ -189,14 +189,14 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
       });
       if (response.ok) await applySuccessfulAuth(response, controller.signal);
       else if (!controller.signal.aborted) {
-        const message = await readApiMessage(response, ui.messages.registrationFailed);
+        const message = await readApiMessage(response, t("messages.registrationFailed"));
         if (controller.signal.aborted) return;
         showNotice(message);
         setStatus("registration failed");
       }
     } catch (error) {
       if (!isAbortError(error)) {
-        showNotice(ui.messages.registrationFailed);
+        showNotice(t("messages.registrationFailed"));
         setStatus("registration failed");
       }
     } finally {
@@ -220,7 +220,7 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
         signal: controller.signal,
       });
       if (!response.ok) {
-        const message = await readApiMessage(response, ui.messages.actionFailed);
+        const message = await readApiMessage(response, t("messages.actionFailed"));
         if (controller.signal.aborted) return false;
         showNotice(message);
         setStatus("logout failed");
@@ -236,7 +236,7 @@ export default function useStudioAuth({ apiBase, asUserId, showNotice, setStatus
       return true;
     } catch (error) {
       if (!isAbortError(error)) {
-        showNotice(ui.messages.actionFailed);
+        showNotice(t("messages.actionFailed"));
         setStatus("logout failed");
       }
       return false;

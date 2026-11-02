@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { ui } from "../lang/ru";
+import { t } from "../lang/index.js";
 import Toast from "../studio/components/Toast";
 import AdminUserCard from "./components/AdminUserCard";
 import useAdminUsers from "./hooks/useAdminUsers";
@@ -18,8 +18,8 @@ export default function AdminPage() {
         <header className="flex items-center justify-between">
           <Link
             href="/"
-            aria-label={ui.main.backToRooms}
-            title={ui.main.backToRooms}
+            aria-label={t("main.backToRooms")}
+            title={t("main.backToRooms")}
             className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--theme-accent)] transition hover:-translate-y-[1px] hover:text-[var(--theme-accent-bright)] active:scale-95"
           >
             <ArrowLeft aria-hidden="true" className="h-6 w-6" strokeWidth={2.4} />
@@ -36,7 +36,7 @@ export default function AdminPage() {
         {admin.status === "loading" ? <p>Загрузка...</p> : null}
         {admin.status === "unauthorized" ? <p>Сначала войдите в аккаунт.</p> : null}
         {admin.status === "forbidden" ? <p>Доступ только для администратора.</p> : null}
-        {admin.status === "error" ? <p>Ошибка загрузки данных.</p> : null}
+        {admin.status === "error" ? <p>Не удалось загрузить пользователей.</p> : null}
 
         {admin.status === "ready" ? (
           <div className={`${styles.users} space-y-3`}>

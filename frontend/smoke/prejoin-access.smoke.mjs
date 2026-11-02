@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 for (const scenario of ["camera missing", "both denied", "both missing", "camera recovers"]) {
   test(`prejoin capture availability: ${scenario}`, async ({ page }) => {
@@ -14,7 +15,7 @@ for (const scenario of ["camera missing", "both denied", "both missing", "camera
       };
     }, scenario);
     const driver = nextDriver(page);
-    await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+    await page.goto(driver.path(smokeRoom()));
     await expect(page.getByRole("button", { name: "Камера выключена", exact: true })).toBeVisible();
     await expect(page.getByRole("status")).toHaveCount(0);
     await expect(page.getByRole("button", { name: scenario.startsWith("both") ? "Микрофон выключен" : "Микрофон включён", exact: true })).toBeVisible();
@@ -40,7 +41,7 @@ for (const failure of ["NotAllowedError", "NotFoundError"]) {
         ? new Promise((resolve, reject) => { window.rejectCamera = () => reject(new DOMException("Unavailable", failure)); })
         : acquire(constraints);
     }, failure);
-    await page.goto(`/room/${encodeURIComponent(process.env.SMOKE_ROOM || "chopper")}`);
+    await page.goto(`/room/${encodeURIComponent(smokeRoom())}`);
     const camera = page.getByRole("button", { name: "Камера выключена", exact: true });
     const microphone = page.getByRole("combobox", { name: "Микрофон", exact: true });
     await page.getByRole("textbox", { name: "Введите имя" }).fill("DeniedCamera");

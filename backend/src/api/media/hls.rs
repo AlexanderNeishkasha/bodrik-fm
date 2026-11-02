@@ -126,31 +126,44 @@ async fn remove_invalid(directory: &Path) {
     }
 }
 
-/// Verify complete VOD markers and existing, nonempty local segment files.
+/// Verify complete VOD markers/durations and existing, nonempty local segment files.
 pub(super) async fn ready(directory: &Path) -> bool {
+    duration(directory).await.is_some()
+}
+
+/// Measure only a complete, locally available VOD cache, never a partial manifest.
+pub(super) async fn duration(directory: &Path) -> Option<f64> {
+    let text = inspected_playlist(directory).await?;
+    let duration = playlist_duration(&text);
+    if duration.is_none() {
+        tracing::warn!("complete HLS cache has invalid segment durations; decoding original");
+    }
+    duration
+}
+
+/// Read one playlist revision and validate every referenced segment before returning it.
+async fn inspected_playlist(directory: &Path) -> Option<String> {
     let text = match tokio::fs::read_to_string(directory.join("index.m3u8")).await {
         Ok(text) => text,
-        Err(error) if error.kind() == ErrorKind::NotFound => return false,
+        Err(error) if error.kind() == ErrorKind::NotFound => return None,
         Err(error) => {
             tracing::warn!(%error, "HLS cache inspection failed");
-            return false;
+            return None;
         }
     };
-    let Some(segments) = playlist_segments(&text) else {
-        return false;
-    };
+    let segments = playlist_segments(&text)?;
     for segment in segments {
         match tokio::fs::metadata(directory.join(segment)).await {
             Ok(metadata) if metadata.is_file() && metadata.len() > 0 => {}
-            Ok(_) => return false,
-            Err(error) if error.kind() == ErrorKind::NotFound => return false,
+            Ok(_) => return None,
+            Err(error) if error.kind() == ErrorKind::NotFound => return None,
             Err(error) => {
                 tracing::warn!(%error, "HLS segment inspection failed");
-                return false;
+                return None;
             }
         }
     }
-    true
+    Some(text)
 }
 
 /// Select the existing copy/transcode policy without adding container assumptions.
@@ -181,6 +194,40 @@ fn playlist_segments(text: &str) -> Option<Vec<&str>> {
     (!segments.is_empty()).then_some(segments)
 }
 
+/// Sum one positive finite EXTINF per segment in a complete, safe generated playlist.
+fn playlist_duration(text: &str) -> Option<f64> {
+    playlist_segments(text)?;
+    let mut total = 0.0_f64;
+    let mut pending = None;
+    let mut ended = false;
+    for line in text.lines().map(str::trim).filter(|line| !line.is_empty()) {
+        if ended {
+            return None;
+        }
+        if line == "#EXT-X-ENDLIST" {
+            if pending.is_some() {
+                return None;
+            }
+            ended = true;
+        } else if let Some(value) = line.strip_prefix("#EXTINF:") {
+            if pending.is_some() {
+                return None;
+            }
+            let duration = value.split_once(',')?.0.trim().parse::<f64>().ok()?;
+            if !duration.is_finite() || duration <= 0.0 {
+                return None;
+            }
+            pending = Some(duration);
+        } else if !line.starts_with('#') {
+            total += pending.take()?;
+            if !total.is_finite() {
+                return None;
+            }
+        }
+    }
+    (ended && total > 0.0).then_some(total)
+}
+
 /// Pure playlist/format tables, without native processes or filesystem fixtures.
 #[cfg(test)]
 mod tests {
@@ -207,6 +254,79 @@ mod tests {
         ] {
             assert_eq!(playlist_segments(text), expected);
         }
+    }
+
+    /// Segment durations must match a complete safe manifest and remain finite on summation.
+    #[test]
+    fn playlist_duration_cases() {
+        for (name, body, expected) in [
+            ("integer", "#EXTINF:6,\n00000.ts\n#EXT-X-ENDLIST", Some(6.0)),
+            (
+                "fractional segments",
+                "#EXTINF:6.008167,\n00000.ts\n#EXTINF:1.828556,title\n00001.ts\n#EXT-X-ENDLIST",
+                Some(7.836723),
+            ),
+            ("missing duration", "00000.ts\n#EXT-X-ENDLIST", None),
+            ("partial VOD", "#EXTINF:6,\n00000.ts", None),
+            ("empty VOD", "#EXT-X-ENDLIST", None),
+            ("missing comma", "#EXTINF:6\n00000.ts\n#EXT-X-ENDLIST", None),
+            (
+                "malformed",
+                "#EXTINF:invalid,\n00000.ts\n#EXT-X-ENDLIST",
+                None,
+            ),
+            ("zero", "#EXTINF:0,\n00000.ts\n#EXT-X-ENDLIST", None),
+            ("negative", "#EXTINF:-1,\n00000.ts\n#EXT-X-ENDLIST", None),
+            ("NaN", "#EXTINF:NaN,\n00000.ts\n#EXT-X-ENDLIST", None),
+            ("infinite", "#EXTINF:inf,\n00000.ts\n#EXT-X-ENDLIST", None),
+            (
+                "overflowing number",
+                "#EXTINF:1e309,\n00000.ts\n#EXT-X-ENDLIST",
+                None,
+            ),
+            (
+                "overflowing total",
+                "#EXTINF:1e308,\n00000.ts\n#EXTINF:1e308,\n00001.ts\n#EXT-X-ENDLIST",
+                None,
+            ),
+            ("dangling duration", "#EXTINF:6,\n#EXT-X-ENDLIST", None),
+            (
+                "duplicate duration",
+                "#EXTINF:6,\n#EXTINF:6,\n00000.ts\n#EXT-X-ENDLIST",
+                None,
+            ),
+            (
+                "second segment missing duration",
+                "#EXTINF:6,\n00000.ts\n00001.ts\n#EXT-X-ENDLIST",
+                None,
+            ),
+            (
+                "unsafe path",
+                "#EXTINF:6,\n../outside.ts\n#EXT-X-ENDLIST",
+                None,
+            ),
+            (
+                "remote segment",
+                "#EXTINF:6,\nhttps://invalid.test/a.ts\n#EXT-X-ENDLIST",
+                None,
+            ),
+            (
+                "data after ENDLIST",
+                "#EXTINF:6,\n00000.ts\n#EXT-X-ENDLIST\n#EXTINF:6,\n00001.ts",
+                None,
+            ),
+        ] {
+            let text = format!("#EXTM3U\n{body}\n");
+            let actual = playlist_duration(&text);
+            match (actual, expected) {
+                (Some(actual), Some(expected)) => {
+                    assert!((actual - expected).abs() < 1e-9, "{name}")
+                }
+                (None, None) => {}
+                _ => panic!("{name}: expected {expected:?}, got {actual:?}"),
+            }
+        }
+        assert!(playlist_duration("#EXTINF:6,\n00000.ts\n#EXT-X-ENDLIST").is_none());
     }
 
     /// Every supported copy/transcode extension follows the original codec policy.

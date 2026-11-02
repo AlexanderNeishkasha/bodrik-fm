@@ -25,7 +25,8 @@ test("disabling a meeting restores the local Studio slider and keeps both saved 
   assert.equal(active.musicOutput, "conference");
   assert.equal(active.localVolume, 0.4);
   active.onVolumeChange({ target: { value: "0.2" } });
-  assert.deepEqual(changes, [["meeting", 0.2]]);
+  active.onToggleMute();
+  assert.deepEqual(changes, [["meeting", 0.2], ["meeting", 0]]);
 
   const disabled = props(false);
   assert.equal(isConferenceMusicActive({ conference_enabled: false, music_output: "conference" }), false);
@@ -34,7 +35,7 @@ test("disabling a meeting restores the local Studio slider and keeps both saved 
   assert.equal(disabled.localMuted, false);
   disabled.onVolumeChange({ target: { value: "0.6" } });
   disabled.onToggleMute();
-  assert.deepEqual(changes, [["meeting", 0.2], ["studio", "0.6"], ["studio mute"]]);
+  assert.deepEqual(changes, [["meeting", 0.2], ["meeting", 0], ["studio", "0.6"], ["studio mute"]]);
   assert.equal(conference.musicVolume, 0.4);
   assert.equal(props(true).localVolume, 0.4);
 });

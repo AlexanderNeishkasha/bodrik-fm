@@ -201,6 +201,49 @@ async fn native_music_authority_and_controls() {
         states["conference"].producer_id, sought_id,
         "track replacement allocates fresh RTP source"
     );
+    for (name, revision, natural_end) in [
+        ("first natural repeat", 5, true),
+        ("second natural repeat", 6, true),
+        ("third natural repeat", 7, true),
+        ("fourth natural repeat", 8, true),
+        ("failed child does not churn", 9, false),
+    ] {
+        let previous_id = states["conference"].producer_id.clone();
+        let child = states
+            .get_mut("conference")
+            .expect("playing state")
+            .process
+            .as_mut()
+            .expect("FFmpeg child");
+        if natural_end {
+            let status = tokio::time::timeout(Duration::from_secs(10), child.wait())
+                .await
+                .expect("synthetic track ends")
+                .expect("child reaped");
+            assert!(status.success(), "{name}");
+        } else {
+            child.kill().await.expect("simulate process failure");
+        }
+        for _ in 0..3 {
+            reconcile(&service, &mut states, &mut seen, false)
+                .await
+                .expect("ended source reconciliation");
+            assert_eq!(states["conference"].producer_id, previous_id, "{name}");
+            assert!(states["conference"].process.is_none(), "{name}");
+        }
+        *snapshot.lock().expect("authority") =
+            (StatusCode::OK, playback(revision + 1, true, 0.0, "second"));
+        reconcile(&service, &mut states, &mut seen, true)
+            .await
+            .expect("authoritative repeat restarts source once");
+        let repeated_id = states["conference"].producer_id.clone();
+        assert_ne!(repeated_id, previous_id, "{name}: fresh RTP source");
+        assert!(states["conference"].process.is_some(), "{name}");
+        reconcile(&service, &mut states, &mut seen, true)
+            .await
+            .expect("repeat snapshot is idempotent");
+        assert_eq!(states["conference"].producer_id, repeated_id, "{name}");
+    }
     let current_id = states["conference"].producer_id.clone();
     let mut late = binding.clone();
     late.peer_id = "late-listener".into();

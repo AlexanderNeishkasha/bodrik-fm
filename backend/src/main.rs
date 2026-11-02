@@ -59,6 +59,7 @@ async fn run() -> Result<(), String> {
     let allowed_origins = config::load_allowed_origins()?;
     let cors = config::build_cors(&allowed_origins)?;
     let meeting_service_secret = config::meeting_service_secret()?;
+    let auth_cookie_domain = config::auth_cookie_domain()?;
     let meeting_shared = meeting::Shared::new();
     let meeting_enabled = config::env_flag("MEETING_ENABLED", false);
     let conference_provider = if meeting_enabled {
@@ -101,8 +102,13 @@ async fn run() -> Result<(), String> {
         jwt_secret,
         trust_proxy_headers: config::env_flag("TRUST_PROXY_HEADERS", false),
         csrf_allowed_origins: Arc::new(allowed_origins),
+        auth_cookie_domain,
         login_rate_limiter: Arc::new(api::auth::LoginRateLimiter::new(5, 600)),
-        conference_join_rate_limiter: Arc::new(api::auth::LoginRateLimiter::new(30, 60)),
+        // Joins per client per minute; the local dev stack raises it for parallel browser smoke runs.
+        conference_join_rate_limiter: Arc::new(api::auth::LoginRateLimiter::new(
+            config::env_usize("CONFERENCE_JOINS_PER_MINUTE", 30),
+            60,
+        )),
         conference_provider: conference_provider.map(Arc::new),
         music_bridge_secret,
         playback_observer: Arc::new(api::playback_observer::PlaybackObserver::new(256)),
@@ -231,12 +237,22 @@ async fn shutdown_signal() {
     info!("HTTP shutdown requested");
 }
 
-/// Install the process tracing subscriber, defaulting to info-level diagnostics.
+/// Install info-level diagnostics; `LOG_FORMAT=json` enables alert-compatible structured logs.
+/// JSON omits request spans to avoid forwarding request URLs into log consumers.
 ///
 /// # Panics
 /// Panics if another subscriber was installed before the application entry point.
 fn init_tracing() {
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info"));
-    tracing_subscriber::fmt().with_env_filter(filter).init();
+    if env::var("LOG_FORMAT").as_deref() == Ok("json") {
+        tracing_subscriber::fmt()
+            .with_env_filter(filter)
+            .json()
+            .with_current_span(false)
+            .with_span_list(false)
+            .init();
+    } else {
+        tracing_subscriber::fmt().with_env_filter(filter).init();
+    }
 }

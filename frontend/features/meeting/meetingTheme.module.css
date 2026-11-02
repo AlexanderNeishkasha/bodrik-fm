@@ -19,6 +19,7 @@
   --meeting-ghost-hover: var(--theme-ghost-hover);
   --meeting-danger: var(--theme-red);
   --meeting-danger-bg: var(--theme-danger);
+  --meeting-danger-foreground: var(--theme-danger-foreground, var(--theme-red));
   --meeting-danger-hover: var(--theme-danger-hover);
   --meeting-focus: var(--theme-focus);
 
@@ -154,12 +155,18 @@
   opacity: 1;
 }
 
-/* Keep the live dock and its popup snapshots above moving cards, below side panels. */
+/* Keep the live dock and its popup snapshots above moving cards, below fullscreen side panels. */
 .theme:global(::view-transition-group(meeting-controls)) { z-index: 3; }
 .theme:global(::view-transition-group(meeting-control-menu)) { z-index: 10; }
 .theme:global(::view-transition-group(meeting-chat)) { z-index: 11; }
 
 .theme:global(::view-transition-group(meeting-participants)) { z-index: 11; }
+/* Docked panels (above 1024px) sit below the live dock (MeetingControlBar z 12); match it so a
+ * sliding panel never covers the dock and then drops behind it when the transition ends. */
+@media (min-width: 1025px) {
+  .theme:global(::view-transition-group(meeting-controls)) { z-index: 12; }
+  .theme:global(::view-transition-group(meeting-control-menu)) { z-index: 13; }
+}
 .theme:global(::view-transition-image-pair(meeting-controls)) { border-radius: var(--meeting-radius-pill); }
 .theme:global(::view-transition-image-pair(meeting-control-menu)) { border-radius: var(--meeting-radius-item); }
 

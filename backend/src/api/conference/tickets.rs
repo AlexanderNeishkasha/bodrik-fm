@@ -1,7 +1,7 @@
 //! Replacement admission issuance; independent keys and server-resolved actor/role authority.
 
-use super::{db, handlers, hosts, policy};
-use crate::api::{AppState, internal_error_response, json_message, normalize_origin, studio};
+use super::{db, handlers, policy};
+use crate::api::{AppState, auth, internal_error_response, json_message, normalize_origin, studio};
 use axum::{
     Json, Router,
     extract::{ConnectInfo, DefaultBodyLimit, Path, State},
@@ -290,15 +290,6 @@ pub(crate) fn routes(app: AppState, issuer: Option<Issuer>) -> Router {
         .with_state(TicketState { app, issuer })
 }
 
-/// Guest request: only an optional Studio host pass; role/actor claims are forbidden.
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct GuestRequest {
-    /// Single-use pass from the Studio "join" link, redeemed for this browser.
-    #[serde(default)]
-    host_grant: Option<String>,
-}
-
 /// Explicit empty request; browser role, actor and service incarnation claims are forbidden.
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -311,13 +302,12 @@ async fn guest(
     Path(slug): Path<String>,
     headers: HeaderMap,
     ConnectInfo(remote): ConnectInfo<SocketAddr>,
-    Json(request): Json<GuestRequest>,
+    Json(_request): Json<EmptyRequest>,
 ) -> Response {
     let device = device::from_headers(&headers);
     let guest = Guest {
         slug,
         device: &device,
-        host_grant: request.host_grant,
     };
     let mut response = issue(state, headers, remote, Some(guest)).await;
     if response.status() == StatusCode::OK {
@@ -326,14 +316,12 @@ async fn guest(
     response
 }
 
-/// Guest ticket inputs: invitation slug, browser device and an optional host pass.
+/// Guest ticket inputs: invitation slug and browser device.
 struct Guest<'a> {
     /// Public invitation slug.
     slug: String,
     /// Browser device from the cookie.
     device: &'a device::Device,
-    /// Optional Studio host pass to redeem.
-    host_grant: Option<String>,
 }
 
 /// Mint a presenter only after live Studio owner/admin authorization.
@@ -347,17 +335,17 @@ async fn presenter(
 }
 
 /// Check origin/throttle, discover service boot, then offload fresh DB/identity lookup and signing.
-/// Guests are hosts when they redeem a Studio host pass or were remembered as hosts of
-/// the room by an earlier pass from the same browser.
+/// A guest is a host exactly when signed in as the room's owner (the session cookie is
+/// shared with the meeting subdomain).
 async fn issue(
     state: TicketState,
     headers: HeaderMap,
     remote: SocketAddr,
     guest: Option<Guest<'_>>,
 ) -> Response {
-    let (slug, device, host_grant) = match guest {
-        Some(guest) => (Some(guest.slug), Some(guest.device), guest.host_grant),
-        None => (None, None, None),
+    let (slug, device) = match guest {
+        Some(guest) => (Some(guest.slug), Some(guest.device)),
+        None => (None, None),
     };
     if !headers
         .get(header::ORIGIN)
@@ -434,9 +422,8 @@ async fn issue(
                 )
             })?
             .as_secs();
-        let presenter = presenter
-            || (guest_host
-                && remembered_host(&state.app, &conference, &actor, host_grant.as_deref(), now)?);
+        let presenter =
+            presenter || (guest_host && room_owner(&state.app, &headers, conference.room_id));
         issuer
             .sign(&conference, instance, actor, presenter, now)
             .map(super::response::no_store_json)
@@ -455,24 +442,10 @@ async fn issue(
     }
 }
 
-/// Redeem a host pass (if any), then report whether the guest actor is a remembered host.
-///
-/// # Errors
-/// Database failures become an internal error response; an invalid pass is just "not host".
-fn remembered_host(
-    app: &AppState,
-    conference: &db::Conference,
-    actor: &str,
-    host_grant: Option<&str>,
-    now: u64,
-) -> Result<bool, Box<Response>> {
-    let internal = |error| Box::new(internal_error_response("conference.ticket.host", error));
-    if let Some(token) = host_grant
-        && hosts::redeem_grant(app, token, conference.room_id, actor, now).map_err(internal)?
-    {
-        return Ok(true);
-    }
-    hosts::is_host(app, conference.room_id, actor).map_err(internal)
+/// Whether the request's session cookie belongs to the active account that owns the room.
+/// Performs synchronous database I/O; call only from a blocking worker.
+fn room_owner(app: &AppState, headers: &HeaderMap, room_id: i64) -> bool {
+    auth::auth_user_from_headers(app, headers).is_some_and(|user| user.room_id == room_id)
 }
 
 /// Shared wire identifier boundary; accepts no path/control/whitespace characters.
@@ -485,5 +458,6 @@ fn identifier(value: &str) -> bool {
 }
 
 mod device;
+mod owner_route_tests;
 mod route_tests;
 mod tests;

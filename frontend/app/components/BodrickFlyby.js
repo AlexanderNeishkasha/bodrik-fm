@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import AssetImage from "./AssetImage";
-import bodrickCartoon from "../assets/bodrick_cartoon.png";
+import bodrickCartoon from "../assets/bodrick_cartoon.svg";
 import { deferEffect } from "../lib/deferEffect";
 import {
   BASE_CHANCE,
@@ -278,8 +278,6 @@ export default function BodrickFlyby({
         <AssetImage
           src={bodrickCartoon}
           alt=""
-          width={spriteSize}
-          height={spriteSize}
           aria-hidden="true"
           className={`bodrick-glow ${isFlipped ? "bodrick-flip" : ""}`}
           style={{ width: `${spriteSize}px`, height: "auto" }}

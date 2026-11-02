@@ -47,3 +47,19 @@ export function createSpeakerTest({ createAudio = (url) => new Audio(url), volum
     },
   };
 }
+
+/** Room statuses during which a speaker test may keep playing. */
+const IN_ROOM = new Set(["admitted", "reconnecting"]);
+
+/**
+ * Stop the melody when the client leaves the room by any path (exit button, kick, failure),
+ * not only when the whole session is released. Returns an unsubscribe function.
+ */
+export function stopOnRoomExit(client, speakerTest) {
+  let inRoom = IN_ROOM.has(client.getState().status);
+  return client.subscribe(() => {
+    const next = IN_ROOM.has(client.getState().status);
+    if (inRoom && !next) speakerTest.stop();
+    inRoom = next;
+  });
+}

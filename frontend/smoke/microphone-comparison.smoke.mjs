@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("all microphone meters run only while the quick menu is open", async ({ page }) => {
   await page.addInitScript(() => {
@@ -39,10 +40,10 @@ test("all microphone meters run only while the quick menu is open", async ({ pag
     };
   });
   const driver = nextDriver(page);
-  await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+  await page.goto(driver.path(smokeRoom()));
   await driver.join(`comparison-${Date.now()}`);
   expect(await page.evaluate(() => window.comparisonStreams.length)).toBe(0);
-  const toggle = page.getByRole("button", { name: "Выбор микрофона и динамика", exact: true });
+  const toggle = page.getByRole("button", { name: "Выбор микрофона и динамиков", exact: true });
   await toggle.click();
   const menu = page.getByRole("menu", { name: "Микрофоны", exact: true });
   await expect(menu.getByRole("meter")).toHaveCount(2);

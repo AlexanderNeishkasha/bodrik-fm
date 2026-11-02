@@ -4,13 +4,12 @@ import { createMeetingChat } from "../client/chat.mjs";
 import { createMeetingClient } from "../client/meetingClient.mjs";
 import { createMeetingFiles } from "../client/files.mjs";
 import { createMeetingParticipants } from "../client/participants.mjs";
-import { takeHostGrant } from "../client/protocol.mjs";
 import { downloadBlob } from "../client/downloadBlob.mjs";
 import { createMeetingNotifications } from "../client/notifications.mjs";
 import { createMeetingSettings } from "../client/settings.mjs";
 import { createRoomTheme } from "../client/theme.mjs";
 import { flushAndSettle, withViewTransition } from "./cardMotion.mjs";
-import { createSpeakerTest } from "./speakerTest.mjs";
+import { createSpeakerTest, stopOnRoomExit } from "./speakerTest.mjs";
 import { createConfirmations } from "./confirmations.mjs";
 
 /** Play one meeting event sound (assets ship with the frontend build). */
@@ -21,7 +20,7 @@ function playSound(name) {
 
 /** Create the client and every feature source for one meeting. */
 function createSession(slug, origin) {
-  const client = createMeetingClient({ slug, hostGrant: takeHostGrant() });
+  const client = createMeetingClient({ slug });
   const files = createMeetingFiles({ client, save: downloadBlob });
   const chat = createMeetingChat({
     client,
@@ -39,6 +38,7 @@ function createSession(slug, origin) {
   const wake = { active: false };
   const speakerTest = createSpeakerTest({ volume: () => client.preferences.getSnapshot().masterVolume / 100 });
   const offTestVolume = client.preferences.subscribe(speakerTest.syncVolume);
+  const offTestExit = stopOnRoomExit(client, speakerTest);
   const settings = createMeetingSettings({
     client,
     speakerTest,
@@ -61,6 +61,7 @@ function createSession(slug, origin) {
       participants.dispose();
       files.dispose();
       offTestVolume();
+      offTestExit();
       speakerTest.stop();
       settings.dispose();
       notifications.dispose();
@@ -87,7 +88,7 @@ export function createSessionStore(slug, origin, { create = createSession, sched
   const unload = () => { generation++; return session?.leave({ notify: false }); };
   return {
     getSnapshot: () => session,
-    /** Replace the disposed client and join immediately with the previous choices. */
+    /** Replace the disposed client; without explicit choices, leave it idle for a fresh prejoin. */
     async restart(choice) {
       if (restarting || subscribers === 0) return;
       restarting = true;
@@ -99,9 +100,9 @@ export function createSessionStore(slug, origin, { create = createSession, sched
         if (subscribers === 0 || attempt !== generation) return;
         session = create(slug, origin);
         if (capturePreferences) for (const [key, value] of Object.entries(capturePreferences)) session.client.capture.setPreference(key, value);
-        if (personal) for (const key of ["language", "shortcuts", "masterVolume"]) session.client.preferences.set(key, personal[key]);
+        if (personal) for (const key of ["shortcuts", "masterVolume"]) session.client.preferences.set(key, personal[key]);
         listeners.forEach(listener => listener());
-        await session.client.join(choice);
+        if (choice) await session.client.join(choice);
       } finally {
         restarting = false;
       }

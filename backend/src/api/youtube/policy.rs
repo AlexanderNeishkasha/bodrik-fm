@@ -120,6 +120,16 @@ pub(crate) fn transition(from: &str, to: &str) -> bool {
     )
 }
 
+/// Classify operational alerts separately from cancellations and expected admission outcomes.
+/// Native stderr is not inspected; HTTP route 404s do not enter this download pipeline.
+pub(crate) fn alert_failure_kind(error: &OpError) -> &'static str {
+    match error {
+        OpError::Internal(detail) if detail == "download job ownership ended" => "cancelled",
+        OpError::Missing | OpError::Conflict(_) | OpError::Rejected(_) => "expected",
+        OpError::Internal(_) => "pipeline_failure",
+    }
+}
+
 /// Preserve only public error classifications; never expose native stderr/cookie paths.
 pub(crate) fn public_error(error: &OpError) -> &'static str {
     match error {

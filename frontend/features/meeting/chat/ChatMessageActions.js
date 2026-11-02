@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { EllipsisVertical, Trash2 } from "lucide-react";
 import styles from "./ChatMessageActions.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /**
  * "⋮" button beside the bubble (revealed on hover) and its menu; the transcript also
  * opens the menu on right-click/long-press. Public removal waits for storage acknowledgement.
  */
-export default function ChatMessageActions({ source, message, language, sessionKey, side = "left", open, onOpenChange }) {
-  const english = language === "en";
+export default function ChatMessageActions({ source, message, sessionKey, side = "left", open, onOpenChange }) {
+  const text = t("meeting.chatMessageActions");
   const ref = useRef(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState(false);
@@ -27,7 +28,7 @@ export default function ChatMessageActions({ source, message, language, sessionK
     };
   }, [open, onOpenChange]);
 
-  const label = english ? "Message actions" : "Действия с сообщением";
+  const label = text.actions;
   return <div ref={ref} data-side={side} className={`${styles.anchor} ${open ? styles.open : ""}`}>
     <button className={styles.trigger} type="button" aria-haspopup="menu" aria-expanded={open} aria-label={label} title={label}
       onClick={() => onOpenChange(!open)}><EllipsisVertical size={16} /></button>
@@ -38,9 +39,9 @@ export default function ChatMessageActions({ source, message, language, sessionK
         catch { setError(true); }
         finally { setPending(false); }
       }}>
-        <Trash2 size={15} /> {english ? "Delete" : "Удалить"}
+        <Trash2 size={15} /> {text.delete}
       </button>
-      {error && <span role="alert">{english ? "Could not delete" : "Не удалось удалить"}</span>}
+      {error && <span role="alert">{text.deleteError}</span>}
     </div>}
   </div>;
 }

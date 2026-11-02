@@ -9,7 +9,7 @@ fn runtime() -> Arc<RoomRuntime> {
         1,
         "room".into(),
         room_settings::RoomSettings {
-            theme: "mono".into(),
+            theme: "pirate".into(),
             repeat_one: false,
             music_output: "studio".into(),
             conference_music_volume: 1.0,

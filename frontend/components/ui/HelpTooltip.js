@@ -6,6 +6,12 @@ import { createTooltipLayer } from "./tooltipLayer";
 import { tooltipPosition } from "./tooltipPosition.mjs";
 import styles from "./HelpTooltip.module.css";
 
+/** Render plain help or a list of short points, preserving safe text and accessible list semantics. */
+function HelpContent({ content }) {
+  if (!Array.isArray(content)) return content;
+  return <span className={styles.list} role="list">{content.map((point, index) => <span className={styles.listItem} role="listitem" key={index}>{point}</span>)}</span>;
+}
+
 /** Show isolated, viewport-bound help outside clipped panels; focus/tap and Escape also work without hover. */
 export default function HelpTooltip({ label, content, children }) {
   const id = useId();
@@ -77,7 +83,7 @@ export default function HelpTooltip({ label, content, children }) {
       onFocus={() => { setFocused(true); setDismissed(false); }} onBlur={() => setFocused(false)}
       onKeyDown={(event) => { if (event.key === "Escape" && visible) { setDismissed(true); event.preventDefault(); event.stopPropagation(); } }}
     >?</button>
-    <span id={id} hidden>{content}</span>
-    {visible && layer && createPortal(<span ref={tipRef} className={styles.tooltip} role="tooltip" onMouseEnter={enter} onMouseLeave={leave} onClick={(event) => event.stopPropagation()} style={{ visibility: "hidden" }}>{content}</span>, layer.container)}
+    <span id={id} hidden><HelpContent content={content} /></span>
+    {visible && layer && createPortal(<span ref={tipRef} className={styles.tooltip} role="tooltip" onMouseEnter={enter} onMouseLeave={leave} onClick={(event) => event.stopPropagation()} style={{ visibility: "hidden" }}><HelpContent content={content} /></span>, layer.container)}
   </span>;
 }

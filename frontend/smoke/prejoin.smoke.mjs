@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("prejoin camera expands right without moving the device controls", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -12,7 +13,7 @@ test("prejoin camera expands right without moving the device controls", async ({
       return acquire(constraints);
     };
   });
-  await page.goto(`/room/${encodeURIComponent(process.env.SMOKE_ROOM || "chopper")}`);
+  await page.goto(`/room/${encodeURIComponent(smokeRoom())}`);
   const camera = page.getByRole("combobox", { name: "Камера", exact: true });
   const microphone = page.getByRole("combobox", { name: "Микрофон", exact: true });
   const name = page.getByRole("textbox", { name: "Введите имя" });

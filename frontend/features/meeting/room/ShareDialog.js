@@ -4,16 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Copy, X } from "lucide-react";
 
 import styles from "./ShareDialog.module.css";
+import { t } from "../../../app/lang/index.js";
 
 /** RU/EN copy. */
-const COPY = {
-  ru: { title: "Поделиться комнатой", link: "Ссылка-приглашение", copy: "Скопировать ссылку", copied: "Ссылка скопирована", close: "Закрыть" },
-  en: { title: "Share room", link: "Invitation link", copy: "Copy link", copied: "Link copied", close: "Close" },
-};
-
 /** Modal with the room's public invitation link and a copy button. */
-export default function ShareDialog({ url, language = "ru", onClose }) {
-  const text = COPY[language === "en" ? "en" : "ru"];
+export default function ShareDialog({ url, onClose }) {
+  const text = t("meeting.shareDialog");
   const ref = useRef(null);
   const [copied, setCopied] = useState(false);
 

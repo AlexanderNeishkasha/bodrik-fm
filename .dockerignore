@@ -25,3 +25,14 @@ backend/**/.env*
 backend/crates/meeting/target
 backend/crates/meeting/data
 backend/crates/meeting/logs
+backend/crates/log-alerts/target
+
+# Include only public logging build inputs, never private infrastructure env/secrets.
+!infra/
+infra/*
+!infra/logging/
+infra/logging/*
+!infra/logging/Dockerfile
+!infra/logging/notifications.yml
+!infra/logging/notifications-disabled.yml
+!infra/logging/DOZZLE-LICENSE

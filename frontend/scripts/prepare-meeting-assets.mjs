@@ -1,10 +1,11 @@
+import { build } from "esbuild";
 import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 /**
  * Copy the meeting's runtime assets into public/meeting-assets (git-ignored):
- * RNNoise worklet and WASM, MediaPipe selfie segmentation (script, model, WASM),
+ * Neural denoiser worklets, WASM and models; MediaPipe selfie segmentation (script, model, WASM),
  * the event sounds that ship
  * with the meeting component, and the development `/brand` document (production serves it
  * from Rust).
@@ -22,6 +23,18 @@ const rnnoise = path.join(modules, "@sapphi-red", "web-noise-suppressor", "dist"
 await mkdir(path.join(destination, "rnnoise"), { recursive: true });
 await cp(path.join(rnnoise, "rnnoise", "workletProcessor.js"), path.join(destination, "rnnoise", "workletProcessor.js"));
 for (const file of ["rnnoise.wasm", "rnnoise_simd.wasm"]) await cp(path.join(rnnoise, file), path.join(destination, "rnnoise", file));
+
+await build({
+  entryPoints: [path.join(frontendRoot, "features", "meeting", "client", "denoisedGainWorklet.mjs")],
+  outfile: path.join(destination, "denoisedGain", "workletProcessor.js"),
+  bundle: true, format: "esm", platform: "browser", target: "es2022",
+});
+
+const deepfilter = path.join(modules, "@workadventure", "noise-suppression");
+await cp(path.join(deepfilter, "dist", "assets", "deepfilternet"), path.join(destination, "deepfilternet"), { recursive: true });
+await cp(path.join(deepfilter, "dist", "assets", "deepfilternet-worklet-processor.js"), path.join(destination, "deepfilternet", "workletProcessor.js"));
+await cp(path.join(deepfilter, "LICENSE"), path.join(destination, "deepfilternet", "LICENSE"));
+await cp(path.join(meetingAssets, "denoisers"), path.join(destination, "licenses", "denoisers"), { recursive: true });
 
 const segmentation = path.join(modules, "@mediapipe", "selfie_segmentation");
 await mkdir(path.join(destination, "selfie_segmentation"), { recursive: true });

@@ -19,11 +19,13 @@ test("meeting theme reaches the main domain before paint despite stale local sto
       let target = path.resolve(root, relative);
       expect(target.startsWith(root)).toBe(true);
       if (!existsSync(target) || statSync(target).isDirectory()) target += route.request().headers().rsc === "1" ? ".txt" : ".html";
+      // Router prefetches may ask for segment files this export does not contain.
+      if (!existsSync(target)) { await route.fulfill({ status: 404 }); return; }
       await route.fulfill({ path: target });
     });
     await context.routeWebSocket(/.*/, socket => { if (socket.url().includes("/ws/rooms/")) stream = socket; });
     await context.addInitScript(() => {
-      try { localStorage.setItem("bodrik_fm_theme", "midnight"); } catch {}
+      try { localStorage.setItem("bodrik_fm_theme_v2", "midnight"); } catch {}
       window.firstTheme = null;
       /** Capture the theme applied before the first rendered frame. */
       requestAnimationFrame(() => { window.firstTheme = document.documentElement.dataset.theme; });
@@ -34,10 +36,10 @@ test("meeting theme reaches the main domain before paint despite stale local sto
     stream.send(JSON.stringify({ theme: "aurora" }));
     await expect(page.locator("html")).toHaveAttribute("data-theme", "aurora");
     const cookies = await context.cookies("https://bodrik.fm/");
-    expect(cookies.find(cookie => cookie.name === "bodrik_fm_theme")).toMatchObject({ value: "aurora", domain: ".bodrik.fm", secure: true, sameSite: "Lax" });
+    expect(cookies.find(cookie => cookie.name === "bodrik_fm_theme_v2")).toMatchObject({ value: "aurora", domain: ".bodrik.fm", secure: true, sameSite: "Lax" });
     await page.goto("https://bodrik.fm/");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "aurora");
     expect(await page.evaluate(() => window.firstTheme)).toBe("aurora");
-    expect(await page.evaluate(() => localStorage.getItem("bodrik_fm_theme"))).toBe("aurora");
+    expect(await page.evaluate(() => localStorage.getItem("bodrik_fm_theme_v2"))).toBe("aurora");
   } finally { await context.close(); }
 });

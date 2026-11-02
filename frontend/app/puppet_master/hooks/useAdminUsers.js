@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ui } from "../../lang/ru";
+import { t } from "../../lang/index.js";
 import { clearCachedAuthUser, setCachedAuthUser } from "../../lib/authSession";
 import { isAbortError } from "../../lib/abortError.mjs";
 import { deferEffect } from "../../lib/deferEffect";
@@ -120,7 +120,7 @@ export default function useAdminUsers() {
       setStatus("ready");
     } catch (error) {
       if (!isAbortError(error)) {
-        showNotice(ui.messages.actionFailed);
+        showNotice(t("messages.actionFailed"));
         setStatus("error");
       }
     } finally {
@@ -142,7 +142,7 @@ export default function useAdminUsers() {
       clearCachedAuthUser();
       router.replace("/");
     } catch {
-      showNotice(ui.messages.actionFailed);
+      showNotice(t("messages.actionFailed"));
     }
   }, [router, showNotice]);
 
@@ -160,14 +160,14 @@ export default function useAdminUsers() {
         signal: controller.signal,
       });
       if (!response.ok) {
-        const message = await readApiMessage(response, ui.messages.passwordResetFailed);
+        const message = await readApiMessage(response, t("messages.passwordResetFailed"));
         if (!controller.signal.aborted) showNotice(message);
         return;
       }
       if (controller.signal.aborted) return;
       setPasswordDrafts((current) => ({ ...current, [userId]: "" }));
     } catch (error) {
-      if (!isAbortError(error)) showNotice(ui.messages.actionFailed);
+      if (!isAbortError(error)) showNotice(t("messages.actionFailed"));
     } finally {
       mutationControllersRef.current.delete(controller);
       if (!controller.signal.aborted) {
@@ -178,7 +178,7 @@ export default function useAdminUsers() {
 
   /** Delete one account and reload only after a confirmed successful response. */
   const deleteUser = useCallback(async (userId) => {
-    if (deleteBusyByUser[userId] || !window.confirm("Удалить пользователя?")) return;
+    if (deleteBusyByUser[userId] || !window.confirm(t("admin.deleteConfirm"))) return;
     setDeleteBusyByUser((current) => ({ ...current, [userId]: true }));
     const controller = new AbortController();
     mutationControllersRef.current.add(controller);
@@ -195,7 +195,7 @@ export default function useAdminUsers() {
       if (controller.signal.aborted) return;
       await loadUsers();
     } catch (error) {
-      if (!isAbortError(error)) showNotice(ui.messages.actionFailed);
+      if (!isAbortError(error)) showNotice(t("messages.actionFailed"));
     } finally {
       mutationControllersRef.current.delete(controller);
       if (!controller.signal.aborted) {
@@ -237,7 +237,7 @@ export default function useAdminUsers() {
         room_listed: nextListed,
       }));
     } catch (error) {
-      if (!isAbortError(error)) showNotice(ui.messages.actionFailed);
+      if (!isAbortError(error)) showNotice(t("messages.actionFailed"));
     } finally {
       const current = roomRequestsRef.current[userId];
       if (ownsRequestRevision(current, revision)) current.controller = null;
@@ -284,7 +284,7 @@ export default function useAdminUsers() {
         conference_allowed: payload.allowed === true,
       }));
     } catch (error) {
-      if (!isAbortError(error)) showNotice(ui.messages.actionFailed);
+      if (!isAbortError(error)) showNotice(t("messages.actionFailed"));
     } finally {
       if (conferenceControllersRef.current[userId] === controller) {
         delete conferenceControllersRef.current[userId];

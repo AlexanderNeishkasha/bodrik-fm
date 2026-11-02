@@ -6,12 +6,6 @@ import { EyeOff, Maximize2, MessageSquare, Minimize2, MoreVertical, PictureInPic
 import styles from "./MeetingGrid.module.css";
 import CardMenu from "./CardMenu";
 
-/** RU/EN card action labels. */
-export const CARD_COPY = {
-  ru: { focus: "В фокус", unfocus: "Вернуть сетку", fullscreen: "Во весь экран", exitFullscreen: "Выйти из полноэкранного режима", pip: "Картинка в картинке", more: "Действия", volume: "Громкость", privateChat: "Личное сообщение", hide: "Скрыть из сетки", mute: "Выключить микрофон", hideCamera: "Выключить камеру", stopScreen: "Остановить демонстрацию", makePresenter: "Назначить ведущим", removePresenter: "Снять роль ведущего", eject: "Выгнать", ban: "Забанить на 24 часа" },
-  en: { focus: "Focus", unfocus: "Back to grid", fullscreen: "Full screen", exitFullscreen: "Exit full screen", pip: "Picture in picture", more: "Actions", volume: "Volume", privateChat: "Private message", hide: "Hide from grid", mute: "Mute microphone", hideCamera: "Turn off camera", stopScreen: "Stop screen share", makePresenter: "Make presenter", removePresenter: "Remove presenter role", eject: "Kick", ban: "Ban for 24 hours" },
-};
-
 /** Current fullscreen element, kept in sync with the document. */
 function subscribeFullscreen(listener) {
   document.addEventListener("fullscreenchange", listener);

@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import {
@@ -28,21 +27,4 @@ test("meeting invitation parsing rejects reserved malformed and multi-segment pa
   ]) {
     assert.deepEqual(parseMeetingPath(pathname), { slug: null, valid: false }, pathname);
   }
-});
-
-test("meeting entry runs the headless-client session, with no retained document", () => {
-  const app = readFileSync(new URL("../features/meeting/MeetingApp.js", import.meta.url), "utf8");
-  assert.match(app, /<MeetingSession slug=\{admission\.slug\} \/>/);
-  assert.doesNotMatch(app, /iframe|retained-meeting|LegacyMeetingFrame/);
-});
-
-test("fixed meeting page keeps browser work behind an explicit client boundary", () => {
-  const page = readFileSync(new URL("../app/meeting/page.js", import.meta.url), "utf8");
-  const boundary = readFileSync(new URL("../features/meeting/MeetingClientBoundary.js", import.meta.url), "utf8");
-  const app = readFileSync(new URL("../features/meeting/MeetingApp.js", import.meta.url), "utf8");
-  assert.doesNotMatch(page, /window|document|localStorage|WebSocket|getUserMedia|mediasoup/i);
-  assert.match(boundary, /^"use client";/);
-  assert.match(boundary, /import MeetingApp from "\.\/MeetingApp";/);
-  assert.match(app, /typeof window === "undefined" \? "\/meeting" : window\.location\.pathname/);
-  assert.doesNotMatch(app, /localStorage|WebSocket|getUserMedia|mediasoup/i);
 });

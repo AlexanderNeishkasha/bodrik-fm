@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "../../../app/lang/index.js";
 import { useId, useSyncExternalStore } from "react";
 import { MessagesSquare, X } from "lucide-react";
 import ChatWorkspace from "./ChatWorkspace";
@@ -14,14 +15,11 @@ export default function ChatPanel({ source, origin, onReady }) {
   /** Use the same transition as the control bar for the close button and mobile Back. */
   function close() { transitionPanel(() => source.close()); }
   useBackClose(snapshot.visible, close);
-  const english = snapshot.language === "en";
   const unavailable = snapshot.available === false;
   const selected = snapshot.conversations.find((item) => item.id === snapshot.selected);
   const members = snapshot.conversations.filter((item) => item.id !== "all" && item.available).length + 1;
 
-  const text = english
-    ? { title: "Chat", publicChat: "Public chat", everyone: `Everyone in the room: ${members}`, direct: "Private messages", conversation: "Conversation", close: "Close chat" }
-    : { title: "Чат", publicChat: "Общий чат", everyone: `Все в комнате: ${members}`, direct: "Личные сообщения", conversation: "Беседа", close: "Закрыть чат" };
+  const text = { ...t("meeting.chatPanel"), everyone: `Все в комнате: ${members}` };
 
   return <aside className={styles.panel} style={{ viewTransitionName: "meeting-chat" }} aria-labelledby={id} hidden={!snapshot.visible}>
     <header className={styles.header}>

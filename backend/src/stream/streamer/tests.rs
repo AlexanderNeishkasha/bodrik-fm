@@ -183,6 +183,69 @@ fn completion_cases() {
     assert!(!Streamer::new(false).advance_at(start));
 }
 
+/// Corrected fractional VBR duration ends/repeats at the audio boundary, not the bitrate estimate.
+#[test]
+fn corrected_vbr_completion_cases() {
+    let start = Instant::now();
+    for (name, micros, repeat, queued, changed, current) in [
+        (
+            "before boundary",
+            247_849_783,
+            false,
+            false,
+            false,
+            Some("vbr"),
+        ),
+        ("stop at boundary", 247_849_784, false, false, true, None),
+        (
+            "next at boundary",
+            247_849_784,
+            false,
+            true,
+            true,
+            Some("next"),
+        ),
+        (
+            "repeat at boundary",
+            247_849_784,
+            true,
+            true,
+            true,
+            Some("vbr"),
+        ),
+        (
+            "no old metadata tail",
+            300_000_000,
+            false,
+            false,
+            true,
+            None,
+        ),
+    ] {
+        let mut player = Streamer::new(repeat);
+        player.current = Some(track("vbr", Some(247.849784)));
+        player.is_playing = true;
+        player.started_at = Some(start);
+        if queued {
+            player.enqueue(track("next", Some(5.0)));
+        }
+        let now = start + Duration::from_micros(micros);
+        assert_eq!(player.advance_at(now), changed, "{name}");
+        assert_eq!(
+            player.current.as_ref().map(|entry| entry.id.as_str()),
+            current,
+            "{name}"
+        );
+        assert_eq!(player.is_playing, current.is_some(), "{name}");
+        if changed {
+            assert!(player.position_at(now).abs() < 1e-9, "{name}");
+        }
+        if repeat {
+            assert_eq!(ids(&player), vec!["next"], "{name}: repeat consumed queue");
+        }
+    }
+}
+
 /// Rename/removal handle duplicate queued occurrences and current identity correctly.
 #[test]
 fn identity_cases() {

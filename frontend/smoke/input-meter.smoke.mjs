@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { nextDriver } from "./meetingDriver.mjs";
+import { smokeRoom } from "./smokeRooms.mjs";
 
 test("microphone meters follow an input switch and animate with reduced-motion support", async ({ page }) => {
   await page.addInitScript(() => {
@@ -25,7 +26,7 @@ test("microphone meters follow an input switch and animate with reduced-motion s
     AnalyserNode.prototype.getByteTimeDomainData = function (data) { data.fill(160); };
   });
   const driver = nextDriver(page);
-  await page.goto(driver.path(process.env.SMOKE_ROOM || "chopper"));
+  await page.goto(driver.path(smokeRoom()));
   await driver.join(`meter-${Date.now()}`);
   await page.getByRole("button", { name: "Настройки", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Настройки встречи" });
@@ -40,8 +41,8 @@ test("microphone meters follow an input switch and animate with reduced-motion s
   await page.emulateMedia({ reducedMotion: "reduce" });
   expect(await meter.locator("span").first().evaluate((node) => getComputedStyle(node).transitionDuration)).toBe("0s");
   await dialog.getByRole("button", { name: "Закрыть настройки" }).click();
-  await page.getByRole("button", { name: "Выбор микрофона и динамика", exact: true }).click();
+  await page.getByRole("button", { name: "Выбор микрофона и динамиков", exact: true }).click();
   await expect(page.getByRole("menu", { name: "Микрофоны", exact: true }).getByRole("meter").first()).toHaveAttribute("aria-valuenow", "0.375");
-  await page.getByRole("button", { name: "Выбор микрофона и динамика", exact: true }).click();
+  await page.getByRole("button", { name: "Выбор микрофона и динамиков", exact: true }).click();
   await driver.leave();
 });

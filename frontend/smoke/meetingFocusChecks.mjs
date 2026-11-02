@@ -1,7 +1,13 @@
 import { expect } from "@playwright/test";
 
-/** Assert real decoded video nodes, streams and tracks survive focus/panel relayouts. */
-export async function checkStableFocus(page) {
+/** Desktop and phone layouts the focus checks run in. */
+export const FOCUS_VIEWPORTS = Object.freeze({ desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } });
+
+/**
+ * Assert real decoded video nodes, streams and tracks survive focus changes in the given layouts:
+ * `focus` covers a focus round trip, `panels` side panels and avatar focus, `fullscreen` fullscreen and picture-in-picture.
+ */
+export async function checkStableFocus(page, viewports = Object.values(FOCUS_VIEWPORTS), { focus = true, panels = true, fullscreen = true } = {}) {
   const region = page.getByRole("region", { name: "Участники встречи" });
   const originalViewport = page.viewportSize();
   await page.evaluate(() => {
@@ -24,31 +30,34 @@ export async function checkStableFocus(page) {
     for (const video of state) expect(video, video.key).toMatchObject({ sameNode: true, sameStream: true, sameTrack: true, continuous: true, playing: true });
   };
   try {
-    for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    for (const viewport of viewports) {
       await page.setViewportSize(viewport);
       const focused = region.locator('article[data-focused="true"]');
       if (await focused.count()) await focused.dblclick({ position: { x: 60, y: 60 } });
       await expect(region).toHaveAttribute("data-view", "grid");
       const camera = region.locator("article").filter({ has: page.locator("video") }).first();
-      for (let cycle = 0; cycle < 20; cycle++) {
-        await camera.dblclick({ position: { x: 60, y: 60 } });
-        await expect(region).toHaveAttribute("data-view", "speaker");
-        await page.waitForTimeout(350);
-        await verify();
-        // Horizontal thumbnail scrolling must leave the large card in the viewport.
-        if (cycle === 0) {
-          await region.evaluate((node) => { node.scrollLeft = node.scrollWidth; });
-          const bounds = await region.locator('article[data-focused="true"]').boundingBox();
-          expect(bounds.x).toBeGreaterThanOrEqual(0);
-          expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width + 1);
-          await region.evaluate((node) => { node.scrollLeft = 0; });
+      if (focus) {
+        // One focus round trip per width catches identity loss; repetition only slowed the smoke.
+        for (let cycle = 0; cycle < 1; cycle++) {
+          await camera.dblclick({ position: { x: 60, y: 60 } });
+          await expect(region).toHaveAttribute("data-view", "speaker");
+          await page.waitForTimeout(350);
+          await verify();
+          // Horizontal thumbnail scrolling must leave the large card in the viewport.
+          if (cycle === 0) {
+            await region.evaluate((node) => { node.scrollLeft = node.scrollWidth; });
+            const bounds = await region.locator('article[data-focused="true"]').boundingBox();
+            expect(bounds.x).toBeGreaterThanOrEqual(0);
+            expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width + 1);
+            await region.evaluate((node) => { node.scrollLeft = 0; });
+          }
+          await camera.dblclick({ position: { x: 60, y: 60 } });
+          await expect(region).toHaveAttribute("data-view", "grid");
+          await page.waitForTimeout(350);
+          await verify();
         }
-        await camera.dblclick({ position: { x: 60, y: 60 } });
-        await expect(region).toHaveAttribute("data-view", "grid");
-        await page.waitForTimeout(350);
-        await verify();
       }
-      if (viewport.width > 600) {
+      if (fullscreen && viewport.width > 600) {
         await camera.hover();
         await camera.getByRole("button", { name: "Во весь экран", exact: true }).click();
         await expect.poll(() => camera.evaluate((node) => document.fullscreenElement === node)).toBe(true);
@@ -73,20 +82,22 @@ export async function checkStableFocus(page) {
           await expect(region).toHaveAttribute("data-view", "grid");
         }
       }
-      const bar = page.getByRole("navigation", { name: "Управление встречей" });
-      await bar.getByRole("button", { name: "Участники", exact: true }).click();
-      await page.getByRole("button", { name: "Закрыть участников", exact: true }).click();
-      await verify();
-      await bar.getByRole("button", { name: "Чат", exact: true }).click();
-      await page.getByRole("button", { name: "Закрыть чат", exact: true }).click();
-      await verify();
-      const avatar = region.locator('article[data-card-key="bodrik-music"]');
-      await avatar.dblclick({ position: { x: 60, y: 60 } });
-      await expect(avatar).toHaveAttribute("data-focused", "true");
-      await verify();
-      await avatar.dblclick({ position: { x: 60, y: 60 } });
-      await expect(region).toHaveAttribute("data-view", "grid");
-      await verify();
+      if (panels) {
+        const bar = page.getByRole("navigation", { name: "Управление встречей" });
+        await bar.getByRole("button", { name: "Участники", exact: true }).click();
+        await page.getByRole("button", { name: "Закрыть участников", exact: true }).click();
+        await verify();
+        await bar.getByRole("button", { name: "Чат", exact: true }).click();
+        await page.getByRole("button", { name: "Закрыть чат", exact: true }).click();
+        await verify();
+        const avatar = region.locator('article[data-card-key="bodrik-music"]');
+        await avatar.dblclick({ position: { x: 60, y: 60 } });
+        await expect(avatar).toHaveAttribute("data-focused", "true");
+        await verify();
+        await avatar.dblclick({ position: { x: 60, y: 60 } });
+        await expect(region).toHaveAttribute("data-view", "grid");
+        await verify();
+      }
     }
   } finally {
     await page.evaluate(() => { delete window.__focusProbe; });

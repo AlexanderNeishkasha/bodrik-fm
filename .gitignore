@@ -5,6 +5,5 @@ out/
 .env
 data/
 uploads/
-infra/dev/certs/
 public/meeting-assets/
 public/brand
